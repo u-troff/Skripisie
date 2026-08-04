@@ -1,0 +1,4 @@
+[environment]
+# Resolve imports against the project venv, not the miniconda base interpreter.
+python = "./venv"
+python-version = "3.9"
