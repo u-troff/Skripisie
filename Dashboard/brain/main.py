@@ -9,6 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 import stt
 from log_setup import setup_logging
 from pipeline import handle_voice_command
+import base64
+import json
+
+from starlette.concurrency import run_in_threadpool
+
+import dialogue_session
+from dialogue_session import Phase
+from pipeline import handle_confirmation_audio, handle_dialogue_audio
 
 setup_logging()
 
@@ -85,3 +93,78 @@ async def audio_stream(websocket: WebSocket):
                 buffer.extend(data)
     except WebSocketDisconnect:
         pass
+
+def _decode(value):
+    """Audio and frames arrive base64-encoded inside the JSON frame."""
+    if not value:
+        return None
+    if isinstance(value, (bytes, bytearray)):
+        return bytes(value)
+    return base64.b64decode(value)
+
+
+@app.websocket("/ws/dialogue")
+async def dialogue(websocket: WebSocket):
+    """Pre-departure phase: clarify → plan → verify → voice confirm.
+
+    Pi -> {"type": "start", "language": "af"}
+    Pi -> {"type": "audio_chunk", "audio": <b64>, "image": <b64|null>}
+       -> {"type": "confirmation_audio", "audio": <b64>}   (same as audio_chunk;
+                                                            the phase decides)
+    us -> {"type": "session"} | {"type": "speak"} | {"type": "plan_ready"}
+       -> {"type": "execute"} | {"type": "revise"} | {"type": "cancelled"}
+       -> {"type": "error"}
+
+    One frame per complete utterance, not a stream: faster-whisper pads every
+    clip to 30s, so chunking makes latency worse, not better.
+    """
+    await websocket.accept()
+    session = None
+    try:
+        while True:
+            frame = json.loads(await websocket.receive_text())
+            kind = frame.get("type")
+
+            if kind == "start" or session is None:
+                session = dialogue_session.store.create(
+                    session_id=frame.get("session_id"),
+                    language=frame.get("language", "af"),
+                )
+                await websocket.send_json(
+                    {"type": "session", "session_id": session.session_id,
+                     "phase": session.phase.value}
+                )
+                if kind == "start":
+                    continue
+
+            if kind not in ("audio_chunk", "confirmation_audio", "audio"):
+                await websocket.send_json({"type": "error", "message": f"unknown type {kind!r}"})
+                continue
+
+            audio = _decode(frame.get("audio"))
+            if not audio:
+                await websocket.send_json({"type": "error", "message": "empty audio"})
+                continue
+
+            if session.phase is Phase.AWAITING_CONFIRMATION:
+                events = await run_in_threadpool(handle_confirmation_audio, session, audio)
+            else:
+                events = await run_in_threadpool(
+                    handle_dialogue_audio, session, audio, _decode(frame.get("image"))
+                )
+
+            for event in events:
+                await websocket.send_json(event)
+
+    except WebSocketDisconnect:
+        pass
+    finally:
+        if session is not None and session.phase in (Phase.CANCELLED, Phase.EXECUTING):
+            dialogue_session.store.drop(session.session_id)
+
+
+@app.get("/dialogue/{session_id}")
+def dialogue_state(session_id: str):
+    """Read-only view for the dashboard while a conversation is in progress."""
+    session = dialogue_session.store.get(session_id)
+    return session.snapshot() if session else {"error": "unknown session"}

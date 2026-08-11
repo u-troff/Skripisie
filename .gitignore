@@ -4,3 +4,5 @@
 /Dashboard/brain/venv
 /Dashboard/brain/logs
 CLAUDE.md
+.env
+/node_modules

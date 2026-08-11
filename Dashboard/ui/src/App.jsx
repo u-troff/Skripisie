@@ -1,18 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-
-// faster-whisper decodes via FFmpeg, so any of these containers is fine.
-// Safari on macOS does not support webm and will fall through to mp4.
-const MIME_CANDIDATES = [
-  'audio/webm;codecs=opus',
-  'audio/webm',
-  'audio/mp4',
-  'audio/ogg;codecs=opus',
-]
-
-function pickMimeType() {
-  if (typeof MediaRecorder === 'undefined') return ''
-  return MIME_CANDIDATES.find((type) => MediaRecorder.isTypeSupported(type)) || ''
-}
+import { useCallback, useEffect, useState } from 'react'
+import DialoguePanel from './DialoguePanel'
+import useRecorder from './useRecorder'
 
 // qwen2.5vl turns image resolution into vision tokens, and a phone photo alone
 // can exceed the model's context window. Cap the long edge before upload.
@@ -49,22 +37,15 @@ function downscale(file) {
 
 export default function App() {
   const [health, setHealth] = useState('checking')
-  const [recording, setRecording] = useState(false)
-  const [elapsed, setElapsed] = useState(0)
   const [language, setLanguage] = useState('af')
-
-  const [clip, setClip] = useState(null) // { blob, url, seconds }
   const [image, setImage] = useState(null) // { file, url }
 
   const [busy, setBusy] = useState(null) // 'transcribe' | 'command' | null
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
 
-  const recorderRef = useRef(null)
-  const chunksRef = useRef([])
-  const streamRef = useRef(null)
-  const tickRef = useRef(null)
-  const secondsRef = useRef(0)
+  const recorder = useRecorder()
+  const { clip, recording, elapsed } = recorder
 
   useEffect(() => {
     fetch('/api/health')
@@ -73,65 +54,13 @@ export default function App() {
   }, [])
 
   // Revoke object URLs so repeated takes don't leak blobs.
-  useEffect(() => () => clip && URL.revokeObjectURL(clip.url), [clip])
   useEffect(() => () => image && URL.revokeObjectURL(image.url), [image])
 
-  const start = useCallback(async () => {
+  const startTake = useCallback(() => {
     setError(null)
     setResult(null)
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      streamRef.current = stream
-
-      const mimeType = pickMimeType()
-      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
-      chunksRef.current = []
-
-      recorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) chunksRef.current.push(event.data)
-      }
-      recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: recorder.mimeType })
-        stream.getTracks().forEach((track) => track.stop())
-        streamRef.current = null
-        if (blob.size > 0) {
-          setClip({ blob, url: URL.createObjectURL(blob), seconds: secondsRef.current })
-        }
-      }
-
-      // No timeslice: we want ONE complete container on stop, not per-chunk
-      // fragments (only the first chunk carries the header).
-      recorder.start()
-      recorderRef.current = recorder
-
-      setClip(null)
-      setRecording(true)
-      setElapsed(0)
-      secondsRef.current = 0
-      tickRef.current = setInterval(() => {
-        secondsRef.current += 0.1
-        setElapsed(secondsRef.current)
-      }, 100)
-    } catch (err) {
-      setError(`Microphone unavailable: ${err.message || err}`)
-    }
-  }, [])
-
-  const stop = useCallback(() => {
-    if (tickRef.current) clearInterval(tickRef.current)
-    tickRef.current = null
-    if (recorderRef.current && recorderRef.current.state !== 'inactive') {
-      recorderRef.current.stop()
-    }
-    setRecording(false)
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      if (tickRef.current) clearInterval(tickRef.current)
-      if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop())
-    }
-  }, [])
+    recorder.start()
+  }, [recorder])
 
   const send = useCallback(
     async (kind) => {
@@ -186,8 +115,8 @@ export default function App() {
       <section className="panel">
         <h2>1 · Reference image (optional)</h2>
         <p className="note">
-          Sent to <code>qwen2.5vl:3b</code> for the ambiguity check and plan verification. Used by
-          the pipeline only — plain transcription ignores it.
+          Sent to the VLM for the ambiguity check and plan verification. Used by the pipeline and
+          the dialogue only — plain transcription ignores it.
         </p>
         {image ? (
           <div className="imgrow">
@@ -225,7 +154,7 @@ export default function App() {
 
         <button
           className={recording ? 'rec active' : 'rec'}
-          onClick={recording ? stop : start}
+          onClick={recording ? recorder.stop : startTake}
           disabled={busy !== null}
         >
           {recording ? 'Stop' : clip ? 'Record again' : 'Record'}
@@ -239,6 +168,8 @@ export default function App() {
 
         {clip && !recording && <audio className="player" controls src={clip.url} />}
 
+        {recorder.error && <pre className="error">{recorder.error}</pre>}
+
         <p className="note">
           Whisper pads every clip to a fixed 30s window, so a 2s clip costs about as much as a 25s
           one. Speak a full sentence rather than a single word.
@@ -247,7 +178,7 @@ export default function App() {
 
       {/* 3 — run */}
       <section className="panel">
-        <h2>3 · Run</h2>
+        <h2>3 · Run (single-shot)</h2>
         <div className="actions">
           <button className="go" onClick={() => send('transcribe')} disabled={!clip || disabled}>
             {busy === 'transcribe' ? 'Transcribing…' : 'Transcribe only'}
@@ -259,7 +190,8 @@ export default function App() {
         <p className="note">
           <strong>Transcribe only</strong> hits Whisper and stops — use it to tell a bad transcript
           apart from a bad plan. <strong>Full pipeline</strong> adds the ambiguity check, planner,
-          and verification, so it loads all three models.
+          and verification, so it loads all three models. This is the old one-question flow, kept
+          as the baseline to compare the dialogue against.
         </p>
       </section>
 
@@ -335,6 +267,8 @@ export default function App() {
           </dl>
         </section>
       )}
+
+      <DialoguePanel language={language} image={image} />
     </main>
   )
 }

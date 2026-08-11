@@ -9,9 +9,18 @@ export default defineConfig({
     // never enters the picture.
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        // 127.0.0.1, not localhost: uvicorn binds IPv4 only, while Node
+        // resolves localhost to ::1 first on macOS.
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      // No rewrite here: the backend route really is /ws/dialogue.
+      '/ws': {
+        // 127.0.0.1, not localhost: uvicorn binds IPv4 only, while Node
+        // resolves localhost to ::1 first on macOS.
+        target: 'http://127.0.0.1:8000',
+        ws: true,
       },
     },
   },
