@@ -47,3 +47,39 @@ def generate_plan(command: str) -> dict:
     for step in steps:
         log.info("       %s. %s -> %s", step.get("id"), step.get("action"), step.get("target"))
     return plan
+
+def revise_plan(confirmed_plan: dict, remaining_steps: list, digest: list, command: str) -> dict:
+    """Propose a revision given what the rover can now see.
+
+    The planner only ever *proposes*; revision.classify decides in plain Python
+    whether the human has to be asked.
+    """
+    prompt = (
+        "You are re-checking a rover's plan while it is already moving.\n"
+        f'Original command: "{command}"\n'
+        f"Confirmed plan: {json.dumps(confirmed_plan)}\n"
+        f"Steps not yet done: {json.dumps(remaining_steps)}\n"
+        "What the rover has seen since departing, oldest first:\n"
+        + "\n".join(f"  - {line}" for line in digest)
+        + "\nOnly propose a change if what it sees makes the remaining steps wrong or "
+        "impossible. Prefer keeping the same targets. If nothing needs to change, say so.\n"
+        "Respond ONLY with JSON: "
+        '{"change": true/false, "reason": "...", '
+        '"steps": [{"id": 1, "action": "...", "target": "..."}]}'
+    )
+
+    try:
+        provider = get_provider("planner")
+        completion = provider.complete([user_message(prompt)], json_mode=True)
+    except ProviderError as exc:
+        log.error("[revise] failed: %s", exc)
+        return {"change": False, "reason": f"revision unavailable: {exc}", "steps": []}
+
+    log.info("[revise] <- %.1fs", completion.latency_s)
+    log_completion(log, "planner", "revise_plan", completion)
+
+    try:
+        return json.loads(completion.text)
+    except (json.JSONDecodeError, TypeError):
+        log.warning("[revise] unparseable JSON: %r", completion.text[:300])
+        return {"change": False, "reason": "unparseable revision output", "steps": []}

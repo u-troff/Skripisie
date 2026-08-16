@@ -1,6 +1,6 @@
 /.claude
 /.vscode
-/Dashboard/node_modules
+/Dashboard/ui/node_modules
 /Dashboard/brain/venv
 /Dashboard/brain/logs
 CLAUDE.md

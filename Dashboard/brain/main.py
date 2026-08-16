@@ -1,6 +1,10 @@
 import io
 import time
 from typing import Optional
+import asyncio
+import mission as mission_mod
+import mission_session
+from rover import get_rover
 
 import av
 from fastapi import FastAPI, File, Form, UploadFile, WebSocket, WebSocketDisconnect
@@ -161,6 +165,71 @@ async def dialogue(websocket: WebSocket):
     finally:
         if session is not None and session.phase in (Phase.CANCELLED, Phase.EXECUTING):
             dialogue_session.store.drop(session.session_id)
+
+@app.websocket("/ws/execution")
+async def execution(websocket: WebSocket):
+    """Mid-mission: frames in, revisions out.
+
+    Pi -> {"type": "begin", "session_id": ...}
+       -> {"type": "frame", "image": <b64>}
+       -> {"type": "revision_audio", "audio": <b64>}
+       -> {"type": "abort"}
+    """
+    await websocket.accept()
+    mission = None
+    task = None
+    rover = get_rover()
+    async def emit(event):
+        await websocket.send_json(event)
+
+    try:
+        while True:
+            frame = json.loads(await websocket.receive_text())
+            kind = frame.get("type")
+
+            if kind == "begin":
+                dialogue = dialogue_session.store.get(frame.get("session_id",""))
+                if dialogue is None or dialogue.phase is not Phase.EXECUTING:
+                    await emit({"type":"error","message":"no confirmed session to execute"})
+                    continue
+                mission = mission_session.store.create(dialogue)
+                task = asyncio.create_task(mission_mod.run_mission(mission,rover,emit))
+                continue
+
+            if mission is None:
+                await emit({"type":"error","message":"no mission found"})
+                continue
+
+            if kind == "frame":
+                image = _decode(frame.get("image"))
+                if image:
+                    await mission_mod.ingest_frame(mission,image,emit)
+
+            elif kind =="revision_audio":
+                audio = _decode(frame.get("audio"))
+                if audio:
+                    await mission_mod.handle_revision_confirmation(mission,audio,emit)
+            elif kind == "abort":
+                await mission_mod.abort(mission,rover,emit)
+
+            else:
+                await emit({"type":"error","message":f"unknown type {kind!r}"})
+
+    except WebSocketDisconnect:
+        pass
+    finally:
+        if task is not None and not task.done():
+            task.cancel()
+
+
+@app.get("/mission/{session_id}")
+def mission_state(session_id:str):
+    mission = mission_session.store.get(session_id)
+    return mission.snapshot() if mission else {"error":"unknow mission"}
+
+
+
+
 
 
 @app.get("/dialogue/{session_id}")

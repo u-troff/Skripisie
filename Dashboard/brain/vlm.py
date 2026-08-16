@@ -55,6 +55,15 @@ def verify_plan(plan: dict, image: Optional[ImageSource] = None) -> dict:
     )
     return _ask("verify_plan", prompt, image)
 
+def describe_frame(image:ImageSource)->str:
+    """One sentence about what the rover can see. This is the only per-frame
+    model call, so it stays short — the digest is what gets reasoned over."""
+    prompt = (
+        "Describe what a robot's camera is seeing, in one short sentence. "
+        "Name visible objects, their rough positions, and anything blocking a path.\n"
+        'Respond ONLY with JSON: {"description": "..."}'
+    )
+    return str(_ask("describe_frame", prompt, image).get("description") or "").strip()
 
 def _ask(stage: str, prompt: str, image: Optional[ImageSource]) -> dict:
     started = time.perf_counter()
