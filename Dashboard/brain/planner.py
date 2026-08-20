@@ -7,11 +7,43 @@ from providers import ProviderError, get_provider, log_completion, user_message
 log = get_logger("planner")
 
 
-def generate_plan(command: str) -> dict:
+# The rover drives and looks. Nothing else. A plan step it cannot perform is a
+# failed plan, not a partial success, so the vocabulary is stated up front
+# rather than filtered afterwards.
+ACTIONS = {
+    "move": "drive forward or backward",
+    "turn": "rotate on the spot",
+    "approach": "drive toward a visible target until close to it",
+    "scan": "sweep the camera around without moving the base",
+    "observe": "hold still and look at a named target",
+    "stop": "halt",
+    "report": "say what was found",
+}
+
+_VOCABULARY = (
+    "The rover can ONLY perform these actions:\n"
+    + "\n".join(f'  "{verb}" - {what}' for verb, what in ACTIONS.items())
+    + "\nIt has no arm. It cannot pick up, carry, open, push, or touch anything.\n"
+    'Every step\'s "action" must be exactly one of those verbs.'
+)
+
+
+def generate_plan(command: str, scene: str = "") -> dict:
+    scene_block = ""
+    if scene:
+        scene_block = (
+            "The room was filmed beforehand. Everything known to be in it:\n"
+            + scene
+            + "\nOnly reference things from that list. If the command needs something "
+            "that is not there, say so in notes instead of inventing it.\n"
+        )
+
     prompt = (
         "You are a mission planner for an indoor rover. Break the command into "
         "a sequence of discrete, executable steps.\n"
-        f'Command: "{command}"\n'
+        + _VOCABULARY + "\n"
+        + scene_block
+        + f'Command: "{command}"\n'
         "Respond ONLY with JSON: "
         '{"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}'
     )

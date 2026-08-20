@@ -86,7 +86,12 @@ export default function DialoguePanel() {
       onEvent,
       onStatus: (status) => storeApi().setDialogueStatus(status),
       onError: (message) => storeApi().setDialogueError(message),
-      onOpen: (socket) => socket.send({ type: 'start', language: storeApi().language }),
+      onOpen: (socket) =>
+        socket.send({
+          type: 'start',
+          language: storeApi().language,
+          scene_id: storeApi().scene?.scene_id ?? null,
+        }),
     })
   }, [onEvent, recorder])
 

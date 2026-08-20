@@ -19,6 +19,7 @@ import json
 from starlette.concurrency import run_in_threadpool
 
 import dialogue_session
+import scene as scene_mod
 from dialogue_session import Phase
 from pipeline import handle_confirmation_audio, handle_dialogue_audio
 
@@ -107,6 +108,25 @@ def _decode(value):
     return base64.b64decode(value)
 
 
+@app.post("/scene")
+async def upload_scene(video: UploadFile = File(...)):
+    """Room video in, scene digest out.
+
+    Slow on purpose: keyframe extraction is cheap, but every surviving frame
+    costs one VLM call. Locally that is roughly 15s a frame, so a five-frame
+    clip is well over a minute. It is paid once per room, not per turn.
+    """
+    raw = await video.read()
+    built = await run_in_threadpool(scene_mod.build_scene, raw)
+    return built.to_dict()
+
+
+@app.get("/scene/{scene_id}")
+def get_scene(scene_id: str):
+    found = scene_mod.store.get(scene_id)
+    return found.to_dict() if found else {"error": "unknown scene"}
+
+
 @app.websocket("/ws/dialogue")
 async def dialogue(websocket: WebSocket):
     """Pre-departure phase: clarify → plan → verify → voice confirm.
@@ -134,9 +154,21 @@ async def dialogue(websocket: WebSocket):
                     session_id=frame.get("session_id"),
                     language=frame.get("language", "af"),
                 )
+                requested = frame.get("scene_id")
+                if requested:
+                    found = scene_mod.store.get(requested)
+                    if found is None:
+                        await websocket.send_json(
+                            {"type": "error", "message": f"unknown scene {requested!r}"}
+                        )
+                    else:
+                        session.scene_id = found.scene_id
+                        session.scene_text = found.digest()
+                        # The VLM still gets something to look at, not just read.
+                        session.image = found.representative()
                 await websocket.send_json(
                     {"type": "session", "session_id": session.session_id,
-                     "phase": session.phase.value}
+                     "phase": session.phase.value, "scene_id": session.scene_id}
                 )
                 if kind == "start":
                     continue

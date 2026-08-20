@@ -9,6 +9,7 @@ import type {
   Plan,
   PlanReady,
   RevisionInfo,
+  SceneResponse,
   SocketStatus,
   StepResult,
 } from './types'
@@ -24,6 +25,12 @@ interface SessionSlice {
   image: { file: File; url: string } | null
   speakAloud: boolean
   missionId: string | null
+  scene: SceneResponse | null
+  sceneUploading: boolean
+  sceneError: string | null
+  setScene: (scene: SceneResponse | null) => void
+  setSceneUploading: (on: boolean) => void
+  setSceneError: (message: string | null) => void
   setHealth: (health: 'checking' | 'up' | 'down') => void
   setLanguage: (language: Language) => void
   setImage: (image: { file: File; url: string } | null) => void
@@ -113,6 +120,12 @@ const createSessionSlice: StateCreator<Store, [], [], SessionSlice> = (set) => (
   image: null,
   speakAloud: true,
   missionId: null,
+  scene: null,
+  sceneUploading: false,
+  sceneError: null,
+  setScene: (scene) => set({ scene }),
+  setSceneUploading: (sceneUploading) => set({ sceneUploading }),
+  setSceneError: (sceneError) => set({ sceneError }),
   setHealth: (health) => set({ health }),
   setLanguage: (language) => set({ language }),
   setImage: (image) => set({ image }),

@@ -13,6 +13,7 @@ from dialogue_session import (
 from log_setup import get_logger
 from planner import generate_plan
 from stt import transcribe_audio
+import vlm
 from vlm import ImageSource, check_ambiguity, verify_plan
 
 log = get_logger("pipeline")
@@ -106,7 +107,27 @@ def handle_dialogue_audio(
 
 def _advance_to_confirmation(session: DialogueSession) -> List[dict]:
     session.phase = Phase.CLARIFYING
-    ambiguity = check_ambiguity(session.command, session.image, history=session.history())
+
+    # Retry once, then surface. A failed call must never read as "the command
+    # was clear" — that is how a flaky model silently skips clarification and
+    # still gets logged as a success.
+    ambiguity = check_ambiguity(
+        session.command, session.image, history=session.history(), scene=session.scene_text
+    )
+    if vlm.failed(ambiguity):
+        log.warning("[dlg %s] ambiguity check failed, retrying once: %s",
+                    session.session_id, ambiguity.get(vlm.ERROR_KEY))
+        ambiguity = check_ambiguity(
+            session.command, session.image, history=session.history(), scene=session.scene_text
+        )
+    if vlm.failed(ambiguity):
+        log.error("[dlg %s] ambiguity check unavailable: %s",
+                  session.session_id, ambiguity.get(vlm.ERROR_KEY))
+        return [
+            {"type": "error", "session_id": session.session_id,
+             "message": "ambiguity check failed: " + str(ambiguity.get(vlm.ERROR_KEY))},
+            _speak(session, "I could not understand that reliably. Please say it again."),
+        ]
 
     if ambiguity.get("ambiguous"):
         question = ambiguity.get("clarifying_question")
@@ -130,16 +151,25 @@ def _advance_to_confirmation(session: DialogueSession) -> List[dict]:
             session.resolved_command = str(resolved)
 
     session.phase = Phase.PLANNING
-    session.plan = generate_plan(session.effective_command())
+    session.plan = generate_plan(session.effective_command(), scene=session.scene_text)
 
     session.phase = Phase.VERIFYING
-    verification = verify_plan(session.plan, session.image)
-    # Default True: a verifier that fails to answer must not block the plan.
-    if not verification.get("verified", True):
+    verification = verify_plan(session.plan, session.image, scene=session.scene_text)
+    if vlm.failed(verification):
+        # Not fatal — the plan still gets read back — but it must not be
+        # reported as verified when nothing verified it.
+        log.warning("[dlg %s] verifier unavailable: %s",
+                    session.session_id, verification.get(vlm.ERROR_KEY))
+        verification = {"verified": None, "concerns": "the plan could not be verified"}
+    # Only an explicit rejection replans. "verified" of None means the verifier
+    # never answered, and replanning against a concern it did not raise would
+    # corrupt a plan that was probably fine.
+    if verification.get("verified") is False:
         log.info("[dlg %s] verifier rejected, replanning. concerns=%s",
                  session.session_id, verification.get("concerns"))
         session.plan = generate_plan(
-            "%s\n\nNote: %s" % (session.effective_command(), verification.get("concerns"))
+            "%s\n\nNote: %s" % (session.effective_command(), verification.get("concerns")),
+            scene=session.scene_text,
         )
     session.verified = verification.get("verified")
     session.concerns = verification.get("concerns")

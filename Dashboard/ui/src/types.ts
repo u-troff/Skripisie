@@ -112,3 +112,27 @@ export interface CommandResult {
   elapsed: number
   had_image: boolean
 }
+
+export interface SceneObject {
+  name: string
+  attributes?: string[]
+  where?: string
+}
+
+export interface SceneFrameInfo {
+  index: number
+  place: string
+  objects: SceneObject[]
+  obstacles: string[]
+  error: string | null
+  /** base64 JPEG, no data: prefix */
+  thumbnail: string
+}
+
+export interface SceneResponse {
+  scene_id: string
+  frame_count: number
+  elapsed: number
+  digest: string
+  frames: SceneFrameInfo[]
+}

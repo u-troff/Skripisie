@@ -38,6 +38,8 @@ class DialogueSession:
     phase: Phase = Phase.CLARIFYING
     command: str = ""
     resolved_command: str = ""
+    scene_id: Optional[str] = None
+    scene_text: str = ""
     turns: List[Turn] = field(default_factory=list)
     plan: Optional[dict] = None
     verified: Optional[bool] = None
@@ -77,6 +79,8 @@ class DialogueSession:
             "phase": self.phase.value,
             "command": self.command,
             "resolved_command": self.resolved_command,
+            "scene_id": self.scene_id,
+            "scene_frames": self.scene_text.count("\n") + 1 if self.scene_text else 0,
             "turns": [{"question": t.question, "answer": t.answer} for t in self.turns],
             "turn_count": len(self.turns),
             "capped": self.capped,

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import DialoguePanel from './components/DialoguePanel'
 import ExecutionPanel from './components/ExecutionPanel'
 import OneShotPanel from './components/OneShotPanel'
-import { fetchHealth } from './net'
+import { fetchHealth, postScene } from './net'
 import { useStore } from './store'
 import type { Language } from './types'
 
@@ -47,10 +47,32 @@ export default function App() {
   const setLanguage = useStore((state) => state.setLanguage)
   const image = useStore((state) => state.image)
   const setImage = useStore((state) => state.setImage)
+  const scene = useStore((state) => state.scene)
+  const setScene = useStore((state) => state.setScene)
+  const sceneUploading = useStore((state) => state.sceneUploading)
+  const setSceneUploading = useStore((state) => state.setSceneUploading)
+  const sceneError = useStore((state) => state.sceneError)
+  const setSceneError = useStore((state) => state.setSceneError)
 
   useEffect(() => {
     void fetchHealth().then((ok) => setHealth(ok ? 'up' : 'down'))
   }, [setHealth])
+
+  const onPickVideo = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    setSceneError(null)
+    setScene(null)
+    setSceneUploading(true)
+    try {
+      setScene(await postScene(file))
+    } catch (err) {
+      setSceneError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setSceneUploading(false)
+    }
+  }
 
   const onPickImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -68,10 +90,55 @@ export default function App() {
       </header>
 
       <section className="panel">
-        <h2>1 · Reference image (optional)</h2>
+        <h2>1 · The room</h2>
         <p className="note" style={{ marginTop: 0 }}>
-          Sent to the VLM for the ambiguity check and plan verification. Used by the pipeline and
-          the dialogue only — plain transcription ignores it.
+          Upload a clip of the room first. Keyframes are extracted and catalogued once, and that
+          catalogue is what the clarifying questions and the planner reason over — without it the
+          model has no way to know whether "the thing by the window" is ambiguous.
+        </p>
+
+        <label className={`drop ${sceneUploading ? 'off' : ''}`}>
+          <input type="file" accept="video/*" onChange={(e) => void onPickVideo(e)}
+                 disabled={sceneUploading} />
+          {sceneUploading ? 'Reading the room… (one model call per keyframe)' : 'Choose a room video…'}
+        </label>
+
+        {sceneError && <pre className="error">{sceneError}</pre>}
+
+        {scene && (
+          <>
+            <div className="turnbar">
+              <span>
+                {scene.frame_count} keyframe(s) in {scene.elapsed.toFixed(1)}s
+              </span>
+              <code className="sid">{scene.scene_id}</code>
+            </div>
+            <div className="strip">
+              {scene.frames.map((frame) => (
+                <figure key={frame.index} className={frame.error ? 'kf bad' : 'kf'}>
+                  <img src={`data:image/jpeg;base64,${frame.thumbnail}`} alt={frame.place} />
+                  <figcaption>
+                    <strong>{frame.place || `view ${frame.index + 1}`}</strong>
+                    {frame.error ? (
+                      <span className="warn">{frame.error}</span>
+                    ) : (
+                      <span>
+                        {frame.objects.map((o) => o.name).join(', ') || 'nothing identified'}
+                      </span>
+                    )}
+                    {frame.obstacles.length > 0 && (
+                      <span className="warn">blocked: {frame.obstacles.join(', ')}</span>
+                    )}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </>
+        )}
+
+        <h3>Reference still (optional)</h3>
+        <p className="note" style={{ marginTop: 0 }}>
+          Only needed if you skip the video. The single-shot pipeline in step 3 uses this.
         </p>
 
         <div className="row">

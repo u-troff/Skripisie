@@ -1,4 +1,4 @@
-import type { DialogueSnapshot, SocketStatus } from './types'
+import type { DialogueSnapshot, SceneResponse, SocketStatus } from './types'
 
 export function socketUrl(path: string): string {
   const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
@@ -73,4 +73,13 @@ export async function fetchDialogueSnapshot(id: string): Promise<DialogueSnapsho
     // The socket is the source of truth; a failed poll is cosmetic.
     return null
   }
+}
+
+/** Room video upload. Slow — one VLM call per surviving keyframe. */
+export async function postScene(file: File): Promise<SceneResponse> {
+  const form = new FormData()
+  form.append('video', file, file.name)
+  const response = await fetch('/api/scene', { method: 'POST', body: form })
+  if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
+  return (await response.json()) as SceneResponse
 }
