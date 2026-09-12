@@ -1,0 +1,22 @@
+\chapter*{Nomenclature\markboth{}{Nomenclature}}
+\addcontentsline{toc}{chapter}{Nomenclature}
+
+\renewcommand{\nomname}{Variables and Functions}
+\renewcommand{\altnomname}{Variables and functions}
+\markboth{}{\scshape \nomname}
+\setlength{\nomlabelwidth}{3cm}
+\printnomenclature
+\input{frontmatter/variables_and_functions}
+
+\newpage
+\section*{Acronyms and Abbreviations}
+\addcontentsline{toc}{section}{Acronyms and abbreviations}
+
+\printacronyms[display=used]
+
+\glsaddall
+\newpage
+\renewcommand\glossaryname{Definitions}
+\printnoidxglossaries
+
+\newpage

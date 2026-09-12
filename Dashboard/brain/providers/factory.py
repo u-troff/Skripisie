@@ -1,6 +1,7 @@
 from typing import Dict, Tuple
 
 import config
+from typing import Optional
 from log_setup import get_logger
 
 from .base import InferenceProvider, ProviderError
@@ -35,9 +36,9 @@ def _resolve(role: str) -> Tuple[str, str]:
     )
     return provider, model
 
-def _optional_cost(name: str):
-    """Prices change and are not worth hardcoding — leave unset to skip cost
-    logging entirely."""
+def _optional_float(name: str) -> Optional[float]:
+    """Blank means "do not send this field at all" — prices change and are not
+    worth hardcoding, and temperature is model-dependent."""
     value = config.get(name)
     try:
         return float(value) if value else None
@@ -82,8 +83,8 @@ def get_provider(role: str) -> InferenceProvider:
             name=provider_name,
             supports_vision=provider_name in VISION_CAPABLE,
             timeout=config.get_float("CLOUD_TIMEOUT_S", 60.0),
-            cost_per_1m_input=_optional_cost(prefix+"_COST_PER_1M_INPUT"),
-            cost_per_1m_output=_optional_cost(prefix+"_COST_PER_1M_OUTPUT"),
+            cost_per_1m_input=_optional_float(prefix+"_COST_PER_1M_INPUT"),
+            cost_per_1m_output=_optional_float(prefix+"_COST_PER_1M_OUTPUT"),
         )
     else:
         raise ProviderError(f"unknown provider {provider_name!r} for role {role}")
