@@ -6,3 +6,7 @@
 CLAUDE.md
 .env
 /node_modules
+/Dashboard/brain/__pycache__
+/Dashboard/brain/providers/__pycache__
+/Dashboard/brain/__pycache__
+/Dashboard/brain/providers/__pycache__
