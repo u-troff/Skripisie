@@ -37,6 +37,7 @@ class OpenAICompatibleProvider(InferenceProvider):
         supports_vision: bool = True,
         timeout: float = 60.0,
         max_retries: int = 2,
+        temperature:Optional[float] = None,
         cost_per_1m_input: Optional[float] = None,
         cost_per_1m_output: Optional[float] = None,
     ):
@@ -47,6 +48,7 @@ class OpenAICompatibleProvider(InferenceProvider):
         self.supports_vision = supports_vision
         self.base_url = base_url.rstrip("/")
         self.max_retries = max_retries
+        self.temperature = temperature
         self._cost_in = cost_per_1m_input
         self._cost_out = cost_per_1m_output
         self._client = httpx.Client(
@@ -79,8 +81,9 @@ class OpenAICompatibleProvider(InferenceProvider):
         body: Dict[str, Any] = {
             "model": self.model,
             "messages": payload_messages,
-            "temperature": 0,
         }
+        if self.temperature is not None:
+            body["temperature"] = self.temperature
         if json_mode:
             # Every prompt in this codebase contains the word JSON, which
             # OpenAI requires when json_object is requested.

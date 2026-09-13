@@ -1,0 +1,142 @@
+%!TEX root = ../thesis.tex
+\mychapter{Introduction}{Introduction}{}
+\label{chap:introduction}
+
+
+\mysection{Background}{Background}
+\label{sec:background}
+
+Having a robot that takes spoken instructions and removing the two things that make most mobile robots hard to operate day to day: a screen to navigate, and an operator trained on its command set. 
+For a small indoor rover this matters even more, since the tasks it can reasonably be asked to do
+(check whether a door is open, look at what's on a shelf, go and see who's in the next room) are
+exactly the kind of thing a person would rather say out loud than type into an app.
+
+Until recently, building this meant hand-coding a fixed vocabulary of recognized phrases, each
+mapped to a specific behavior. Large language models change that. Given a natural-language
+command and a description of what the robot can do, an LLM can decompose an instruction into a
+sequence of primitive actions without the vocabulary being enumerated in advance. Hori et al.\
+demonstrate this for long-horizon tasks specifically, using a dialogue-based process where the
+model asks questions to fill in what a one-shot instruction leaves out before committing to a
+plan \cite{hori2025longhorizon}.
+
+Two problems follow directly from handing planning to a language model instead of a fixed rule
+set. First, spoken commands are often genuinely ambiguous. ``Look at the plant'' is only
+well-defined if there is one plant in the room, and a system that always acts on its first guess
+will act on the wrong guess often enough to matter. Ren et al.\ frame this formally: an
+LLM-based planner should recognise when it does not have enough information and ask for help
+rather than proceeding, and they give a taxonomy of the kinds of ambiguity (attribute, numeric,
+spatial) a household or office command tends to carry \cite{ren2023knowno}. Second, language
+models hallucinate. They produce fluent, confident output that does not correspond to anything
+real, and Liang et al.\ show this gets worse, not better, as a task is broken into more steps,
+which is a direct problem for a robot expected to carry out multi-step instructions rather than
+single commands \cite{liang2024introspective}.
+
+Both of these are usually studied against cloud-hosted, large-parameter models running on
+hardware that also has more sensing than a low-cost mobile robot typically carries. The rover
+used in this project for demonstration is the, a Hiwonder TurboPi. It does not fit that picture of large memory and compute power: a Raspberry Pi 5, a
+mecanum chassis, a camera on a 2-DOF pan/tilt gimbal, and no wheel encoders, IMU, or LiDAR. There
+is no odometry and no heading, and the mecanum wheels slip enough that an open-loop ``drive
+forward two metres'' cannot be trusted. Nothing on the Pi itself can run a language or vision
+model at a usable speed, and a stable internet connection cannot be assumed for a robot meant to
+operate on ordinary household or office connectivity. The pipeline built has to hold up
+under both constraints at once: ambiguity and hallucination have to be managed using models small
+enough to run locally on commodity hardware and not the large cloud-hosted models most of the
+literature above assumed.
+
+The same idea, that a language model can reason about likely failure, also applies once a plan is
+already executing, not only while it is being made. Sinha et al.\ and Elhafsi et al.\ both use an
+LLM as a runtime monitor, watching a robot's observations for signs that something has gone wrong
+and triggering a safety response, for a quadrotor and for autonomous-driving and manipulation
+policies respectively \cite{sinha2024aesop, elhafsi2023semantic}. This project reuses that same
+principle for a rover reading its camera feed mid-mission, to decide whether a plan needs
+revising rather than only checking it once before departure.
+
+\mysection{Problem statement}{Problem Statement}
+\label{sec:problem-statement}
+
+It is not established whether a fully local language-and-vision pipeline, with no dependency on
+a cloud API and small enough to run on a single consumer-grade machine, can reliably turn an
+ambiguous spoken command into a plan that a low-cost, sensor-poor indoor rover can actually carry
+out, or how much command complexity such a pipeline can absorb before it fails.
+
+The literature reviewed in Chapter~\ref{chap:literature} addresses parts of this without closing
+the gap. Ren et al.\ and Liang et al.\ both address ambiguity and hallucination in LLM-based
+planning, but with large, cloud-hosted models and, in Ren et al.'s case, largely in simulated
+tabletop manipulation rather than on a physically constrained mobile platform
+\cite{ren2023knowno, liang2024introspective}. Hori et al.\ target long-horizon plans specifically
+but do not measure how many chained instructions a small, locally hosted model can carry before
+its output becomes unreliable \cite{hori2025longhorizon}. Sinha et al.\ and Elhafsi et al.\
+monitor for failure once a task is already underway, but neither closes the loop back into a
+voice-driven clarification-and-confirmation step that gates a physical robot before it moves at
+all \cite{sinha2024aesop, elhafsi2023semantic}.
+
+This project addresses that gap directly, through two research questions. The first is whether
+locally hosted models, running entirely on a laptop-class machine paired with a rover that has no
+odometry or IMU, can generate plans that are both correct enough given a vague command and
+executable given the rover's actual capabilities. The second is how many commands can be chained
+together before the pipeline starts hallucinating: at what point does compositional depth outrun
+what a small, local model can reliably plan for.
+
+
+\mysection{Research questions}{Research Questions}
+\label{sec:research-questions}
+
+This project is assessed against two research questions, both concerned with what a fully
+local speech-and-vision pipeline can and cannot do on hardware with no odometry or heading.
+
+\begin{enumerate}
+    \item[\textbf{RQ1}] Can locally hosted models generate plans that a rover can actually
+        execute and follow, even when the spoken command that produced them is vague?
+        Answering this requires the plan to be correct enough despite an under specified
+        command, and executable given what the rover can physically do.
+    \item[\textbf{RQ2}] How many commands can be chained together before the pipeline starts
+        to hallucinate? This asks how far compositional depth can be pushed before the
+        model's output stops corresponding to anything the room, the command, or the
+        rover's capabilities actually support.
+\end{enumerate}
+
+\mysection{Objectives}{Objectives}
+\label{sec:objectives}
+
+The main objective of this project is to build and evaluate a fully local pipeline that turns
+a spoken, potentially ambiguous command into a plan an indoor rover can carry out, using models
+small enough to run on a single consumer-grade machine rather than a cloud API. To answer RQ1,
+this requires a multi-turn clarification loop that resolves ambiguity through spoken dialogue
+before a plan is generated, a planner constrained to a capability vocabulary the rover can
+actually perform, and a voice-only confirmation step that gates execution. To answer RQ2, the
+pipeline must log enough about each run, the number of chained instructions, the number of
+clarification turns used, and whether the resulting plan referenced anything never seen or
+said, to measure how compositional depth relates to hallucination.
+
+A secondary objective is to demonstrate plan executability. Comparing the local pipeline against equivalent cloud-hosted models is a further, secondary objective, included as a benchmark rather than as evidence for either research
+question.
+
+\mysection{Scope and limitations}{Scope and Limitations}
+\label{sec:scope-and-limitations}
+
+This project covers the local speech-to-execution pipeline: transcription, ambiguity
+resolution through spoken dialogue, plan generation and verification, and a voice-gated
+confirmation step. Navigation is treated as instrumentation rather than a research problem in
+its own right.
+
+The room the rover operates in is scanned once beforehand by a walkthrough video, producing a
+digest the planner can ground its plans in. Extending that scan into a general-purpose mapping
+system is not attempted. Cloud-hosted models appear only as a benchmarking comparison and are
+not part of the system under test.
+
+The main limitation follows from timing. The rover itself has no wheel encoders, IMU, or LiDAR, so open-loop movement commands cannot be relied on for precision, a hardware limitation this project works around rather than solves. Evaluation
+is limited to a small number of test rooms and command sets, so the results characterise the
+pipeline's behaviour on the cases tested rather than guaranteeing performance on arbitrary
+rooms or commands.
+
+\mysection{Report outline}{Report Outline}
+\label{sec:report-outline}
+
+Chapter~\ref{chap:literature} reviews existing work on LLM-based task planning, ambiguity
+resolution, and hallucination in robotic systems, and identifies where this project's local,
+resource-constrained setting differs from it. Chapter~3 describes the system design: the
+speech-to-plan pipeline and its clarification loop. Chapter~4 covers the rover platform and
+the interface between the planning software and the hardware it controls. Chapter~5 describes
+the test methodology, including the simulated executor used in place of physical hardware.
+Chapters~6 and 7 present and discuss the results for RQ1 and RQ2, and Chapter~8 concludes with
+a summary and recommendations for future work.
