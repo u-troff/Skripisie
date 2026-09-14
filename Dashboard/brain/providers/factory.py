@@ -24,6 +24,12 @@ _DEFAULT_MODEL = {
     ("vlm", "openai"): "gpt-4o-mini",
 }
 _DEFAULT_NUM_CTX = {"planner": 8192, "vlm": 8192}
+_DEFAULT_REPEAT_PENALTY = 1.3
+# Only the VLM's per-frame cataloguing prompt has shown degenerate looping
+# (a near-zero-temperature model repeating the same object block instead of
+# ever finishing); the planner is left uncapped since plan length legitimately
+# varies with the task.
+_DEFAULT_NUM_PREDICT = {"vlm": 768}
 
 _cache: Dict[Tuple[str, str, str], InferenceProvider] = {}
 
@@ -44,6 +50,16 @@ def _optional_float(name: str) -> Optional[float]:
         return float(value) if value else None
     except ValueError:
         return None
+
+
+def _optional_int(name: str, default: Optional[int] = None) -> Optional[int]:
+    value = config.get(name)
+    if not value:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        return default
 
 
 
@@ -68,6 +84,8 @@ def get_provider(role: str) -> InferenceProvider:
             model=model,
             num_ctx=config.get_int(role.upper() + "_NUM_CTX", _DEFAULT_NUM_CTX[role]),
             host=config.get("OLLAMA_HOST"),
+            repeat_penalty=config.get_float("OLLAMA_REPEAT_PENALTY", _DEFAULT_REPEAT_PENALTY),
+            num_predict=_optional_int(role.upper() + "_NUM_PREDICT", _DEFAULT_NUM_PREDICT.get(role)),
         )
     elif provider_name in ("openai", "deepseek"):
         prefix = provider_name.upper()

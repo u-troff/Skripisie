@@ -70,8 +70,26 @@ def analyse(raw: bytes) -> Optional[FrameStats]:
 
 
 def distance(a: FrameStats, b: FrameStats) -> float:
-    """0.0 identical, 1.0 maximally different."""
-    return float(np.abs(a.thumb - b.thumb).mean() / 255.0)
+    """0.0 identical structure, 1.0 maximally different.
+
+    Pearson correlation between the two thumbnails, so a frame that is just
+    brighter/darker than the last one (exposure drift, a light flickering)
+    still reads as "the same place", while a frame whose spatial pattern has
+    actually decorrelated -- the rover turned to face a different wall --
+    reads as changed. Plain mean-abs-diff conflated the two: a uniform
+    brightness shift could cross the threshold as easily as a real scene
+    change.
+    """
+    x = a.thumb.ravel() - a.thumb.mean()
+    y = b.thumb.ravel() - b.thumb.mean()
+    denom = float(np.sqrt((x * x).sum() * (y * y).sum()))
+    if denom < 1e-6:
+        # A flat/blank thumbnail (e.g. a blown-out wall) has no structure to
+        # correlate against -- fall back to plain intensity difference so two
+        # different flat frames still count as changed.
+        return float(np.abs(a.thumb - b.thumb).mean() / 255.0)
+    correlation = float((x * y).sum() / denom)
+    return min(1.0, max(0.0, 1.0 - correlation))
 
 
 def _encode_jpeg(frame, max_edge: int) -> bytes:
