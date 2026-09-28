@@ -24,6 +24,7 @@ import tts
 from log_setup import get_logger
 from mission_session import TERMINAL, MissionPhase, MissionSession, RevisionRecord
 from planner import revise_plan
+from providers import usage
 from rover import RoverController
 from stt import transcribe_audio
 from vlm import check_arrival, check_progress, check_side_look, describe_frame
@@ -469,6 +470,43 @@ async def _maybe_arrival_check(mission: MissionSession, rover, step: dict,
     await _arrival_check(mission, rover, str(step.get("target") or ""), emit)
 
 
+def _grounding(mission: MissionSession, rover: RoverController) -> List[dict]:
+    """Every confirmed-plan step with a target, resolved through the room's
+    matcher — independent of whether the mission actually reached that step,
+    so a plan naming a target the room doesn't have shows up even if the
+    mission halted before getting there. Only meaningful for a rover with a
+    room.resolve (VirtualRover); [] otherwise."""
+    room = getattr(rover, "room", None)
+    if room is None or not hasattr(room, "resolve"):
+        return []
+    grounding = []
+    for step in mission.confirmed_plan.get("steps") or []:
+        target = step.get("target")
+        if not target:
+            continue
+        landmark, how = room.resolve(target)
+        grounding.append({
+            "step_id": step.get("id"),
+            "action": step.get("action"),
+            "target": target,
+            "resolved": landmark is not None,
+            "matched": landmark.name if landmark is not None else None,
+            "how": how,
+        })
+    return grounding
+
+
+def _collect_terminal_fields(mission: MissionSession, rover: RoverController) -> None:
+    """rover_summary, grounding and usage all need to be in place before
+    report.build_report runs — including on the abort path, where the report
+    is built inside the except block, before `finally` would otherwise set
+    them. Called from both places; cheap and idempotent either way."""
+    if hasattr(rover, "summary"):
+        mission.rover_summary = rover.summary()
+    mission.grounding = _grounding(mission, rover)
+    mission.usage = usage.snapshot()
+
+
 def _write_run_log(mission: MissionSession, report: dict) -> Optional[str]:
     try:
         LOGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -548,6 +586,10 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
             await emit({"type": "step_done", "session_id": mission.session_id,
                         "index": mission.cursor, "step": step, "result": result})
 
+            if hasattr(rover, "state_snapshot"):
+                await emit({"type": "rover_state", "session_id": mission.session_id,
+                            "state": rover.state_snapshot()})
+
             if result.get("status") == "ok":
                 await _maybe_arrival_check(mission, rover, step, result, emit)
 
@@ -569,6 +611,7 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
         # already asked the rover to stop, and the report must not be the thing
         # that delays it. The deterministic half of the report is still worth
         # keeping, so it is written straight to disk and nothing is spoken.
+        _collect_terminal_fields(mission, rover)
         _write_run_log(mission, report_mod.build_report(mission, spoken=False))
         raise
     finally:
@@ -577,6 +620,7 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
         # Always, on every non-aborted outcome: completed, blocked or halted.
         # A run that ends badly is exactly the run whose report matters most.
         if mission.phase is not MissionPhase.ABORTED:
+            _collect_terminal_fields(mission, rover)
             await _finish_report(mission, emit)
         await emit({"type": "mission_ended", "session_id": mission.session_id,
                     "phase": mission.phase.value, "snapshot": mission.snapshot()})

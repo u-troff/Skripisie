@@ -1,3 +1,4 @@
+from . import usage
 from .base import (
     Completion,
     ImageSource,
@@ -21,5 +22,6 @@ __all__ = [
     "get_provider",
     "log_completion",
     "reset_cache",
+    "usage",
     "user_message",
 ]

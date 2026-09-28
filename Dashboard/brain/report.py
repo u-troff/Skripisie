@@ -19,7 +19,10 @@ Only `spoken_summary` involves a model, and it is a single planner call
 constrained to the JSON above with an offline template fallback. If it fails,
 the report is still complete; the rover just reads out the template.
 
-See Progress/spec-grounded-line-mission.md §F.
+See Progress/spec-grounded-line-mission.md §F and
+Progress/spec-planner-profiles-and-virtual-sweep.md §3D (rover_summary,
+grounding, dialogue, usage_summary, grounding_summary and the RQ2-flavoured
+uncertainty codes below).
 """
 
 import json
@@ -27,6 +30,7 @@ import time
 from typing import Any, Dict, List, Optional
 
 import config
+import planner
 from log_setup import get_logger
 from providers import ProviderError, get_provider, log_completion, user_message
 
@@ -62,6 +66,45 @@ def _visible(check: Optional[dict]) -> Optional[bool]:
     return bool(inner.get("target_visible"))
 
 
+def _usage_summary(usage_records: List[dict]) -> Dict[str, dict]:
+    """Per role: calls, total/mean latency, tokens and USD cost if present.
+    Built straight from providers.usage.snapshot() — no model touches this."""
+    by_role: Dict[str, List[dict]] = {}
+    for record in usage_records:
+        by_role.setdefault(str(record.get("role") or "unknown"), []).append(record)
+
+    def _sum(records: List[dict], key: str) -> Optional[float]:
+        values = [r[key] for r in records if isinstance(r.get(key), (int, float))]
+        return sum(values) if values else None
+
+    summary: Dict[str, dict] = {}
+    for role, records in by_role.items():
+        latencies = [r["latency_s"] for r in records if isinstance(r.get("latency_s"), (int, float))]
+        prompt_total = _sum(records, "prompt_tokens")
+        completion_total = _sum(records, "completion_tokens")
+        cost_total = _sum(records, "cost_usd")
+        summary[role] = {
+            "calls": len(records),
+            "latency_total_s": round(sum(latencies), 3) if latencies else None,
+            "latency_mean_s": round(sum(latencies) / len(latencies), 3) if latencies else None,
+            "prompt_tokens_total": int(prompt_total) if prompt_total is not None else None,
+            "completion_tokens_total": int(completion_total) if completion_total is not None else None,
+            "cost_usd_total": round(cost_total, 6) if cost_total is not None else None,
+        }
+    return summary
+
+
+def _grounding_summary(grounding: List[dict], plan: dict, active_actions: dict) -> dict:
+    """targets, unresolved and out_of_vocab_actions — the RQ2 roll-up over
+    mission.grounding and the confirmed plan's actions."""
+    targets = [g.get("target") for g in grounding]
+    unresolved = [g.get("target") for g in grounding if not g.get("resolved")]
+    plan_actions = {str(s.get("action") or "").strip().lower()
+                    for s in (plan.get("steps") or [])}
+    out_of_vocab = sorted(a for a in plan_actions if a and a not in active_actions)
+    return {"targets": targets, "unresolved": unresolved, "out_of_vocab_actions": out_of_vocab}
+
+
 def build_report(mission, spoken: bool = True) -> dict:
     """Assemble the run's report. `spoken=False` skips the one planner call,
     for the abort path where no network round-trip is allowed."""
@@ -81,6 +124,7 @@ def build_report(mission, spoken: bool = True) -> dict:
 
     telemetry = mission.rover_telemetry or {}
     outcome = mission.phase.value
+    profile = planner.profile_info()
 
     report: Dict[str, Any] = {
         "session_id": mission.session_id,
@@ -122,7 +166,15 @@ def build_report(mission, spoken: bool = True) -> dict:
             "checks_failed": len(failed),
         },
         "models": {"planner": _role_config("planner"), "vlm": _role_config("vlm")},
+        # -- planner-profiles / virtual-sweep additions (§3D) ---------------
+        "rover_summary": mission.rover_summary,
+        "grounding": mission.grounding,
+        "grounding_summary": _grounding_summary(mission.grounding, mission.active_plan,
+                                                profile["actions"]),
+        "dialogue": mission.dialogue_meta,
+        "usage_summary": _usage_summary(mission.usage),
     }
+    report["models"]["planner_profile"] = profile
 
     report["uncertainties"] = _uncertainties(mission, progress, completed, failed, outcome)
     report["spoken_summary"] = (
@@ -139,14 +191,23 @@ def _uncertainties(mission, progress: List[dict], completed: List[dict],
     def flag(code: str, detail: str) -> None:
         out.append({"code": code, "detail": detail})
 
+    # no_arrival_check and thin_evidence are about the line-follower's keyframe
+    # checks — meaningless for a virtual run, which has no follow_line step and
+    # no camera. Gated to fire only when the plan actually has one.
+    has_follow_line = any(
+        str(s.get("action") or "").strip().lower() == "follow_line"
+        for s in (mission.active_plan.get("steps") or [])
+    )
+
     arrival = mission.arrival if isinstance(mission.arrival, dict) else None
     arrival_result = _result(arrival)
     arrival_visible = _visible(arrival)
 
     if arrival is None:
-        flag("no_arrival_check",
-             "the mission never reached an arrival check, so nothing confirms "
-             "what the rover was looking at when it stopped")
+        if has_follow_line:
+            flag("no_arrival_check",
+                 "the mission never reached an arrival check, so nothing confirms "
+                 "what the rover was looking at when it stopped")
     elif _errored(arrival):
         flag("arrival_check_failed",
              "the arrival check failed (%s) — this is not evidence that the "
@@ -196,10 +257,41 @@ def _uncertainties(mission, progress: List[dict], completed: List[dict],
     elif outcome == "aborted":
         flag("mission_aborted", "the mission was aborted by the operator")
 
-    if len(completed) < 2:
+    if has_follow_line and len(completed) < 2:
         flag("thin_evidence",
              "only %d progress check(s) completed during the drive — too few to "
              "say much about what was passed on the way" % len(completed))
+
+    # -- planner-profiles / virtual-sweep additions (§3D) -------------------
+    unresolved_targets = [g.get("target") for g in mission.grounding if not g.get("resolved")]
+    if unresolved_targets:
+        flag("plan_target_unresolved",
+             "the plan named a target the room doesn't have: "
+             + ", ".join(str(t) for t in unresolved_targets))
+
+    active_actions = planner.profile_info()["actions"]
+    plan_actions = {str(s.get("action") or "").strip().lower()
+                    for s in (mission.active_plan.get("steps") or [])}
+    out_of_vocab = sorted(a for a in plan_actions if a and a not in active_actions)
+    if out_of_vocab:
+        flag("out_of_vocab_action",
+             "the plan used action(s) outside the active vocabulary: "
+             + ", ".join(out_of_vocab))
+
+    for r in mission.results:
+        detail = r.get("detail")
+        if not isinstance(detail, dict):
+            continue
+        if detail.get("reason") == "collision":
+            obstacle = detail.get("obstacle")
+            flag("collision",
+                 "the rover collided with %s" % obstacle if obstacle
+                 else "the rover collided with something")
+        elif detail.get("reason") == "no_path":
+            target = detail.get("target")
+            flag("no_path",
+                 "no collision-free route to %s" % target if target
+                 else "no collision-free route was found")
 
     return out
 
@@ -215,7 +307,8 @@ _SUMMARY_PROMPT = (
 # Fields the summariser needs. The full report carries base64-free but still
 # bulky check records; trimming keeps the prompt inside the planner's num_ctx.
 _SUMMARY_KEYS = ("outcome", "command", "resolved_command", "uncertainties",
-                 "arrival", "look_left", "sonar_obstacle_events", "timings")
+                 "arrival", "look_left", "sonar_obstacle_events", "timings",
+                 "rover_summary")
 
 
 def _spoken_summary(report: dict) -> str:

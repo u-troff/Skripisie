@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
+from . import usage
+
 # Uploads arrive as bytes and never touch disk; a path is accepted for
 # scripted benchmark runs that read frames off the VLM test set.
 ImageSource = Union[str, bytes]
@@ -70,3 +72,13 @@ def log_completion(log, role: str, stage: str, completion: Completion) -> None:
         completion.completion_tokens if completion.completion_tokens is not None else "",
         f"{completion.cost_usd:.6f}" if completion.cost_usd is not None else "",
     )
+    usage.record({
+        "role": role,
+        "stage": stage,
+        "provider": completion.provider,
+        "model": completion.model,
+        "latency_s": completion.latency_s,
+        "prompt_tokens": completion.prompt_tokens,
+        "completion_tokens": completion.completion_tokens,
+        "cost_usd": completion.cost_usd,
+    })

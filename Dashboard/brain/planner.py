@@ -1,38 +1,62 @@
+import hashlib
 import json
 import time
 
+import config
+import planner_pi
+import planner_virtual
 from log_setup import get_logger
 from providers import ProviderError, get_provider, log_completion, user_message
 
 log = get_logger("planner")
 
+# Backward-compat alias: the Pi vocabulary, unchanged in shape from before the
+# profile split. Nothing in this codebase imports it any more (generate_plan
+# reads the active profile instead), but it's kept so nothing external that
+# expects planner.ACTIONS breaks.
+ACTIONS = planner_pi.ACTIONS
 
-# The rover drives and looks. Nothing else. A plan step it cannot perform is a
-# failed plan, not a partial success, so the vocabulary is stated up front
-# rather than filtered afterwards.
-ACTIONS = {
-    "follow_line": ("follow the floor line to its end marker — the only way to "
-                    "travel more than a short distance"),
-    "move": "drive forward or backward",
-    "turn": "rotate on the spot",
-    "approach": "drive toward a visible target until close to it",
-    "scan": "sweep the camera around without moving the base",
-    "observe": "hold still and look at a named target",
-    "stop": "halt",
-    "report": "say what was found",
-}
-
-_VOCABULARY = (
-    "The rover can ONLY perform these actions:\n"
-    + "\n".join(f'  "{verb}" - {what}' for verb, what in ACTIONS.items())
-    + "\nIt has no arm. It cannot pick up, carry, open, push, or touch anything.\n"
-    "To go somewhere, use one follow_line step whose target is what should be "
-    "visible at the end, then observe that target, then report.\n"
-    'Every step\'s "action" must be exactly one of those verbs.'
-)
+_PROFILES = {"pi": planner_pi, "virtual": planner_virtual}
 
 
-def generate_plan(command: str, scene: str = "") -> dict:
+def _profile():
+    """PLANNER_PROFILE wins if set; otherwise pi for ROVER=pi, else virtual.
+    Picking this per call (not once at import) is what lets a single process
+    run the Pi prompt and the virtual prompt side by side in a benchmark."""
+    name = config.get("PLANNER_PROFILE", "").strip().lower()
+    if not name:
+        name = "pi" if config.get("ROVER", "sim").lower() == "pi" else "virtual"
+    return _PROFILES.get(name, planner_virtual)
+
+
+def _build_vocabulary(actions: dict, guidance: str) -> str:
+    """Same shape _VOCABULARY was built in before the split, just parameterised
+    over a profile's ACTIONS/GUIDANCE instead of the old module-level constants."""
+    return (
+        "The rover can ONLY perform these actions:\n"
+        + "\n".join(f'  "{verb}" - {what}' for verb, what in actions.items())
+        + "\nIt has no arm. It cannot pick up, carry, open, push, or touch anything.\n"
+        + guidance + "\n"
+        'Every step\'s "action" must be exactly one of those verbs.'
+    )
+
+
+def profile_info() -> dict:
+    """What's actually driving the planner right now — for report.py's
+    models.planner_profile and the UI's header pill."""
+    profile = _profile()
+    vocabulary = _build_vocabulary(profile.ACTIONS, profile.GUIDANCE)
+    digest = hashlib.sha256((vocabulary + profile.STEP_SCHEMA).encode("utf-8")).hexdigest()[:12]
+    return {"profile": profile.PROFILE_NAME, "prompt_sha": digest, "actions": dict(profile.ACTIONS)}
+
+
+def build_plan_prompt(command: str, scene: str = "") -> str:
+    """Behaviour-neutral extraction of generate_plan's prompt construction, so
+    tools/snapshot_prompt.py can print the exact prompt without calling a
+    model. Nothing here may change what generate_plan sends."""
+    profile = _profile()
+    vocabulary = _build_vocabulary(profile.ACTIONS, profile.GUIDANCE)
+
     scene_block = ""
     if scene:
         scene_block = (
@@ -42,15 +66,18 @@ def generate_plan(command: str, scene: str = "") -> dict:
             "that is not there, say so in notes instead of inventing it.\n"
         )
 
-    prompt = (
+    return (
         "You are a mission planner for an indoor rover. Break the command into "
         "a sequence of discrete, executable steps.\n"
-        + _VOCABULARY + "\n"
+        + vocabulary + "\n"
         + scene_block
         + f'Command: "{command}"\n'
-        "Respond ONLY with JSON: "
-        '{"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}'
+        "Respond ONLY with JSON: " + profile.STEP_SCHEMA
     )
+
+
+def generate_plan(command: str, scene: str = "") -> dict:
+    prompt = build_plan_prompt(command, scene)
 
     started = time.perf_counter()
     try:

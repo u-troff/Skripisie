@@ -19,9 +19,27 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+import config
 from log_setup import get_logger
 
 log = get_logger("room_map")
+
+
+def _flag(name: str, default: bool = False) -> bool:
+    raw = config.get(name, "1" if default else "0").strip().lower()
+    return raw not in ("0", "false", "no", "off")
+
+
+def footprint_clearance_m() -> float:
+    """Half the rover's diagonal — safe anywhere the centre is, since a
+    mecanum base turns on the spot — plus a safety margin. The one formula
+    both this module's footprint check and VirtualRover's occupancy grid use,
+    so a landmark that validates here can never turn out unreachable there.
+    See Progress/spec-planner-profiles-and-virtual-sweep.md §1."""
+    length = config.get_float("VIRTUAL_ROBOT_LENGTH_M", 0.187)
+    width = config.get_float("VIRTUAL_ROBOT_WIDTH_M", 0.162)
+    margin = config.get_float("VIRTUAL_SAFETY_MARGIN_M", 0.05)
+    return math.hypot(length, width) / 2.0 + margin
 
 BRAIN_DIR = Path(__file__).parent
 
@@ -104,6 +122,10 @@ class Landmark:
     x: float
     y: float
     aliases: List[str] = field(default_factory=list)
+    # Plain relative phrase ("by the window"), no coordinates. Only matters
+    # for ambiguity ("the thing by the window"), never for collisions — the
+    # grid and resolve() don't read it.
+    where: Optional[str] = None
 
     def point(self) -> Point:
         return (self.x, self.y)
@@ -114,16 +136,19 @@ class Landmark:
         return [key for key in found if key]
 
     def to_dict(self) -> dict:
-        return {"name": self.name, "x": self.x, "y": self.y, "aliases": list(self.aliases)}
+        return {"name": self.name, "x": self.x, "y": self.y,
+                "aliases": list(self.aliases), "where": self.where}
 
 
 @dataclass
 class Obstacle:
     name: str
     polygon: Polygon
+    where: Optional[str] = None
 
     def to_dict(self) -> dict:
-        return {"name": self.name, "polygon": [list(p) for p in self.polygon]}
+        return {"name": self.name, "polygon": [list(p) for p in self.polygon],
+                "where": self.where}
 
 
 def _side(a: Point, b: Point, c: Point) -> float:
@@ -240,15 +265,24 @@ class RoomMap:
         the clarification loop then see exactly the same names
         VirtualRover.resolve() will later look up, so there is no video-vs-
         fixture mismatch left to cause a false "hallucination" reading.
+
+        `where` strings are appended only when VIRTUAL_DIGEST_WHERE=1 and the
+        landmark/obstacle actually has one — a fixture with no `where` fields
+        produces byte-identical output regardless of the flag.
         """
+        show_where = _flag("VIRTUAL_DIGEST_WHERE", False)
         parts = []
         for landmark in self.landmarks:
             label = landmark.name
             if landmark.aliases:
                 label += " (also called: " + ", ".join(landmark.aliases) + ")"
+            if show_where and landmark.where:
+                label += " — " + landmark.where
             parts.append(label)
         if self.obstacles:
-            parts.append("floor obstacles: " + ", ".join(o.name for o in self.obstacles))
+            def obstacle_label(o: Obstacle) -> str:
+                return o.name + (" — " + o.where if show_where and o.where else "")
+            parts.append("floor obstacles: " + ", ".join(obstacle_label(o) for o in self.obstacles))
         return f"View 1 ({self.name}): " + ("; ".join(parts) if parts else "nothing known")
 
 
@@ -286,6 +320,44 @@ def _validate(room: RoomMap) -> None:
                           "the standing spot in front of the object, not its centre",
                           room.name, landmark.name, obstacle.name)
 
+    _validate_footprint(room)
+
+
+def _validate_footprint(room: RoomMap) -> None:
+    """Every landmark's standing spot must be free on the inflated occupancy
+    grid *and* reachable from the start pose — the same grid `approach` plans
+    on, so a landmark that fails here would make every plan targeting it come
+    back `blocked`/`no_path` at mission time. Logged, never auto-corrected:
+    moving a hand-typed coordinate silently would hide exactly the kind of
+    fixture mistake this check exists to catch."""
+    # Local import: nav.py imports Point/Polygon/RoomMap from this module, so
+    # importing nav at module load time here would be circular. By the time
+    # this function actually runs (via load_room, after both modules have
+    # finished importing) the cycle is moot.
+    from nav import OccupancyGrid, plan_path
+
+    clearance = footprint_clearance_m()
+    grid = OccupancyGrid(room, clearance)
+    start_point = room.start_pose().point()
+
+    for landmark in room.landmarks:
+        free = grid.free(landmark.x, landmark.y)
+        if not free:
+            blocker = grid.blocker(landmark.x, landmark.y)
+            log.error(
+                "[room %s] landmark %r's standing spot (%.2f, %.2f) is not free at "
+                "%.2fm clearance (blocked by %s) — the rover footprint cannot stand there",
+                room.name, landmark.name, landmark.x, landmark.y, clearance, blocker,
+            )
+            continue
+        if plan_path(grid, start_point, landmark.point()) is None:
+            log.error(
+                "[room %s] landmark %r's standing spot (%.2f, %.2f) is free but not "
+                "reachable from the start pose (%.2f, %.2f) at %.2fm clearance",
+                room.name, landmark.name, landmark.x, landmark.y,
+                start_point[0], start_point[1], clearance,
+            )
+
 
 def load_room(path) -> RoomMap:
     file = Path(path)
@@ -297,10 +369,12 @@ def load_room(path) -> RoomMap:
         name=str(data.get("name") or file.stem),
         width_m=float(data.get("width_m", 5.0)),
         height_m=float(data.get("height_m", 4.0)),
-        obstacles=[Obstacle(str(e.get("name") or "obstacle"), _polygon_of(e))
+        obstacles=[Obstacle(str(e.get("name") or "obstacle"), _polygon_of(e),
+                            where=(str(e["where"]) if e.get("where") else None))
                    for e in (data.get("obstacles") or [])],
         landmarks=[Landmark(str(e["name"]), float(e["x"]), float(e["y"]),
-                            [str(a) for a in (e.get("aliases") or [])])
+                            [str(a) for a in (e.get("aliases") or [])],
+                            where=(str(e["where"]) if e.get("where") else None))
                    for e in (data.get("landmarks") or [])],
         start_x=float(start.get("x", 0.0)),
         start_y=float(start.get("y", 0.0)),

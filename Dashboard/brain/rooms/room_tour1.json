@@ -15,7 +15,8 @@
                 2.4,
                 1.3,
                 3.4
-            ]
+            ],
+            "where": "along the left wall, toward the back"
         },
         {
             "name": "the coffee table",
@@ -24,7 +25,8 @@
                 1.4,
                 3.0,
                 2.2
-            ]
+            ],
+            "where": "in the middle of the room"
         },
         {
             "name": "the desk",
@@ -33,7 +35,8 @@
                 3.2,
                 4.8,
                 4.0
-            ]
+            ],
+            "where": "in the back right corner"
         },
         {
             "name": "the bookshelf",
@@ -42,7 +45,8 @@
                 0.0,
                 5.0,
                 2.0
-            ]
+            ],
+            "where": "along the right wall, near the front"
         }
     ],
     "landmarks": [
@@ -53,7 +57,8 @@
             "aliases": [
                 "sofa",
                 "settee"
-            ]
+            ],
+            "where": "along the left wall, toward the back"
         },
         {
             "name": "coffee table",
@@ -62,7 +67,8 @@
             "aliases": [
                 "table",
                 "low table"
-            ]
+            ],
+            "where": "in the middle of the room"
         },
         {
             "name": "desk",
@@ -71,7 +77,8 @@
             "aliases": [
                 "workstation",
                 "study table"
-            ]
+            ],
+            "where": "in the back right corner"
         },
         {
             "name": "bookshelf",
@@ -81,7 +88,8 @@
                 "shelf",
                 "bookcase",
                 "books"
-            ]
+            ],
+            "where": "along the right wall, near the front"
         },
         {
             "name": "door",
@@ -90,15 +98,17 @@
             "aliases": [
                 "doorway",
                 "entrance"
-            ]
+            ],
+            "where": "in the back left corner"
         },
         {
             "name": "window",
             "x": 2.6,
-            "y": 3.9,
+            "y": 3.7,
             "aliases": [
                 "windows"
-            ]
+            ],
+            "where": "on the back wall"
         }
     ]
 }

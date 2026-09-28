@@ -82,6 +82,23 @@ class MissionSession:
     # building the report so a slow check still lands in the log.
     check_tasks: List[Any] = field(default_factory=list)
 
+    # -- planner-profiles / virtual-sweep (spec-planner-profiles-and-virtual-
+    # sweep.md §3D) ----------------------------------------------------------
+    # rover.summary() if the rover has one (VirtualRover); {} on a rover that
+    # doesn't (e.g. PiRoverController).
+    rover_summary: dict = field(default_factory=dict)
+    # One entry per confirmed-plan step with a target, resolved through
+    # rover.room.resolve — only meaningful for ROVER=virtual, where
+    # room.resolve exists; {} otherwise.
+    grounding: List[dict] = field(default_factory=list)
+    # What the pre-departure dialogue looked like: turn_count, capped,
+    # verified, concerns, replan_count. Copied once at mission creation —
+    # see MissionStore.create.
+    dialogue_meta: dict = field(default_factory=dict)
+    # providers.usage.snapshot() at mission end: every model call's role,
+    # provider, model, latency, tokens and cost.
+    usage: List[dict] = field(default_factory=list)
+
     def steps(self) -> List[dict]:
         return self.active_plan.get("steps") or []
 
@@ -118,7 +135,21 @@ class MissionSession:
                 {"at": r.at, "kind": r.kind, "reason": r.reason, "applied": r.applied}
                 for r in self.revision_log
             ],
+            "rover_summary": self.rover_summary,
+            "grounding": self.grounding,
+            "dialogue_meta": self.dialogue_meta,
+            "usage": self.usage,
         }
+
+
+def _replan_count(dialogue: DialogueSession) -> int:
+    """How many times the plan was rebuilt after a "no, change this" during
+    the dialogue. DialogueSession doesn't track this as its own counter, so
+    it's read off pipeline.handle_confirmation_text's REJECT marker: every
+    REJECT appends exactly one Turn with this question before looping back
+    into _advance_to_confirmation, the only path (besides the initial
+    ambiguity loop) that regenerates session.plan after the first time."""
+    return sum(1 for turn in dialogue.turns if turn.question == "What should I change?")
 
 
 class MissionStore:
@@ -136,6 +167,13 @@ class MissionStore:
             scene_text=dialogue.scene_text,
             confirmed_plan=plan,
             active_plan=copy.deepcopy(plan),
+            dialogue_meta={
+                "turn_count": len(dialogue.turns),
+                "capped": dialogue.capped,
+                "verified": dialogue.verified,
+                "concerns": dialogue.concerns,
+                "replan_count": _replan_count(dialogue),
+            },
         )
         with self._lock:
             self._missions[mission.session_id] = mission

@@ -22,11 +22,14 @@ import json
 from starlette.concurrency import run_in_threadpool
 
 import dialogue_session
+import planner
 import scene as scene_mod
 from dialogue_session import Phase
 from pipeline import handle_confirmation_audio, handle_dialogue_audio
 import httpx
 from fastapi import Response
+import report as report_mod
+from providers import usage
 
 
 GIMBAL_STEP = 100
@@ -51,6 +54,40 @@ app.add_middleware(
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/runtime")
+def runtime():
+    """What this process is actually configured to run — the header pill in
+    App.tsx, and a run's provenance for the report."""
+    return {
+        "rover": config.get("ROVER", "sim"),
+        "planner_profile": planner.profile_info(),
+        "planner": report_mod._role_config("planner"),
+        "vlm": report_mod._role_config("vlm"),
+        "scene_source": config.get("SCENE_SOURCE", "video"),
+        "room_map": config.get("ROOM_MAP", "rooms/room_tour1.json"),
+        "robot": {
+            "length_m": config.get_float("VIRTUAL_ROBOT_LENGTH_M", 0.187),
+            "width_m": config.get_float("VIRTUAL_ROBOT_WIDTH_M", 0.162),
+            "clearance_m": round(room_map.footprint_clearance_m(), 4),
+        },
+        "drift": {
+            "frac": config.get_float("VIRTUAL_DRIFT_FRAC", 0.0),
+            "deg": config.get_float("VIRTUAL_DRIFT_DEG", 0.0),
+        },
+        "time_scale": config.get_float("VIRTUAL_TIME_SCALE", 1.0),
+    }
+
+
+@app.get("/room")
+def room_endpoint():
+    """The static room geometry for the live map (§4). Virtual-only — a Pi
+    run has no RoomMap to serve."""
+    rover = get_rover()
+    if getattr(rover, "name", None) != "virtual":
+        return Response(status_code=404, content=b"ROVER is not virtual")
+    return rover.room.to_dict()
 
 
 @app.post("/transcribe")
@@ -163,6 +200,11 @@ async def dialogue(websocket: WebSocket):
             kind = frame.get("type")
 
             if kind == "start" or session is None:
+                # One mission at a time in this process (true for the UI and
+                # for tools/virtual_sweep.py), so a new dialogue session is
+                # exactly the point to zero the usage ledger for the run
+                # about to start — see providers/usage.py.
+                usage.reset()
                 session = dialogue_session.store.create(
                     session_id=frame.get("session_id"),
                     language=frame.get("language", "af"),
