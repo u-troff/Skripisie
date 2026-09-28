@@ -1,3 +1,4 @@
+import base64
 import time
 from typing import List, Optional
 
@@ -13,6 +14,7 @@ from dialogue_session import (
 from log_setup import get_logger
 from planner import generate_plan
 from stt import transcribe_audio
+import tts
 import vlm
 from vlm import ImageSource, check_ambiguity, verify_plan
 
@@ -71,24 +73,32 @@ def handle_voice_command(
 # front end if the WebSocket turns out to be awkward on the Pi.
 # --------------------------------------------------------------------------
 def _speak(session: DialogueSession, text: str) -> dict:
-    return {"type": "speak", "text": text, "phase": session.phase.value,
-            "session_id": session.session_id}
+    event = {"type": "speak", "text": text, "phase": session.phase.value,
+             "session_id": session.session_id}
+    try:
+        event["audio"] = base64.b64encode(tts.synthesize_speech(text)).decode("ascii")
+    except Exception:
+        # A TTS failure must degrade to text-only, not kill the turn — same
+        # spirit as vlm.failed()'s soft-fail elsewhere in this module.
+        log.warning("[dlg %s] TTS synthesis failed, falling back to text-only",
+                    session.session_id, exc_info=True)
+    return event
 
 
-def handle_dialogue_audio(
+def handle_dialogue_text(
     session: DialogueSession,
-    audio,
+    text: str,
     image: Optional[ImageSource] = None,
 ) -> List[dict]:
-    """One inbound utterance during CLARIFYING. Either asks the next question
-    or exits the loop into PLANNING → VERIFYING → AWAITING_CONFIRMATION."""
+    """One inbound utterance during CLARIFYING, already in text form (typed or
+    transcribed). Either asks the next question or exits the loop into
+    PLANNING → VERIFYING → AWAITING_CONFIRMATION.
+
+    handle_dialogue_audio is a thin wrapper that adds STT in front of this;
+    a typed command skips straight here.
+    """
     if image is not None:
         session.image = image
-
-    started = time.perf_counter()
-    text = transcribe_audio(audio, language=session.language)
-    log.info("[dlg %s] stt %.1fs transcript=%r", session.session_id,
-             time.perf_counter() - started, text)
 
     pending = session.pending_turn()
     if pending is not None:
@@ -103,6 +113,20 @@ def handle_dialogue_audio(
 
     session.touch()
     return _advance_to_confirmation(session)
+
+
+def handle_dialogue_audio(
+    session: DialogueSession,
+    audio,
+    image: Optional[ImageSource] = None,
+) -> List[dict]:
+    """Same as handle_dialogue_text, plus the STT step in front of it."""
+    started = time.perf_counter()
+    text = transcribe_audio(audio, language=session.language)
+    log.info("[dlg %s] stt %.1fs transcript=%r", session.session_id,
+             time.perf_counter() - started, text)
+    return handle_dialogue_text(session, text, image)
+
 
 
 def _advance_to_confirmation(session: DialogueSession) -> List[dict]:
@@ -188,9 +212,14 @@ def _advance_to_confirmation(session: DialogueSession) -> List[dict]:
     ]
 
 
-def handle_confirmation_audio(session: DialogueSession, audio) -> List[dict]:
-    """The voice-only gate. Nothing else may move the rover."""
-    text = transcribe_audio(audio, language=session.language)
+def handle_confirmation_text(session: DialogueSession, text: str) -> List[dict]:
+    """The confirmation gate, given text that already exists.
+
+    Not "voice-only" as a function — ALLOW_TEXT_COMMANDS in main.py is the
+    actual gate that keeps a live/demo run voice-only. This function does not
+    care where `text` came from, which is exactly why that gate has to sit
+    upstream of it, not here.
+    """
     log.info("[dlg %s] confirmation transcript=%r", session.session_id, text)
     verdict = confirmation.classify(text)
 
@@ -204,8 +233,6 @@ def handle_confirmation_audio(session: DialogueSession, audio) -> List[dict]:
         ]
 
     if verdict == confirmation.REJECT:
-        # A rejection is usually also a change request, so it becomes history
-        # rather than just a cancel.
         session.turns.append(Turn(question="What should I change?", answer=text))
         session.capped = False
         session.resolved_command = ""
@@ -221,10 +248,17 @@ def handle_confirmation_audio(session: DialogueSession, audio) -> List[dict]:
                  session.session_id, session.confirm_retries, MAX_CONFIRM_RETRIES)
         return [_speak(session, "I did not catch that. Say yes to go, or no to cancel.")]
 
-    # Fail safe: never execute on an unresolved answer.
     session.phase = Phase.CANCELLED
     log.warning("[dlg %s] CANCELLED — no clear confirmation", session.session_id)
     return [
         _speak(session, "I did not get a clear answer, so I am cancelling."),
         {"type": "cancelled", "session_id": session.session_id, "reason": "unclear_confirmation"},
     ]
+
+
+def handle_confirmation_audio(session: DialogueSession, audio) -> List[dict]:
+    """The voice-only gate for a live/real run. Nothing else may move the
+    rover in that configuration — ALLOW_TEXT_COMMANDS is what could let
+    handle_confirmation_text run instead, and it defaults off."""
+    text = transcribe_audio(audio, language=session.language)
+    return handle_confirmation_text(session, text)

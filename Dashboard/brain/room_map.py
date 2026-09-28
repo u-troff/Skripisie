@@ -232,6 +232,25 @@ class RoomMap:
             "source": self.source,
         }
 
+    def digest_text(self) -> str:
+        """A text digest shaped like Scene.digest() (scene.py), built straight
+        from the hand-typed node table instead of a VLM reading video frames.
+
+        Lets a run skip scene.py/vlm.inventory_frame entirely: the planner and
+        the clarification loop then see exactly the same names
+        VirtualRover.resolve() will later look up, so there is no video-vs-
+        fixture mismatch left to cause a false "hallucination" reading.
+        """
+        parts = []
+        for landmark in self.landmarks:
+            label = landmark.name
+            if landmark.aliases:
+                label += " (also called: " + ", ".join(landmark.aliases) + ")"
+            parts.append(label)
+        if self.obstacles:
+            parts.append("floor obstacles: " + ", ".join(o.name for o in self.obstacles))
+        return f"View 1 ({self.name}): " + ("; ".join(parts) if parts else "nothing known")
+
 
 def _polygon_of(entry: dict) -> Polygon:
     if "box" in entry:

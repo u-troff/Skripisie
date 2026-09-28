@@ -7,19 +7,27 @@ step loop applies it between steps.
 """
 
 import asyncio
+import base64
+import json
+import re
 import time
-from typing import Awaitable, Callable, Optional
+from pathlib import Path
+from typing import Awaitable, Callable, List, Optional
 
 import config
 import confirmation
 import frames
+import report as report_mod
 import revision as revision_rules
+import scene as scene_mod
+import tts
 from log_setup import get_logger
 from mission_session import TERMINAL, MissionPhase, MissionSession, RevisionRecord
 from planner import revise_plan
 from rover import RoverController
 from stt import transcribe_audio
-from vlm import describe_frame
+from vlm import check_arrival, check_progress, check_side_look, describe_frame
+from vlm import failed as vlm_failed
 
 log = get_logger("mission")
 
@@ -29,10 +37,52 @@ CHANGE_THRESHOLD = config.get_float("PERCEPTION_CHANGE_THRESHOLD", 0.06)
 MIN_INTERVAL_S = config.get_float("PERCEPTION_MIN_INTERVAL_S", 6.0)
 MIN_SHARPNESS = config.get_float("PERCEPTION_MIN_SHARPNESS", 25.0)
 
+# -- grounded line mission (spec-grounded-line-mission.md §E) ---------------
+# There is no distance or speed anywhere in a plan step, and the chassis has no
+# encoders, so "how far along the line are we" is wall-clock time times a
+# measured constant. LINE_SPEED_CMPS comes from test T2 — until it is measured
+# every est_distance_cm in a run log is a placeholder, not a measurement.
+LINE_LENGTH_CM = config.get_float("LINE_LENGTH_CM", 300.0)
+LINE_SPEED_CMPS = config.get_float("LINE_SPEED_CMPS", 17.0)
+KEYFRAME_SPACING_CM = config.get_float("KEYFRAME_SPACING_CM", 40.0)
+LOOK_LEFT_AT_FRACTION = config.get_float("LOOK_LEFT_AT_FRACTION", 0.5)
+LOOK_LEFT_PAN = config.get_int("LOOK_LEFT_PAN", 1100)
+# How long to let a VLM check that is still running when the drive ends finish
+# before giving up on it. At ~15s a frame on the local host, a check launched
+# near the crossbar routinely outlives the step it belongs to.
+CHECK_DRAIN_S = config.get_float("CHECK_DRAIN_S", 25.0)
 
-def _speak(mission: MissionSession, text: str) -> dict:
-    return {"type": "speak", "text": text, "session_id": mission.session_id,
-            "phase": mission.phase.value}
+LOGS_DIR = Path(__file__).parent / "logs"
+
+# Used only when no room scene is loaded, to turn the command into a rough
+# "what else should be here" list for the arrival check.
+_STOPWORDS = {
+    "the", "and", "then", "that", "this", "there", "here", "with", "from",
+    "into", "onto", "your", "you", "its", "for", "are", "was", "has", "have",
+    "line", "follow", "following", "drive", "driving", "move", "turn", "look",
+    "tell", "see", "check", "find", "get", "got", "please", "rover", "robot",
+    "along", "toward", "towards", "until", "when", "what", "where", "whether",
+    "can", "will", "would", "should", "not", "any", "all", "out",
+}
+
+
+async def _speak(mission: MissionSession, text: str) -> dict:
+    """Same event shape as pipeline._speak, including the Piper audio the Pi
+    client plays back. Async because this runs inside the step loop, which
+    shares an event loop with ingest_frame — synthesis is sub-second but
+    still blocking, so it goes to a worker thread rather than stalling
+    perception mid-mission."""
+    event = {"type": "speak", "text": text, "session_id": mission.session_id,
+             "phase": mission.phase.value}
+    try:
+        audio = await asyncio.to_thread(tts.synthesize_speech, text)
+        event["audio"] = base64.b64encode(audio).decode("ascii")
+    except Exception:
+        # Degrade to text-only rather than killing the mission — same
+        # soft-fail stance pipeline._speak takes.
+        log.warning("[mission %s] TTS synthesis failed, falling back to text-only",
+                    mission.session_id, exc_info=True)
+    return event
 
 
 # --------------------------------------------------------------------------
@@ -101,7 +151,7 @@ async def _analyse(mission: MissionSession, raw: bytes, emit: Emit) -> None:
         )
         await emit({"type": "revision", "session_id": mission.session_id,
                     "revision": verdict.to_dict(), "plan": proposed, "applied": True})
-        await emit(_speak(mission, "Adjusting my route. " + verdict.reason + "."))
+        await emit(await _speak(mission, "Adjusting my route. " + verdict.reason + "."))
         return
 
     # MATERIAL or BLOCKED: the human decides, and the rover stops asking the
@@ -114,13 +164,335 @@ async def _analyse(mission: MissionSession, raw: bytes, emit: Emit) -> None:
         mission.phase = MissionPhase.HALTED
         await emit({"type": "halted", "session_id": mission.session_id,
                     "revision": verdict.to_dict()})
-        await emit(_speak(mission, "I cannot continue. " + verdict.reason + "."))
+        await emit(await _speak(mission, "I cannot continue. " + verdict.reason + "."))
         return
 
     mission.phase = MissionPhase.AWAITING_REVISION_CONFIRMATION
     await emit({"type": "awaiting_revision", "session_id": mission.session_id,
                 "revision": verdict.to_dict(), "plan": proposed})
-    await emit(_speak(mission, revision_rules.summarise(verdict, proposed)))
+    await emit(await _speak(mission, revision_rules.summarise(verdict, proposed)))
+
+
+# --------------------------------------------------------------------------
+# Grounded line mission — keyframe checks while driving, and the arrival check.
+#
+# Everything here is OBSERVATION. The IR line sensor steers, the ultrasonic
+# decides when to stop, and the follower's own crossbar detection decides when
+# the rover has arrived. Nothing in this section can stop the rover, and a
+# check that fails is recorded as a failed check, never as "not visible".
+# --------------------------------------------------------------------------
+def _frames_dir(session_id: str) -> Path:
+    path = LOGS_DIR / "frames" / session_id
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def _save_frame(mission: MissionSession, name: str, raw: bytes) -> Optional[str]:
+    """Every frame that goes to the VLM is kept. A verdict with no frame behind
+    it cannot be checked against ground truth after the run, which is most of
+    what T9 needs."""
+    try:
+        path = _frames_dir(mission.session_id) / name
+        path.write_bytes(raw)
+        return str(path.relative_to(Path(__file__).parent))
+    except OSError:
+        log.warning("[mission %s] could not save frame %s", mission.session_id, name,
+                    exc_info=True)
+        return None
+
+
+def _scene_object_names(mission: MissionSession) -> List[str]:
+    if not mission.scene_id:
+        return []
+    room = scene_mod.store.get(mission.scene_id)
+    if room is None:
+        return []
+    names = []
+    for frame in room.frames:
+        for obj in frame.objects:
+            name = str(obj.get("name") or "").strip()
+            if name:
+                names.append(name)
+    return names
+
+
+def _expected_things(mission: MissionSession, target: str) -> List[str]:
+    """What else the arrival frame should contain, besides the target.
+
+    Deliberately narrow: only room objects the command itself mentions, not the
+    whole room inventory. Handing the VLM every object in the room would make
+    `missing` non-empty on every single run, and report.py flags a non-empty
+    `missing` as an uncertainty — the flag would stop meaning anything.
+    """
+    text = ((mission.command or "") + " " + (mission.original_command or "")).lower()
+    expected: List[str] = []
+    seen = set()
+
+    def add(item: str) -> None:
+        key = item.strip().lower()
+        if key and key not in seen:
+            seen.add(key)
+            expected.append(item.strip())
+
+    if target:
+        add(target)
+
+    names = _scene_object_names(mission)
+    if names:
+        for name in names:
+            if name.lower() in text:
+                add(name)
+    else:
+        for word in re.findall(r"[A-Za-z]{3,}", text):
+            if word.lower() not in _STOPWORDS:
+                add(word)
+    return expected[:8]
+
+
+async def _emit_check(mission: MissionSession, record: dict, emit: Emit) -> None:
+    await emit({"type": "check", "session_id": mission.session_id, "check": record})
+
+
+async def _record_check(mission: MissionSession, kind: str, frame: bytes,
+                        t_rel_s: float, target: str, emit: Emit,
+                        filename: str) -> None:
+    """Run one VLM check in a worker thread and file the result.
+
+    Runs as its own task so the drive is never waiting on inference — at ~15s a
+    frame the check would otherwise be the slowest thing in the loop by two
+    orders of magnitude.
+    """
+    frame_path = _save_frame(mission, filename, frame)
+    call = check_progress if kind == "progress" else check_side_look
+    started = time.perf_counter()
+    result = await asyncio.to_thread(call, frame, target)
+    latency = time.perf_counter() - started
+
+    record = {
+        "kind": kind,
+        "target": target,
+        "t_rel_s": round(t_rel_s, 2),
+        "est_distance_cm": round(t_rel_s * LINE_SPEED_CMPS, 1),
+        "latency_s": round(latency, 2),
+        "frame_path": frame_path,
+        "result": result,
+    }
+    mission.checks.append(record)
+    if kind == "look_left":
+        mission.look_left = record
+    mission.touch()
+    log.info("[mission %s] %s check at %.1fs (%.1fs latency): %s",
+             mission.session_id, kind, t_rel_s, latency, json.dumps(result)[:200])
+    await _emit_check(mission, record, emit)
+
+    # Policy for this slice: warn, never halt. The sonar is the only authority
+    # on distance and stopping, and a VLM whose answer is seconds stale must
+    # not be allowed to veto a sensor that is current.
+    if kind == "progress" and not vlm_failed(result):
+        if result.get("path_clear") is False:
+            mission.path_unclear_streak += 1
+            if mission.path_unclear_streak >= 2:
+                log.warning("[mission %s] two consecutive checks report the path is "
+                            "not clear — not halting (sonar owns stopping)",
+                            mission.session_id)
+                await emit({"type": "warning", "session_id": mission.session_id,
+                            "message": "Two consecutive camera checks report the path "
+                                       "ahead is not clear.",
+                            "check": record})
+        else:
+            mission.path_unclear_streak = 0
+
+
+async def _skip(mission: MissionSession, reason: str, t_rel_s: float, emit: Emit) -> None:
+    record = {"kind": "skipped", "reason": reason, "t_rel_s": round(t_rel_s, 2),
+              "est_distance_cm": round(t_rel_s * LINE_SPEED_CMPS, 1)}
+    mission.checks.append(record)
+    log.info("[mission %s] check skipped at %.1fs (%s)", mission.session_id,
+             t_rel_s, reason)
+    await _emit_check(mission, record, emit)
+
+
+async def _look_left(mission: MissionSession, rover, target: str,
+                     started: float, emit: Emit) -> None:
+    """The one planned stop. Pause, pan left, grab a frame, re-centre, resume —
+    and only then ask the model about it, so inference never holds up motion."""
+    t_rel = time.time() - started
+    parked = await asyncio.to_thread(rover.pause)
+    if not parked:
+        log.warning("[mission %s] look-left skipped: follower did not park",
+                    mission.session_id)
+        await _skip(mission, "pause_failed", t_rel, emit)
+        return
+
+    frame = await asyncio.to_thread(rover.look, LOOK_LEFT_PAN)
+    await asyncio.to_thread(rover.resume)
+
+    if frame is None:
+        await _skip(mission, "no_frame", t_rel, emit)
+        return
+
+    task = asyncio.ensure_future(
+        _record_check(mission, "look_left", frame, t_rel, target, emit, "left_01.jpg")
+    )
+    mission.check_tasks.append(task)
+
+
+async def keyframe_monitor(mission: MissionSession, rover, step: dict, emit: Emit) -> None:
+    """Sample the camera while a follow_line step runs.
+
+    Single-flight: if a check is still in the VLM when the next tick comes due,
+    that tick is recorded as skipped rather than queued. On the local host this
+    is expected to skip most ticks and complete 1-3 checks per run — that ratio
+    is a measured RQ1 result, not a bug to tune away.
+
+    Cancelled by run_mission the moment the step returns; in-flight checks are
+    drained separately so a slow one still reaches the report.
+    """
+    target = str(step.get("target") or "").strip()
+    started = time.time()
+    interval_s = max(1.0, KEYFRAME_SPACING_CM / LINE_SPEED_CMPS) if LINE_SPEED_CMPS > 0 else 1.0
+    look_left_at_s = (LOOK_LEFT_AT_FRACTION * LINE_LENGTH_CM / LINE_SPEED_CMPS
+                      if LINE_SPEED_CMPS > 0 else 0.0)
+    can_look = all(hasattr(rover, name) for name in ("pause", "resume", "look"))
+    look_done = not can_look
+    if not can_look:
+        log.info("[mission %s] rover has no pause/look/resume — no look-left this run",
+                 mission.session_id)
+
+    log.info("[mission %s] keyframe monitor: every %.1fs, look-left at %.1fs, target=%r",
+             mission.session_id, interval_s, look_left_at_s, target)
+
+    in_flight = None
+    index = 0
+    next_tick = started + interval_s
+
+    while True:
+        await asyncio.sleep(0.2)
+        now = time.time()
+
+        if not look_done and (now - started) >= look_left_at_s:
+            look_done = True
+            await _look_left(mission, rover, target, started, emit)
+            # Don't fire a keyframe the instant the rover starts moving again.
+            next_tick = time.time() + interval_s
+            continue
+
+        if now < next_tick:
+            continue
+        next_tick = now + interval_s
+
+        if in_flight is not None and not in_flight.done():
+            await _skip(mission, "vlm_busy", now - started, emit)
+            continue
+
+        frame = await asyncio.to_thread(rover.get_frame)
+        if frame is None:
+            await _skip(mission, "no_frame", now - started, emit)
+            continue
+
+        index += 1
+        in_flight = asyncio.ensure_future(
+            _record_check(mission, "progress", frame, now - started, target, emit,
+                          "kf_%02d.jpg" % index)
+        )
+        mission.check_tasks.append(in_flight)
+
+
+async def _drain_checks(mission: MissionSession) -> None:
+    pending = [task for task in mission.check_tasks if not task.done()]
+    mission.check_tasks = []
+    if not pending:
+        return
+    log.info("[mission %s] waiting up to %.0fs for %d in-flight check(s)",
+             mission.session_id, CHECK_DRAIN_S, len(pending))
+    _, unfinished = await asyncio.wait(pending, timeout=CHECK_DRAIN_S)
+    for task in unfinished:
+        task.cancel()
+    if unfinished:
+        log.warning("[mission %s] gave up on %d check(s) still in the VLM",
+                    mission.session_id, len(unfinished))
+
+
+async def _arrival_check(mission: MissionSession, rover, target: str, emit: Emit) -> None:
+    t_rel = time.time() - mission.started_at
+    frame = await asyncio.to_thread(rover.get_frame)
+    if frame is None:
+        mission.arrival = {"kind": "arrival", "target": target, "expected": [],
+                           "t_rel_s": round(t_rel, 2), "latency_s": None,
+                           "frame_path": None,
+                           "result": {"_error": "no frame from the camera"}}
+        await _emit_check(mission, mission.arrival, emit)
+        return
+
+    expected = _expected_things(mission, target)
+    frame_path = _save_frame(mission, "arrival.jpg", frame)
+    started = time.perf_counter()
+    result = await asyncio.to_thread(check_arrival, frame, target, expected)
+    record = {
+        "kind": "arrival",
+        "target": target,
+        "expected": expected,
+        "t_rel_s": round(t_rel, 2),
+        "latency_s": round(time.perf_counter() - started, 2),
+        "frame_path": frame_path,
+        "result": result,
+    }
+    mission.arrival = record
+    mission.touch()
+    log.info("[mission %s] arrival check: %s", mission.session_id,
+             json.dumps(result)[:300])
+    await _emit_check(mission, record, emit)
+
+
+async def _maybe_arrival_check(mission: MissionSession, rover, step: dict,
+                               result: dict, emit: Emit) -> None:
+    """One arrival check per run: after the observe step if the plan has one,
+    otherwise straight after a follow_line step that actually reached the
+    crossbar. A follow_line that timed out or was blocked has not arrived, so
+    there is nothing to check for."""
+    if mission.arrival is not None or not hasattr(rover, "get_frame"):
+        return
+
+    action = str(step.get("action") or "").strip().lower()
+    if action == "observe":
+        pass
+    elif action == "follow_line":
+        detail = result.get("detail")
+        arrived = isinstance(detail, dict) and detail.get("arrived")
+        has_observe = any(str(s.get("action") or "").strip().lower() == "observe"
+                          for s in mission.steps())
+        if not arrived or has_observe:
+            return
+    else:
+        return
+
+    await _arrival_check(mission, rover, str(step.get("target") or ""), emit)
+
+
+def _write_run_log(mission: MissionSession, report: dict) -> Optional[str]:
+    try:
+        LOGS_DIR.mkdir(parents=True, exist_ok=True)
+        path = LOGS_DIR / ("mission_%s.json" % mission.session_id)
+        path.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    except OSError:
+        log.warning("[mission %s] could not write the run log", mission.session_id,
+                    exc_info=True)
+        return None
+    log.info("[mission %s] run log -> %s", mission.session_id, path)
+    return str(path)
+
+
+async def _finish_report(mission: MissionSession, emit: Emit) -> None:
+    try:
+        report = await asyncio.to_thread(report_mod.build_report, mission)
+    except Exception:
+        log.exception("[mission %s] report generation failed", mission.session_id)
+        return
+    await emit({"type": "report", "session_id": mission.session_id, "report": report})
+    summary = str(report.get("spoken_summary") or "").strip()
+    if summary:
+        await emit(await _speak(mission, summary))
+    await asyncio.to_thread(_write_run_log, mission, report)
 
 
 # --------------------------------------------------------------------------
@@ -146,18 +518,42 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
                             "plan": mission.active_plan})
 
             step = mission.steps()[mission.cursor]
+            action = str(step.get("action") or "").strip().lower()
             await emit({"type": "step_started", "session_id": mission.session_id,
                         "index": mission.cursor, "step": step})
 
-            result = await asyncio.to_thread(rover.execute_step, step)
-            mission.results.append({"step": step, **result})
+            # The keyframe monitor only exists for the driving step, and only
+            # for a rover that can hand over a frame. On sim/virtual there is
+            # no get_frame, so the whole check path stays switched off and
+            # mission.py behaves exactly as it did before.
+            monitor = None
+            if action == "follow_line" and hasattr(rover, "get_frame"):
+                monitor = asyncio.ensure_future(keyframe_monitor(mission, rover, step, emit))
+
+            step_started_at = time.time()
+            try:
+                result = await asyncio.to_thread(rover.execute_step, step)
+            finally:
+                if monitor is not None:
+                    monitor.cancel()
+                    await asyncio.gather(monitor, return_exceptions=True)
+                    await _drain_checks(mission)
+                    if hasattr(rover, "telemetry_snapshot"):
+                        mission.rover_telemetry = rover.telemetry_snapshot()
+
+            mission.results.append({"step": step,
+                                    "elapsed_s": round(time.time() - step_started_at, 2),
+                                    **result})
             mission.touch()
             await emit({"type": "step_done", "session_id": mission.session_id,
                         "index": mission.cursor, "step": step, "result": result})
 
+            if result.get("status") == "ok":
+                await _maybe_arrival_check(mission, rover, step, result, emit)
+
             if result.get("status") == "blocked":
                 mission.phase = MissionPhase.HALTED
-                await emit(_speak(mission, "I am blocked and have stopped."))
+                await emit(await _speak(mission, "I am blocked and have stopped."))
                 break
             if result.get("status") == "halted":
                 break
@@ -166,14 +562,22 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
 
         if mission.phase is MissionPhase.EXECUTING and mission.cursor >= len(mission.steps()):
             mission.phase = MissionPhase.COMPLETED
-            await emit(_speak(mission, "Done."))
     except asyncio.CancelledError:
         rover.halt()
         mission.phase = MissionPhase.ABORTED
+        # No planner call and no await on the abort path — the operator has
+        # already asked the rover to stop, and the report must not be the thing
+        # that delays it. The deterministic half of the report is still worth
+        # keeping, so it is written straight to disk and nothing is spoken.
+        _write_run_log(mission, report_mod.build_report(mission, spoken=False))
         raise
     finally:
         mission.touch()
         log.info("[mission %s] end — %s", mission.session_id, mission.phase.value)
+        # Always, on every non-aborted outcome: completed, blocked or halted.
+        # A run that ends badly is exactly the run whose report matters most.
+        if mission.phase is not MissionPhase.ABORTED:
+            await _finish_report(mission, emit)
         await emit({"type": "mission_ended", "session_id": mission.session_id,
                     "phase": mission.phase.value, "snapshot": mission.snapshot()})
 
@@ -192,7 +596,7 @@ async def handle_revision_confirmation(mission: MissionSession, audio, emit: Emi
             mission.revision_log[-1].applied = True
         await emit({"type": "plan_revised", "session_id": mission.session_id,
                     "plan": mission.active_plan})
-        await emit(_speak(mission, "Accepted. Continuing."))
+        await emit(await _speak(mission, "Accepted. Continuing."))
         return
 
     # Anything that is not a clear yes stops the rover. Unclear must never
@@ -201,7 +605,7 @@ async def handle_revision_confirmation(mission: MissionSession, audio, emit: Emi
     mission.phase = MissionPhase.HALTED
     await emit({"type": "halted", "session_id": mission.session_id,
                 "reason": "revision_rejected" if verdict == confirmation.REJECT else "unclear"})
-    await emit(_speak(mission, "Stopping."))
+    await emit(await _speak(mission, "Stopping."))
 
 
 async def abort(mission: MissionSession, rover: RoverController, emit: Emit) -> None:

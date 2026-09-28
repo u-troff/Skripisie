@@ -22,37 +22,6 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
-\bibitem[Hori et~al.(2025)Hori, Suzuki, and Ogata]{hori2025longhorizon}
-K.~Hori, K.~Suzuki, and T.~Ogata, ``Enhancement of long-horizon task planning
-  via active and passive modification in large language models,''
-  \emph{Scientific Reports}, vol.~15, p. 7113, 2025.
-
-\bibitem[Ren et~al.(2023)Ren, Dixit, Bodrova, Singh, Tu, Brown, Xu, Takayama,
-  Xia, Varley, Xu, Sadigh, Zeng, and Majumdar]{ren2023knowno}
-A.~Z. Ren, A.~Dixit, A.~Bodrova, S.~Singh, S.~Tu, N.~Brown, P.~Xu, L.~Takayama,
-  F.~Xia, J.~Varley, Z.~Xu, D.~Sadigh, A.~Zeng, and A.~Majumdar, ``Robots that
-  ask for help: Uncertainty alignment for large language model planners,'' in
-  \emph{Proceedings of the 7th Conference on Robot Learning (CoRL)}, ser.
-  Proceedings of Machine Learning Research, vol. 229, 2023, arXiv:2307.01928.
-
-\bibitem[Liang et~al.(2024)Liang, Zhang, and Fisac]{liang2024introspective}
-K.~Liang, Z.~Zhang, and J.~F. Fisac, ``Introspective planning: Aligning robots'
-  uncertainty with inherent task ambiguity,'' in \emph{Advances in Neural
-  Information Processing Systems (NeurIPS)}, 2024, arXiv:2402.06529.
-
-\bibitem[Sinha et~al.(2024)Sinha, Elhafsi, Agia, Foutter, Schmerling, and
-  Pavone]{sinha2024aesop}
-R.~Sinha, A.~Elhafsi, C.~Agia, M.~Foutter, E.~Schmerling, and M.~Pavone,
-  ``Real-time anomaly detection and reactive planning with large language
-  models,'' in \emph{Robotics: Science and Systems (RSS)}, 2024,
-  arXiv:2407.08735.
-
-\bibitem[Elhafsi et~al.(2023)Elhafsi, Sinha, Agia, Schmerling, Nesnas, and
-  Pavone]{elhafsi2023semantic}
-A.~Elhafsi, R.~Sinha, C.~Agia, E.~Schmerling, I.~A.~D. Nesnas, and M.~Pavone,
-  ``Semantic anomaly detection with large language models,'' \emph{Autonomous
-  Robots}, vol.~47, no.~8, pp. 1035--1055, 2023.
-
 \bibitem[Ahn et~al.(2023)Ahn, Brohan, Brown, Chebotar, Cortes, David, Finn, Fu,
   Gopalakrishnan, Hausman, Herzog, Ho, Hsu, Ibarz, Ichter, Irpan, Jang,
   Jauregui~Ruano, Jeffrey, Jesmonth, Joshi, Julian, Kalashnikov, Kuang, Lee,
@@ -69,6 +38,37 @@ M.~Ahn, A.~Brohan, N.~Brown, Y.~Chebotar, O.~Cortes, B.~David, C.~Finn, C.~Fu,
   language in robotic affordances,'' in \emph{Proceedings of the 6th Conference
   on Robot Learning (CoRL)}, ser. Proceedings of Machine Learning Research,
   vol. 205, 2023, pp. 287--318, arXiv:2204.01691.
+
+\bibitem[Ren et~al.(2023)Ren, Dixit, Bodrova, Singh, Tu, Brown, Xu, Takayama,
+  Xia, Varley, Xu, Sadigh, Zeng, and Majumdar]{ren2023knowno}
+A.~Z. Ren, A.~Dixit, A.~Bodrova, S.~Singh, S.~Tu, N.~Brown, P.~Xu, L.~Takayama,
+  F.~Xia, J.~Varley, Z.~Xu, D.~Sadigh, A.~Zeng, and A.~Majumdar, ``Robots that
+  ask for help: Uncertainty alignment for large language model planners,'' in
+  \emph{Proceedings of the 7th Conference on Robot Learning (CoRL)}, ser.
+  Proceedings of Machine Learning Research, vol. 229, 2023, arXiv:2307.01928.
+
+\bibitem[Liang et~al.(2024)Liang, Zhang, and Fisac]{liang2024introspective}
+K.~Liang, Z.~Zhang, and J.~F. Fisac, ``Introspective planning: Aligning robots'
+  uncertainty with inherent task ambiguity,'' in \emph{Advances in Neural
+  Information Processing Systems (NeurIPS)}, 2024, arXiv:2402.06529.
+
+\bibitem[Hori et~al.(2025)Hori, Suzuki, and Ogata]{hori2025longhorizon}
+K.~Hori, K.~Suzuki, and T.~Ogata, ``Enhancement of long-horizon task planning
+  via active and passive modification in large language models,''
+  \emph{Scientific Reports}, vol.~15, p. 7113, 2025.
+
+\bibitem[Sinha et~al.(2024)Sinha, Elhafsi, Agia, Foutter, Schmerling, and
+  Pavone]{sinha2024aesop}
+R.~Sinha, A.~Elhafsi, C.~Agia, M.~Foutter, E.~Schmerling, and M.~Pavone,
+  ``Real-time anomaly detection and reactive planning with large language
+  models,'' in \emph{Robotics: Science and Systems (RSS)}, 2024,
+  arXiv:2407.08735.
+
+\bibitem[Elhafsi et~al.(2023)Elhafsi, Sinha, Agia, Schmerling, Nesnas, and
+  Pavone]{elhafsi2023semantic}
+A.~Elhafsi, R.~Sinha, C.~Agia, E.~Schmerling, I.~A.~D. Nesnas, and M.~Pavone,
+  ``Semantic anomaly detection with large language models,'' \emph{Autonomous
+  Robots}, vol.~47, no.~8, pp. 1035--1055, 2023.
 
 \bibitem[Liang et~al.(2023)Liang, Huang, Xia, Xu, Hausman, Ichter, Florence,
   and Zeng]{liang2023codeaspolicies}

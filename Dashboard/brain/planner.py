@@ -11,6 +11,8 @@ log = get_logger("planner")
 # failed plan, not a partial success, so the vocabulary is stated up front
 # rather than filtered afterwards.
 ACTIONS = {
+    "follow_line": ("follow the floor line to its end marker — the only way to "
+                    "travel more than a short distance"),
     "move": "drive forward or backward",
     "turn": "rotate on the spot",
     "approach": "drive toward a visible target until close to it",
@@ -24,6 +26,8 @@ _VOCABULARY = (
     "The rover can ONLY perform these actions:\n"
     + "\n".join(f'  "{verb}" - {what}' for verb, what in ACTIONS.items())
     + "\nIt has no arm. It cannot pick up, carry, open, push, or touch anything.\n"
+    "To go somewhere, use one follow_line step whose target is what should be "
+    "visible at the end, then observe that target, then report.\n"
     'Every step\'s "action" must be exactly one of those verbs.'
 )
 

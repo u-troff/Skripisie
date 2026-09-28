@@ -80,7 +80,7 @@ model an apple was present. The value function is what supplied that.
 Ahn et al. formalise this selection rule as
 
 \begin{equation}
-    \pi = \operatorname*{arg\,max}_{\pi \in \Pi} \; p(c_\pi \mid s, \ell_\pi) \, p(\ell_\pi \mid i)
+    \operatorname*{arg\,max}_{\pi \in \Pi} \mskip\thickmuskip p(c_\pi \mid s, \ell_\pi) \, p(\ell_\pi \mid i)
     \label{eq:saycan_selection}
 \end{equation}
 
@@ -165,7 +165,7 @@ The calibrated threshold $\hat{q}$ is then set to the
 where $\epsilon$ is a user-chosen error tolerance. At test time, the prediction set kept for a new instruction is every label whose score clears this threshold:
 
 \begin{equation}
-    C(\tilde{x}_{\text{test}}) = \left\{ y \in Y \;\middle|\; \hat{f}(\tilde{x}_{\text{test}})_y \geq 1-\hat{q} \right\}.
+    C(\tilde{x}_{\text{test}}) = \left\{ y \in Y \mskip\thickmuskip\middle|\mskip\thickmuskip \hat{f}(\tilde{x}_{\text{test}})_y \geq 1-\hat{q} \right\}.
     \label{eq:knowno_predset}
 \end{equation}
 
@@ -192,7 +192,7 @@ Quantisation is the standard technique for making a model fit that constraint: m
 at some cost to numerical precision. \citet{liu2025quantreasoning} define uniform quantisation of a tensor $\mathbf{X}$ to $b$ bits as
 
 \begin{equation}
-    \hat{\mathbf{X}} = \mathcal{Q}(\mathbf{X}; b) = s \cdot \Pi_{\Omega(b)}\!\left(\frac{\mathbf{X}}{s}\right), \qquad s = \frac{\max(\mathbf{X}) - \min(\mathbf{X})}{2^{b}-1},
+    \hat{\mathbf{X}} = \mathcal{Q}(\mathbf{X}; b) = s \cdot \Pi_{\Omega(b)}\mskip-\thinmuskip\left(\frac{\mathbf{X}}{s}\right), \qquad s = \frac{\max(\mathbf{X}) - \min(\mathbf{X})}{2^{b}-1},
     \label{eq:quantization}
 \end{equation}
 

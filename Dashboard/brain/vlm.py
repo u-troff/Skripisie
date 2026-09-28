@@ -9,7 +9,8 @@ log = get_logger("vlm")
 
 # ImageSource is re-exported so pipeline.py's existing import keeps working.
 __all__ = ["ImageSource", "check_ambiguity", "verify_plan", "describe_frame",
-           "inventory_frame", "failed"]
+           "inventory_frame", "check_progress", "check_side_look",
+           "check_arrival", "failed"]
 
 # Marker key on a result that never reached a usable answer. Without this a
 # failed call returns {} and .get("ambiguous") is falsy, so a broken model reads
@@ -119,6 +120,61 @@ def inventory_frame(image: ImageSource) -> dict:
         '"obstacles": ["anything on the floor that would block a small wheeled robot"]}'
     )
     return _ask("inventory_frame", prompt, image)
+
+
+# --------------------------------------------------------------------------
+# Grounded line mission — checks taken while the rover drives, and at arrival.
+#
+# All three are OBSERVATIONS, never control signals. The IR sensor steers and
+# the ultrasonic decides when to stop; at ~15s a frame the VLM is two orders of
+# magnitude too slow to be in that loop. A failed call returns {"_error": ...}
+# and callers MUST record that as "check failed", never as "target not
+# visible" — the whole point of RQ1's evidence is the difference between the
+# system saying "I could not see it" and the system hallucinating that it did.
+# --------------------------------------------------------------------------
+def check_progress(image: ImageSource, target: str) -> dict:
+    """Mid-route keyframe check. Observation only; never a control signal."""
+    prompt = (
+        "You are the camera check for a small rover driving along a floor line toward: "
+        f'"{target}".\n'
+        "Answer only from what is visible in this image.\n"
+        "Respond ONLY with JSON: "
+        '{"target_visible": true/false, "path_clear": true/false, '
+        '"description": "one short sentence"}'
+    )
+    return _ask("check_progress", prompt, image)
+
+
+def check_arrival(image: ImageSource, target: str, expected: Optional[List[str]] = None) -> dict:
+    """Arrival check for the report.
+
+    `expected` is the other things the command or the room scene says should be
+    visible here. Splitting `seen` from `missing` is what lets report.py flag
+    residual uncertainty deterministically instead of asking a model whether it
+    was sure.
+    """
+    prompt = (
+        f'A rover has stopped where it should be able to see: "{target}".\n'
+        f"Other things that may be nearby: {json.dumps(list(expected or []))}\n"
+        "Answer only from what is visible in this image. Do not assume.\n"
+        "Respond ONLY with JSON: "
+        '{"target_visible": true/false, "confidence": "high"|"medium"|"low", '
+        '"seen": ["things from the lists that ARE visible"], '
+        '"missing": ["things from the lists that are NOT visible"], '
+        '"description": "one or two sentences"}'
+    )
+    return _ask("check_arrival", prompt, image)
+
+
+def check_side_look(image: ImageSource, target: str) -> dict:
+    """The one planned stop: what is off to the left of the route."""
+    prompt = (
+        "This frame was taken with the rover's camera turned LEFT, off its direction of travel.\n"
+        f'The rover is heading toward: "{target}".\n'
+        "Respond ONLY with JSON: "
+        '{"objects": ["..."], "target_visible": true/false, "description": "one sentence"}'
+    )
+    return _ask("check_side_look", prompt, image)
 
 
 def _ask(stage: str, prompt: str, image: Optional[ImageSource]) -> dict:

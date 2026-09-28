@@ -329,8 +329,34 @@ def get_rover() -> RoverController:
             seed=int(seed_text) if seed_text.lstrip("-").isdigit() else None,
             strict_targets=_get_bool("VIRTUAL_STRICT_TARGETS", True),
         )
+    elif name == "pi":
+        # Lazy import: roslibpy (and its deps) is only needed for ROVER=pi,
+        # so sim/virtual work stays dependency-free. See rover_pi.py and
+        # Progress/turbopi-ros2-programming-guide.md §8 for what this does
+        # and doesn't cover yet (motion only — no line-following, no
+        # perception feed for ingest_frame, "approach" == "move" for now;
+        # follow_line and the keyframe/arrival checks ARE wired up as of
+        # 2026-09-28 — see Progress/spec-grounded-line-mission.md).
+        from rover_pi import PiRoverController
+        host = config.get("ROVER_PI_HOST", "").strip()
+        if not host:
+            raise RoverError(
+                "ROVER=pi requires ROVER_PI_HOST (the robot's IP/hostname) in .env"
+            )
+        _cache = PiRoverController(
+            host=host,
+            rosbridge_port=config.get_int("ROVER_PI_ROSBRIDGE_PORT", 9090),
+            move_seconds=config.get_float("ROVER_PI_MOVE_SECONDS", 1.0),
+            turn_seconds=config.get_float("ROVER_PI_TURN_SECONDS", 1.0),
+            linear_speed=config.get_float("ROVER_PI_LINEAR_SPEED", 0.3),
+            angular_speed=config.get_float("ROVER_PI_ANGULAR_SPEED", 4.0),
+            camera_port=config.get_int("ROVER_PI_CAMERA_PORT", 8080),
+            sonar_stop_mm=config.get_int("ROVER_PI_SONAR_STOP_MM", 200),
+            sonar_clear_mm=config.get_int("ROVER_PI_SONAR_CLEAR_MM", 300),
+            obstacle_wait_s=config.get_float("ROVER_PI_OBSTACLE_WAIT_S", 5.0),
+            line_timeout_s=config.get_float("ROVER_PI_LINE_TIMEOUT_S", 40.0),
+        )
     else:
-        raise RoverError(f"unknown ROVER={name!r} — 'sim' and 'virtual' are implemented")
+        raise RoverError(f"unknown ROVER={name!r} — 'sim', 'virtual', and 'pi' are implemented")
     log.info("[rover] %s", _cache.name)
     return _cache
-

@@ -5,6 +5,7 @@ import OneShotPanel from './components/OneShotPanel'
 import { fetchHealth, postScene } from './net'
 import { useStore } from './store'
 import type { Language } from './types'
+import GimbalControl from './components/GimbalControl'
 
 // qwen2.5vl turns image resolution into vision tokens, and a phone photo alone
 // can exceed the model's context window. Cap the long edge before upload.
@@ -99,7 +100,7 @@ export default function App() {
 
         <label className={`drop ${sceneUploading ? 'off' : ''}`}>
           <input type="file" accept="video/*" onChange={(e) => void onPickVideo(e)}
-                 disabled={sceneUploading} />
+            disabled={sceneUploading} />
           {sceneUploading ? 'Reading the room… (one model call per keyframe)' : 'Choose a room video…'}
         </label>
 
@@ -174,6 +175,7 @@ export default function App() {
       <OneShotPanel />
       <DialoguePanel />
       <ExecutionPanel />
+      <GimbalControl />
     </main>
   )
 }

@@ -59,6 +59,29 @@ class MissionSession:
     started_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
 
+    # -- grounded line mission (spec-grounded-line-mission.md §E/§F) ---------
+    # What the human actually said, kept next to the resolved command so a run
+    # log shows how much of the plan came from clarification rather than from
+    # the original utterance. That difference is the RQ1 evidence.
+    original_command: str = ""
+    scene_id: Optional[str] = None
+    scene_text: str = ""
+
+    # Every VLM check taken while driving, including the ones that were skipped
+    # because a previous check was still running. Skips are data, not noise:
+    # "how many checks fit in one run on this host" is a measured RQ1 number.
+    checks: List[dict] = field(default_factory=list)
+    look_left: Optional[dict] = None
+    arrival: Optional[dict] = None
+    # Consecutive completed progress checks reporting path_clear=false. Two in
+    # a row warns; it never halts — the sonar is the only authority on stopping.
+    path_unclear_streak: int = 0
+    rover_telemetry: dict = field(default_factory=dict)
+    # Live asyncio Tasks for in-flight VLM checks. Not serialisable and
+    # deliberately absent from snapshot(); run_mission drains it before
+    # building the report so a slow check still lands in the log.
+    check_tasks: List[Any] = field(default_factory=list)
+
     def steps(self) -> List[dict]:
         return self.active_plan.get("steps") or []
 
@@ -85,6 +108,10 @@ class MissionSession:
             "digest": list(self.digest),
             "frames_seen": self.frames_seen,
             "frames_analysed": self.frames_analysed,
+            "checks": self.checks,
+            "look_left": self.look_left,
+            "arrival": self.arrival,
+            "rover_telemetry": self.rover_telemetry,
             "pending_material": self.pending_material,
             "results": self.results,
             "revisions": [
@@ -104,6 +131,9 @@ class MissionStore:
         mission = MissionSession(
             session_id=dialogue.session_id,
             command=dialogue.effective_command(),
+            original_command=dialogue.command,
+            scene_id=dialogue.scene_id,
+            scene_text=dialogue.scene_text,
             confirmed_plan=plan,
             active_plan=copy.deepcopy(plan),
         )

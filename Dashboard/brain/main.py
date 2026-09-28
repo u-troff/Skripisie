@@ -5,7 +5,10 @@ import asyncio
 import mission as mission_mod
 import mission_session
 from rover import get_rover
+import config,room_map
 
+
+from pipeline import handle_confirmation_audio,handle_confirmation_text,handle_dialogue_audio,handle_dialogue_text
 import av
 from fastapi import FastAPI, File, Form, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,8 +25,18 @@ import dialogue_session
 import scene as scene_mod
 from dialogue_session import Phase
 from pipeline import handle_confirmation_audio, handle_dialogue_audio
+import httpx
+from fastapi import Response
+
+
+GIMBAL_STEP = 100
 
 setup_logging()
+
+def _bool_env(name: str, default: bool) -> bool:
+    return config.get(name, "1" if default else "0").strip().lower() not in ("0", "false", "no", "off")
+
+TEXT_COMMANDS_ENABLED = _bool_env("ALLOW_TEXT_COMMANDS", False)
 
 app = FastAPI()
 
@@ -166,6 +179,17 @@ async def dialogue(websocket: WebSocket):
                         session.scene_text = found.digest()
                         # The VLM still gets something to look at, not just read.
                         session.image = found.representative()
+                elif config.get("SCENE_SOURCE", "video").lower() == "room":
+                    # Testing mode: no video, no vlm.inventory_frame call. The
+                    # planner and ambiguity check see only the fixture
+                    # VirtualRover will later resolve against, so a run can't
+                    # fail on a mismatch between what a video showed and what
+                    # the fixture says is there. session.image stays None —
+                    # text-only grounding, on purpose, for this mode.
+                    room = room_map.load_room(config.get("ROOM_MAP", "rooms/room_tour1.json"))
+                    session.scene_id = "room:" + room.name
+                    session.scene_text = room.digest_text()
+
                 await websocket.send_json(
                     {"type": "session", "session_id": session.session_id,
                      "phase": session.phase.value, "scene_id": session.scene_id}
@@ -173,9 +197,28 @@ async def dialogue(websocket: WebSocket):
                 if kind == "start":
                     continue
 
-            if kind not in ("audio_chunk", "confirmation_audio", "audio"):
-                await websocket.send_json({"type": "error", "message": f"unknown type {kind!r}"})
+            if kind in ("text_command", "confirmation_text"):
+                if not TEXT_COMMANDS_ENABLED:
+                    await websocket.send_json(
+                        {"type": "error",
+                         "message": "text commands are disabled — set ALLOW_TEXT_COMMANDS=1"}
+                    )
+                    continue
+                text = str(frame.get("text") or "").strip()
+                if not text:
+                    await websocket.send_json({"type": "error", "message": "empty text"})
+                    continue
+                if session.phase is Phase.AWAITING_CONFIRMATION:
+                    events = await run_in_threadpool(handle_confirmation_text, session, text)
+                else:
+                    events = await run_in_threadpool(
+                        handle_dialogue_text, session, text, _decode(frame.get("image"))
+                    )
+                for event in events:
+                    await websocket.send_json(event)
                 continue
+
+
 
             audio = _decode(frame.get("audio"))
             if not audio:
@@ -269,3 +312,33 @@ def dialogue_state(session_id: str):
     """Read-only view for the dashboard while a conversation is in progress."""
     session = dialogue_session.store.get(session_id)
     return session.snapshot() if session else {"error": "unknown session"}
+
+@app.post("/pi/gimbal/{direction}")
+def gimbal_control(direction:str):
+    rover = get_rover()
+    if getattr(rover, "name", None) != "pi":
+        return {"error": "gimbal control requires ROVER=pi"}
+    if direction == "center":
+        return rover.center_gimbal()
+    deltas = {
+        "up": (0, GIMBAL_STEP), "down": (0, -GIMBAL_STEP),
+        "left": (-GIMBAL_STEP, 0), "right": (GIMBAL_STEP, 0),
+    }
+    if direction not in deltas:
+        return {"error": f"unknown direction {direction!r}"}
+    pan_delta, tilt_delta = deltas[direction]
+    return rover.nudge_gimbal(pan_delta=pan_delta, tilt_delta=tilt_delta)
+
+
+@app.get("/pi/camera/snapshot")
+def camera_snapshot():
+    host = config.get("ROVER_PI_HOST", "").strip()
+    if not host:
+        return Response(status_code=503, content=b"ROVER_PI_HOST not set")
+    port = config.get_int("ROVER_PI_CAMERA_PORT", 8080)
+    try:
+        upstream = httpx.get(f"http://{host}:{port}/snapshot?topic=/image_raw", timeout=2.0)
+        upstream.raise_for_status()
+    except httpx.HTTPError as exc:
+        return Response(status_code=502, content=str(exc).encode())
+    return Response(content=upstream.content, media_type="image/jpeg")
