@@ -59,11 +59,15 @@ class Bench:
         self.sonar_mm = None          # latest valid reading
         self.sonar_seq = 0            # increments per valid reading
         self.arrived = threading.Event()
+        self.corners = []             # (t, "LEFT"/"RIGHT") from the patched node
+        self.last_corner_t = -1e9
 
         roslibpy.Topic(self.ros, "/sonar_controller/get_distance", "std_msgs/msg/Int32",
                        throttle_rate=100, queue_length=1).subscribe(self._on_sonar)
         roslibpy.Topic(self.ros, "/line_follow/crossroads_stop",
                        "std_msgs/msg/Bool").subscribe(self._on_crossroads)
+        roslibpy.Topic(self.ros, "/line_follow/corner",
+                       "std_msgs/msg/Int32").subscribe(self._on_corner)
         time.sleep(0.5)  # let subscriptions settle
 
     # -- callbacks -----------------------------------------------------------
@@ -78,6 +82,12 @@ class Bench:
         if msg.get("data"):
             log("crossroads_stop received -> ARRIVED")
             self.arrived.set()
+
+    def _on_corner(self, msg):
+        side = "LEFT" if int(msg.get("data", 0)) < 0 else "RIGHT"
+        self.last_corner_t = time.perf_counter()
+        self.corners.append(side)
+        log(f"bend taken: {side}")
 
     # -- follower control -------------------------------------------------------
     def lf(self, cmd: str, blocking: bool = False) -> None:
@@ -101,6 +111,9 @@ class Bench:
         """What rover_pi.halt() must do: stop the follower AND publish zero."""
         self.lf("STOP")
         self.zero_twist()
+        # A STOP that lands in the 0.5 s "forward nudge" before a corner turn does not
+        # cancel the turn that follows it (stock node quirk), so repeat once after it.
+        threading.Timer(0.7, lambda: (self.lf("STOP"), self.zero_twist())).start()
 
     # -- gimbal / camera ---------------------------------------------------------
     def pan(self, position: int, duration: float = 0.3) -> None:
@@ -128,9 +141,13 @@ class Bench:
     # -- the loop that becomes rover_pi.follow_line -----------------------------
     def follow_line(self, stop_mm: int, clear_mm: int, obstacle_wait_s: float,
                     timeout_s: float, halt_after: float = 0.0, look_left_at: float = 0.0,
-                    look_left_pan: int = 1100, out_dir: str = ".") -> dict:
+                    look_left_pan: int = 1100, out_dir: str = ".",
+                    route: str = "STOP_NEXT_ROAD") -> dict:
         self.arrived.clear()
-        self.lf("STOP_NEXT_ROAD", blocking=True)   # MUST precede running (default mode turns right)
+        self.corners = []
+        # MUST precede running (default mode turns right at every crossroad).
+        # "L" = turn left at the first crossroad (the corner), then park at the next (crossbar).
+        self.lf(route, blocking=True)
         self.set_running(True)
         start = time.perf_counter()
         below, last_seq = 0, self.sonar_seq
@@ -148,10 +165,14 @@ class Bench:
 
                 if self.arrived.is_set():
                     return {"status": "ok", "arrived": True, "elapsed_s": round(el, 2),
-                            "obstacle_events": obstacle_events}
+                            "obstacle_events": obstacle_events, "bends": list(self.corners)}
 
-                if look_left_at and not looked and el >= look_left_at:
+                # never pause mid-bend: a STOP during the pivot cancels the turn and the
+                # rover resumes straight off the tape. Defer until 5 s after the last bend.
+                in_bend = time.perf_counter() - self.last_corner_t < 5.0
+                if look_left_at and not looked and el >= look_left_at and not in_bend:
                     looked = True
+                    t_look = time.perf_counter()
                     log("look-left: STOP")
                     self.lf("STOP", blocking=True)
                     time.sleep(0.3)
@@ -164,6 +185,7 @@ class Bench:
                     time.sleep(0.5)
                     self.lf("CONTINUE", blocking=True)
                     log("look-left: CONTINUE (arrival trigger should still be armed)")
+                    start += time.perf_counter() - t_look   # pause doesn't count against timeout
 
                 with self._lock:
                     mm, seq = self.sonar_mm, self.sonar_seq
@@ -222,6 +244,8 @@ def main() -> None:
     r.add_argument("--look-left-at", type=float, default=0)
     r.add_argument("--look-left-pan", type=int, default=1100)
     r.add_argument("--out", default=".")
+    r.add_argument("--route", default="STOP_NEXT_ROAD",
+                   help='STOP_NEXT_ROAD for a straight track; "L" for the L-shaped track')
 
     sub.add_parser("stop", help="panic stop")
     args = ap.parse_args()
@@ -238,7 +262,8 @@ def main() -> None:
                 time.sleep(0.5)
         else:
             res = b.follow_line(args.stop_mm, args.clear_mm, args.obstacle_wait, args.timeout,
-                                args.halt_after, args.look_left_at, args.look_left_pan, args.out)
+                                args.halt_after, args.look_left_at, args.look_left_pan, args.out,
+                                args.route)
             log(f"RESULT: {res}")
             if args.length_cm and res.get("arrived"):
                 log(f"speed ≈ {args.length_cm / res['elapsed_s']:.1f} cm/s over {args.length_cm:.0f} cm")

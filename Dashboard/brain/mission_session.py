@@ -73,6 +73,7 @@ class MissionSession:
     checks: List[dict] = field(default_factory=list)
     look_left: Optional[dict] = None
     arrival: Optional[dict] = None
+    target_confirmed: Optional[dict] = None
     # Consecutive completed progress checks reporting path_clear=false. Two in
     # a row warns; it never halts — the sonar is the only authority on stopping.
     path_unclear_streak: int = 0
@@ -128,6 +129,7 @@ class MissionSession:
             "checks": self.checks,
             "look_left": self.look_left,
             "arrival": self.arrival,
+            "target_confirmed": self.target_confirmed,
             "rover_telemetry": self.rover_telemetry,
             "pending_material": self.pending_material,
             "results": self.results,

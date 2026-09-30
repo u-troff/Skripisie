@@ -10,7 +10,7 @@ log = get_logger("vlm")
 # ImageSource is re-exported so pipeline.py's existing import keeps working.
 __all__ = ["ImageSource", "check_ambiguity", "verify_plan", "describe_frame",
            "inventory_frame", "check_progress", "check_side_look",
-           "check_arrival", "failed"]
+           "check_arrival", "failed", "KNOWN_MAX"]
 
 # Marker key on a result that never reached a usable answer. Without this a
 # failed call returns {} and .get("ambiguous") is falsy, so a broken model reads
@@ -132,47 +132,101 @@ def inventory_frame(image: ImageSource) -> dict:
 # visible" — the whole point of RQ1's evidence is the difference between the
 # system saying "I could not see it" and the system hallucinating that it did.
 # --------------------------------------------------------------------------
-def check_progress(image: ImageSource, target: str) -> dict:
+# The room catalogue handed to a check is capped. A 3B model given a long list
+# starts reporting things *because they are on the list* — which would invert
+# the evidence these checks exist to produce, turning a hallucination measure
+# into a hallucination source. Short list, and every check is also asked for
+# `unexpected`, so over-claiming at least shows up in the log instead of
+# quietly passing as a match.
+KNOWN_MAX = 20
+
+
+def _known_block(known: Optional[List[str]]) -> str:
+    """The room-video grounding block, shared by all three drive checks.
+
+    The room was filmed before departure and catalogued by scene.py; this is
+    that catalogue as plain names. It is what lets a check answer "I can see
+    the desk and the bookshelf" rather than free-associating, and it is the
+    only thing that makes `unexpected` meaningful — a name the rover reports
+    that the room does not contain is the cleanest RQ2 hallucination signal in
+    the run.
+
+    Grounding only. Nothing derived from it steers: the IR sensor and the
+    sonar own the driving, at two orders of magnitude more often than a frame
+    can be read.
+    """
+    if not known:
+        return ""
+    names = json.dumps(list(known)[:KNOWN_MAX])
+    return (
+        "The room was filmed beforehand. Everything catalogued in it:\n"
+        f"{names}\n"
+        "List in \"seen\" only the catalogued things you can ACTUALLY see in this "
+        "image right now. Do not list something merely because it is on the "
+        "list. Anything clearly visible that is NOT on the list goes in "
+        "\"unexpected\".\n"
+    )
+
+
+def check_progress(image: ImageSource, target: str,
+                   known: Optional[List[str]] = None) -> dict:
     """Mid-route keyframe check. Observation only; never a control signal."""
     prompt = (
         "You are the camera check for a small rover driving along a floor line toward: "
         f'"{target}".\n'
         "Answer only from what is visible in this image.\n"
+        + _known_block(known) +
         "Respond ONLY with JSON: "
         '{"target_visible": true/false, "path_clear": true/false, '
+        '"seen": ["catalogued things visible now"], '
+        '"unexpected": ["visible things not in the catalogue"], '
         '"description": "one short sentence"}'
     )
     return _ask("check_progress", prompt, image)
 
 
-def check_arrival(image: ImageSource, target: str, expected: Optional[List[str]] = None) -> dict:
+def check_arrival(image: ImageSource, target: str, expected: Optional[List[str]] = None,
+                  known: Optional[List[str]] = None) -> dict:
     """Arrival check for the report.
 
-    `expected` is the other things the command or the room scene says should be
-    visible here. Splitting `seen` from `missing` is what lets report.py flag
-    residual uncertainty deterministically instead of asking a model whether it
-    was sure.
+    `expected` is the narrow list — the target plus whatever the command itself
+    named. `known` is the wider room catalogue. Both are reported against, but
+    only `expected` drives `missing`: report.py flags a non-empty `missing` as
+    an uncertainty, and scoring the whole room inventory as "missing" would
+    make that flag fire on every run and stop meaning anything.
     """
     prompt = (
         f'A rover has stopped where it should be able to see: "{target}".\n'
         f"Other things that may be nearby: {json.dumps(list(expected or []))}\n"
         "Answer only from what is visible in this image. Do not assume.\n"
+        + _known_block(known) +
         "Respond ONLY with JSON: "
         '{"target_visible": true/false, "confidence": "high"|"medium"|"low", '
         '"seen": ["things from the lists that ARE visible"], '
-        '"missing": ["things from the lists that are NOT visible"], '
+        '"missing": ["things from the NEARBY list that are NOT visible"], '
+        '"unexpected": ["visible things not in either list"], '
         '"description": "one or two sentences"}'
     )
     return _ask("check_arrival", prompt, image)
 
 
-def check_side_look(image: ImageSource, target: str) -> dict:
-    """The one planned stop: what is off to the left of the route."""
+def check_side_look(image: ImageSource, target: str,
+                    known: Optional[List[str]] = None) -> dict:
+    """The one planned stop: what is off to the left of the route.
+
+    The check that gains most from the catalogue — it is a deliberate "what is
+    over there" observation with no target to anchor it, so without the room
+    list the model has nothing to be right or wrong against.
+    """
     prompt = (
         "This frame was taken with the rover's camera turned LEFT, off its direction of travel.\n"
         f'The rover is heading toward: "{target}".\n'
+        + _known_block(known) +
         "Respond ONLY with JSON: "
-        '{"objects": ["..."], "target_visible": true/false, "description": "one sentence"}'
+        '{"objects": ["..."], "target_visible": true/false, '
+        '"seen": ["catalogued things visible now"], '
+        '"unexpected": ["visible things not in the catalogue"], '
+        '"description": "one sentence"}'
     )
     return _ask("check_side_look", prompt, image)
 

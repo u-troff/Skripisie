@@ -54,7 +54,7 @@ Start the follower in **Terminal A**. Run the node on its own — **not** `line_
 which would start a second `mecanum` node:
 
 ```bash
-ros2 run example line_follow
+python3 ~/line_follow_corner.py      # patched bend-following node (spec §7). Stock fallback: ros2 run example line_follow
 ```
 
 Expect `Line follow ready`. The node sits idle and prints nothing until it is running.

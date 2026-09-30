@@ -1,4 +1,4 @@
-import type { DialogueSnapshot, SceneResponse, SocketStatus } from './types'
+import type { DialogueSnapshot, RunReport, RunSummary, SceneResponse, SocketStatus } from './types'
 
 export function socketUrl(path: string): string {
   const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
@@ -82,4 +82,18 @@ export async function postScene(file: File): Promise<SceneResponse> {
   const response = await fetch('/api/scene', { method: 'POST', body: form })
   if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
   return (await response.json()) as SceneResponse
+}
+
+/** Summaries of every run log on disk, newest first — for the Logs page. */
+export async function fetchLogs(): Promise<RunSummary[]> {
+  const response = await fetch('/api/logs')
+  if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
+  return (await response.json()) as RunSummary[]
+}
+
+/** One run's full report, for the Logs page's detail view. */
+export async function fetchLog(sessionId: string): Promise<RunReport> {
+  const response = await fetch(`/api/logs/${sessionId}`)
+  if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
+  return (await response.json()) as RunReport
 }

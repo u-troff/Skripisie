@@ -107,16 +107,23 @@ Out of scope this week: turns at junctions, multi-leg routes, gimbal sweeps, fee
 
 ### A. Pi side (no code changes)
 
+> **Updated 2026-09-29:** the Pi runs the **patched bend-following node**
+> `Dashboard/pi_client/line_follow_corner.py` (see §7), **not** the stock `ros2 run example
+> line_follow`. It has the same node name and services, so nothing in this spec changes except the
+> start command. The stock node is only for comparison or rollback.
+
 After the normal bring-up sequence (restart container → `bringup.launch.py`), start the node in a
 second shell:
 
 ```bash
+# one-off deploy (from the Mac, then on the Pi):
+#   scp Dashboard/pi_client/line_follow_corner.py <pi-user>@<pi-ip>:~/
+#   docker cp ~/line_follow_corner.py turbopi:/home/ubuntu/line_follow_corner.py
 docker exec -it -u ubuntu -w /home/ubuntu turbopi /bin/zsh -c \
-  "source ~/.zshrc && ros2 run example line_follow"
+  "source ~/.zshrc && python3 ~/line_follow_corner.py"
 ```
 
-If `ros2 pkg executables example` doesn't list `line_follow`, the workspace needs a
-`colcon build --packages-select example`. Ask before doing this.
+Rollback to stock: `ros2 run example line_follow` (it will treat bends as crossroads).
 
 ### B. `rover_pi.py`
 
@@ -303,7 +310,7 @@ LOOK_LEFT_PAN=1100                # set by eye in T5
 
 | # | Test | Pass when |
 |---|---|---|
-| T0 | Bring-up, then `ros2 run example line_follow`; `ros2 service list \| grep line_follow` | All services listed; no second `mecanum` node |
+| T0 | Bring-up, then `python3 ~/line_follow_corner.py` (§3A); `ros2 service list \| grep line_follow` | All services listed; no second `mecanum` node |
 | T1 | From a container shell: `cmd STOP_NEXT_ROAD` → `set_running true`. Rover on the tape | Follows the line and parks on the crossbar 5/5 runs; `crossroads_stop` echoes `true`. Note the S0..S3 polarity |
 | T2 | Time 3 runs over a marked 100 cm stretch | `LINE_SPEED_CMPS` set (mean); `LINE_TIMEOUT_S` recomputed |
 | T3 | `ros2 topic echo /sonar_controller/get_distance` with a box at 10/20/30 cm | Readings are in mm and within ±2 cm; no 0 values or spikes at those distances |
@@ -338,3 +345,89 @@ hallucinating.
 - **The target has to be in frame at arrival** at the default tilt. Set its position in §2
   before T7, not during.
 - **I2C bus shared by sonar and IR.** Watch for `OSError` in the node logs during T1 and T3.
+
+---
+
+## 6. Day-1 results (2026-09-29) — T0–T5 PASSED. Use these, they override §3G defaults
+
+Reference implementation of the §3B loop: `Dashboard/brain/tools/line_bench.py` (`Bench.follow_line`).
+**Lift it into `rover_pi.py` rather than re-deriving it** — it is the version that passed on hardware.
+
+Measured / confirmed values (`.env`):
+
+```dotenv
+ROVER_PI_HOST=172.20.10.4
+ROVER_PI_CAMERA_PORT=8080
+ROVER_PI_SONAR_STOP_MM=200
+ROVER_PI_SONAR_CLEAR_MM=300
+ROVER_PI_OBSTACLE_WAIT_S=5
+ROVER_PI_LINE_TIMEOUT_S=23        # ≈ 2 × length / speed; 1.5× (17.2 s) was too tight
+LINE_LENGTH_CM=176
+LINE_SPEED_CMPS=15.3
+KEYFRAME_SPACING_CM=40            # → one progress check every ~2.6 s at 15.3 cm/s
+LOOK_LEFT_AT_FRACTION=0.45        # ~5 s into an ~11.5 s drive; 8.6 s was too late (hit crossbar)
+LOOK_LEFT_PAN=1100                # confirmed = camera pans LEFT
+```
+
+Changes the implementation MUST carry over from `line_bench.py` (found during T0–T5, not in §3B as written):
+
+1. **Timeout excludes pauses.** Both the obstacle wait and the look-left pause are added back to the
+   start time, so neither counts against `ROVER_PI_LINE_TIMEOUT_S`. `elapsed_s` = driving time only.
+2. **`halt()` sends `STOP` twice** — immediately and again after 0.7 s (`threading.Timer`). A `STOP`
+   that lands in the stock node's 0.5 s pre-turn "forward nudge" does not cancel the pivot turn that
+   follows it.
+3. **The route command is a parameter**, not hard-coded `STOP_NEXT_ROAD`: `STOP_NEXT_ROAD` for a
+   straight track; `L`/`R`/`C` sequences for tracks with junctions (the node turns at each crossroad in
+   order, then parks at the next one). Add `ROVER_PI_LINE_ROUTE=STOP_NEXT_ROAD` to `.env`.
+4. **Frames need an explicit output dir.** `line_bench.py` saves to the CWD by default (`--out`);
+   the mission code must use `logs/frames/<session_id>/` per §3E.1.
+
+Hardware notes:
+- IR sensor needed **cloth duck tape** (glossy PVC tape reflects IR = invisible) and **potentiometer
+  tuning** at resting height. If the track or floor changes, re-check with the T1a polarity script.
+- `/sonar_controller` present after bring-up (via `avoidance_node.launch.py`); readings in mm.
+- Only one `/mecanum` node — confirmed. Run `line_follow` with `ros2 run`, never its launch file.
+
+**Next: Day 2 (T6–T9)** — Claude Code implements §3B–§3F using the above, then T6 offline VLM checks.
+
+---
+
+## 7. Bend following (added 2026-09-29)
+
+The stock node reads a 90° bend as a crossroad (3 sensors black) and — with `STOP_NEXT_ROAD` — parks
+there. Fix: **`Dashboard/pi_client/line_follow_corner.py`**, a patched copy of the stock node that
+runs *instead of* it (same node name `line_follow`, same services — no brain changes required):
+
+- one-sided `[1,1,1,0]` / `[0,1,1,1]` for 4 ticks (~6 mm) → **bend** → stock pivot turn (L/R), keeps following
+- `[1,1,1,1]` → **crossbar** → stock crossroads logic (`STOP_NEXT_ROAD` parks here)
+- publishes `/line_follow/corner` (`std_msgs/Int32`, −1 left / +1 right) — log it in `mission.checks`
+  and the report ("took 1 left bend") — cheap evidence the rover followed the physical route
+- disable: `--ros-args -p auto_corners:=false`
+
+Rules the implementation must follow (already in `line_bench.py`):
+- **No look-left within 5 s of a bend** (subscribe to `/line_follow/corner`, defer the pause). A `STOP`
+  mid-pivot cancels the turn and the rover resumes straight off the tape.
+- Known limitation: a sonar stop *during* a pivot has the same effect → expect `line_timeout` in that
+  rare case. Accepted this week; the report will state it.
+- Track constraints: bends must be square and **solid** (tape overlapping), crossbar full-width and
+  ≥ 30 cm after the last bend. Only one bend direction per corner; no T-junctions.
+- `LINE_LENGTH_CM` = total tape length; timeout ≈ 2 × length / speed + 4 s per bend.
+
+---
+
+## 8. Gimbal direction is inverted (added 2026-09-29)
+
+Observed: commanding the gimbal "left" physically looks **right**, and "up" looks **down** (both
+servos are mounted reversed relative to the labels in `main.py` / `rover_pi.nudge_gimbal`).
+The **image itself is upright** — checked `left_look.jpg`: floor at the bottom, no rotation needed.
+Do NOT rotate/flip frames before the VLM.
+
+Implementation:
+- Add `ROVER_PI_PAN_INVERT=true` and `ROVER_PI_TILT_INVERT=true` to `.env`. In `rover_pi.py`, apply
+  inversion in ONE place — a helper that maps a logical offset from centre to a PWM value:
+  `pwm = center - offset if invert else center + offset`. `nudge_gimbal`, `look()`, `scan` and the
+  dashboard's `/pi/gimbal/{direction}` must all go through it, so "left" in code = left in the room.
+- `LOOK_LEFT_PAN` stays a **raw PWM value** (bypasses the helper) and must be the value that points
+  the camera at the rover's **physical left**, confirmed by eye standing behind the rover. If the
+  1100 used in T5 actually pointed right, it becomes **1900**.
+- Log the physical direction ("left") in `mission.checks` and the report, never the PWM number.

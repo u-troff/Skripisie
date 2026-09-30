@@ -27,7 +27,7 @@ from planner import revise_plan
 from providers import usage
 from rover import RoverController
 from stt import transcribe_audio
-from vlm import check_arrival, check_progress, check_side_look, describe_frame
+from vlm import KNOWN_MAX, check_arrival, check_progress, check_side_look, describe_frame
 from vlm import failed as vlm_failed
 
 log = get_logger("mission")
@@ -45,9 +45,16 @@ MIN_SHARPNESS = config.get_float("PERCEPTION_MIN_SHARPNESS", 25.0)
 # every est_distance_cm in a run log is a placeholder, not a measurement.
 LINE_LENGTH_CM = config.get_float("LINE_LENGTH_CM", 300.0)
 LINE_SPEED_CMPS = config.get_float("LINE_SPEED_CMPS", 17.0)
-KEYFRAME_SPACING_CM = config.get_float("KEYFRAME_SPACING_CM", 40.0)
+KEYFRAME_SPACING_CM = config.get_float("KEYFRAME_SPACING_CM", 100.0)
 LOOK_LEFT_AT_FRACTION = config.get_float("LOOK_LEFT_AT_FRACTION", 0.5)
 LOOK_LEFT_PAN = config.get_int("LOOK_LEFT_PAN", 1100)
+# Where the gimbal points for successive progress checks. The IR array is on the
+# chassis, not the gimbal, so panning costs nothing and disturbs nothing — that
+# is exactly what §0's "keeps the camera free for the VLM" bought. Set this to
+# "centre" alone to restore the old forward-only behaviour.
+PAN_CYCLE = [d.strip().lower() for d in
+             config.get("KEYFRAME_PAN_CYCLE", "centre,left,right").split(",")
+             if d.strip()] or ["centre"]
 # How long to let a VLM check that is still running when the drive ends finish
 # before giving up on it. At ~15s a frame on the local host, a check launched
 # near the crossbar routinely outlives the step it belongs to.
@@ -177,11 +184,15 @@ async def _analyse(mission: MissionSession, raw: bytes, emit: Emit) -> None:
 # --------------------------------------------------------------------------
 # Grounded line mission — keyframe checks while driving, and the arrival check.
 #
-# Everything here is OBSERVATION. The IR line sensor steers, the ultrasonic
-# decides when to stop, and the follower's own crossbar detection decides when
-# the rover has arrived. Nothing in this section can stop the rover, and a
-# check that fails is recorded as a failed check, never as "not visible".
+# Almost everything here is OBSERVATION. The IR line sensor steers and the
+# ultrasonic remains the only authority on obstacles; a check that fails is
+# recorded as a failed check, never as "not visible". The one deliberate
+# exception: a confirmed sighting of the step's own named target (see the end
+# of _record_check) halts the drive and counts as arrival — the follower's own
+# crossbar detection is the *other* way a drive ends in arrival, not the only
+# one any more.
 # --------------------------------------------------------------------------
+
 def _frames_dir(session_id: str) -> Path:
     path = LOGS_DIR / "frames" / session_id
     path.mkdir(parents=True, exist_ok=True)
@@ -215,6 +226,27 @@ def _scene_object_names(mission: MissionSession) -> List[str]:
             if name:
                 names.append(name)
     return names
+
+
+def _room_vocabulary(mission: MissionSession) -> List[str]:
+    """The room video's catalogue, as the grounding list for the drive checks.
+
+    This is the room video reaching the *hardware* stage. Until now the scene
+    digest only shaped the pre-departure prompts (clarification, planning,
+    verification) and then went unused the moment the rover started moving — a
+    check mid-drive had nothing to be right or wrong against. Now every check
+    answers against the same catalogue the plan was built from, which is what
+    makes "it saw something that is not in this room" a measurable event rather
+    than a judgement call.
+
+    Grounding only. Nothing derived from it steers: the IR sensor and the sonar
+    own the driving, at two orders of magnitude more often than a frame can be
+    read. [] when no room video was uploaded, which is a weaker but valid run.
+    """
+    if not mission.scene_id:
+        return []
+    room = scene_mod.store.get(mission.scene_id)
+    return room.vocabulary(KNOWN_MAX) if room is not None else []
 
 
 def _expected_things(mission: MissionSession, target: str) -> List[str]:
@@ -254,24 +286,34 @@ async def _emit_check(mission: MissionSession, record: dict, emit: Emit) -> None
     await emit({"type": "check", "session_id": mission.session_id, "check": record})
 
 
-async def _record_check(mission: MissionSession, kind: str, frame: bytes,
+async def _record_check(mission: MissionSession, rover, kind: str, frame: bytes,
                         t_rel_s: float, target: str, emit: Emit,
-                        filename: str) -> None:
+                        filename: str, known: Optional[List[str]] = None,
+                        aimed: str = "centre") -> None:
     """Run one VLM check in a worker thread and file the result.
 
     Runs as its own task so the drive is never waiting on inference — at ~15s a
     frame the check would otherwise be the slowest thing in the loop by two
     orders of magnitude.
+
+    `known` is the room-video catalogue (_room_vocabulary). It costs no extra
+    call — it is a block in the prompt that already runs — and it is what turns
+    a free-form description into a claim that can be checked against a room we
+    filmed.
     """
     frame_path = _save_frame(mission, filename, frame)
     call = check_progress if kind == "progress" else check_side_look
     started = time.perf_counter()
-    result = await asyncio.to_thread(call, frame, target)
+    result = await asyncio.to_thread(call, frame, target, known or [])
     latency = time.perf_counter() - started
 
     record = {
         "kind": kind,
         "target": target,
+        # The physical direction the camera was pointing, never the PWM
+        # number — spec §8.
+        "aimed": aimed,
+        "known_count": len(known or []),
         "t_rel_s": round(t_rel_s, 2),
         "est_distance_cm": round(t_rel_s * LINE_SPEED_CMPS, 1),
         "latency_s": round(latency, 2),
@@ -289,7 +331,12 @@ async def _record_check(mission: MissionSession, kind: str, frame: bytes,
     # Policy for this slice: warn, never halt. The sonar is the only authority
     # on distance and stopping, and a VLM whose answer is seconds stale must
     # not be allowed to veto a sensor that is current.
-    if kind == "progress" and not vlm_failed(result):
+    #
+    # Centre frames ONLY. `path_clear` on a side-looking frame is a statement
+    # about a wall to the left, not about the route ahead — counting those
+    # would fire the warning on a perfectly clear line, and a warning that
+    # fires every run is worse than no warning at all.
+    if kind == "progress" and aimed == "centre" and not vlm_failed(result):
         if result.get("path_clear") is False:
             mission.path_unclear_streak += 1
             if mission.path_unclear_streak >= 2:
@@ -303,6 +350,28 @@ async def _record_check(mission: MissionSession, kind: str, frame: bytes,
         else:
             mission.path_unclear_streak = 0
 
+    # Narrow exception to "never halt", above: a confirmed sighting of the
+    # step's own named target is a deliberate stop condition, not a path/
+    # obstacle judgement — those stay sonar/crossbar-only. Any aimed direction
+    # counts (a sweep's left/right frame is as valid a sighting as centre), and
+    # the look-left check counts too (check_side_look also reports
+    # target_visible). First confirmation wins — the guard below stops a
+    # second in-flight check in the same sweep from firing twice.
+    if kind in ("progress", "look_left") and target and not vlm_failed(result):
+        if result.get("target_visible") is True and mission.target_confirmed is None:
+            mission.target_confirmed = record
+            log.warning("[mission %s] target %r confirmed at %.1fs (aimed=%s, ~%.0fcm) "
+                        "— stopping", mission.session_id, target, t_rel_s, aimed,
+                        record["est_distance_cm"])
+            confirm = getattr(rover, "confirm_target", None)
+            if confirm is not None:
+                confirm(target)
+            await emit({"type": "target_confirmed", "session_id": mission.session_id,
+                        "check": record})
+
+        else:
+            mission.path_unclear_streak = 0
+
 
 async def _skip(mission: MissionSession, reason: str, t_rel_s: float, emit: Emit) -> None:
     record = {"kind": "skipped", "reason": reason, "t_rel_s": round(t_rel_s, 2),
@@ -313,8 +382,28 @@ async def _skip(mission: MissionSession, reason: str, t_rel_s: float, emit: Emit
     await _emit_check(mission, record, emit)
 
 
+async def _bend(mission: MissionSession, bend: dict, t_rel_s: float,
+                emit: Emit) -> None:
+    """One 90-degree bend the follower took, from line_follow_corner.py's
+    ~/corner topic.
+
+    Filed alongside the VLM checks on purpose: it is the only thing in a run
+    log that says where the rover actually *went* rather than what it thought
+    it saw, it costs no inference, and it comes from the same IR sensor that
+    did the steering — so it cannot be hallucinated.
+    """
+    record = {"kind": "bend", "side": bend.get("side"),
+              "t_rel_s": round(t_rel_s, 2),
+              "est_distance_cm": round(t_rel_s * LINE_SPEED_CMPS, 1)}
+    mission.checks.append(record)
+    log.info("[mission %s] bend taken: %s at %.1fs", mission.session_id,
+             record["side"], t_rel_s)
+    await _emit_check(mission, record, emit)
+
+
 async def _look_left(mission: MissionSession, rover, target: str,
-                     started: float, emit: Emit) -> None:
+                     started: float, emit: Emit,
+                     known: Optional[List[str]] = None) -> None:
     """The one planned stop. Pause, pan left, grab a frame, re-centre, resume —
     and only then ask the model about it, so inference never holds up motion."""
     t_rel = time.time() - started
@@ -333,9 +422,11 @@ async def _look_left(mission: MissionSession, rover, target: str,
         return
 
     task = asyncio.ensure_future(
-        _record_check(mission, "look_left", frame, t_rel, target, emit, "left_01.jpg")
+        _record_check(mission, rover, "look_left", frame, t_rel, target, emit,
+                      "left_01.jpg", known, "left")
     )
     mission.check_tasks.append(task)
+
 
 
 async def keyframe_monitor(mission: MissionSession, rover, step: dict, emit: Emit) -> None:
@@ -350,6 +441,9 @@ async def keyframe_monitor(mission: MissionSession, rover, step: dict, emit: Emi
     drained separately so a slow one still reaches the report.
     """
     target = str(step.get("target") or "").strip()
+    # Built once per drive, not per check: the scene is immutable for the run,
+    # and rebuilding it 20 times would be pure waste.
+    known = _room_vocabulary(mission)
     started = time.time()
     interval_s = max(1.0, KEYFRAME_SPACING_CM / LINE_SPEED_CMPS) if LINE_SPEED_CMPS > 0 else 1.0
     look_left_at_s = (LOOK_LEFT_AT_FRACTION * LINE_LENGTH_CM / LINE_SPEED_CMPS
@@ -360,43 +454,116 @@ async def keyframe_monitor(mission: MissionSession, rover, step: dict, emit: Emi
         log.info("[mission %s] rover has no pause/look/resume — no look-left this run",
                  mission.session_id)
 
-    log.info("[mission %s] keyframe monitor: every %.1fs, look-left at %.1fs, target=%r",
-             mission.session_id, interval_s, look_left_at_s, target)
+    # Only a rover running line_follow_corner.py has these; against the stock
+    # node (or sim/virtual) both stay None and the loop behaves exactly as it
+    # did on a straight track.
+    corner_guard = getattr(rover, "corner_guard_active", None)
+    drain_corners = getattr(rover, "drain_corners", None)
+    deferred_logged = False
 
-    in_flight = None
+    # Panning while driving, not stopping to do it: the IR array is on the
+    # chassis, so where the camera points has no bearing on steering. A rover
+    # that only ever looks straight ahead can only ever report what is on the
+    # tape, which is the least interesting thing in the room.
+    aim = getattr(rover, "aim", None)
+    pan_cycle = PAN_CYCLE if aim is not None else ["centre"]
+
+    log.info("[mission %s] keyframe monitor: every %.1fs, look-left at %.1fs, target=%r, "
+             "room catalogue=%d item(s)",
+             mission.session_id, interval_s, look_left_at_s, target, len(known))
+    if not known:
+        # Not an error — a run with no room video is a valid (weaker) run. But
+        # it means every `unexpected` will be empty, so the report must not read
+        # that as "the rover hallucinated nothing".
+        log.info("[mission %s] no room video loaded — checks run ungrounded",
+                 mission.session_id)
+
+    in_flight: List[asyncio.Future] = []
     index = 0
     next_tick = started + interval_s
 
-    while True:
-        await asyncio.sleep(0.2)
-        now = time.time()
 
-        if not look_done and (now - started) >= look_left_at_s:
-            look_done = True
-            await _look_left(mission, rover, target, started, emit)
-            # Don't fire a keyframe the instant the rover starts moving again.
-            next_tick = time.time() + interval_s
-            continue
+    try:
+        while True:
+            await asyncio.sleep(0.2)
+            now = time.time()
 
-        if now < next_tick:
-            continue
-        next_tick = now + interval_s
+            if drain_corners is not None:
+                for bend in drain_corners():
+                    await _bend(mission, bend, float(bend.get("at") or now) - started, emit)
 
-        if in_flight is not None and not in_flight.done():
-            await _skip(mission, "vlm_busy", now - started, emit)
-            continue
+            due_for_look = not look_done and (now - started) >= look_left_at_s
+            if due_for_look and corner_guard is not None and corner_guard():
+                # Spec §7: a STOP landing inside the follower's pivot cancels the
+                # turn and the rover resumes straight, off the tape. Defer the one
+                # planned stop rather than skip it — keyframe checks carry on
+                # meanwhile, so nothing else is lost by waiting the bend out.
+                if not deferred_logged:
+                    log.info("[mission %s] look-left deferred: a bend is in progress",
+                             mission.session_id)
+                    deferred_logged = True
+                due_for_look = False
 
-        frame = await asyncio.to_thread(rover.get_frame)
-        if frame is None:
-            await _skip(mission, "no_frame", now - started, emit)
-            continue
+            if due_for_look:
+                look_done = True
+                await _look_left(mission, rover, target, started, emit, known)
+                # Don't fire a keyframe the instant the rover starts moving again.
+                next_tick = time.time() + interval_s
+                continue
 
-        index += 1
-        in_flight = asyncio.ensure_future(
-            _record_check(mission, "progress", frame, now - started, target, emit,
-                          "kf_%02d.jpg" % index)
-        )
-        mission.check_tasks.append(in_flight)
+            if now < next_tick:
+                continue
+            next_tick = now + interval_s
+
+            if in_flight and any(not t.done() for t in in_flight):
+                await _skip(mission, "vlm_busy", now - started, emit)
+                continue
+
+            # Full centre/left/right sweep at every checkpoint now, not one
+            # direction cycled across ticks — the single-flight rule above
+            # applies to the sweep as a whole: the next sweep waits for every
+            # check from this one to finish before it will dispatch.
+            in_flight = []
+            for direction in pan_cycle:
+                # Aim first, then grab: the settle is inside aim(). At 15.3
+                # cm/s a 0.5 s settle is ~8 cm of travel, so the frame is
+                # taken from essentially where the check is timestamped.
+                aimed = direction
+                if aim is not None:
+                    aimed = await asyncio.to_thread(aim, direction) or direction
+
+                frame = await asyncio.to_thread(rover.get_frame)
+                if frame is None:
+                    await _skip(mission, "no_frame", time.time() - started, emit)
+                    continue
+
+                index += 1
+                task = asyncio.ensure_future(
+                    _record_check(mission, rover, "progress", frame,
+                                  time.time() - started, target, emit,
+                                  "kf_%02d_%s.jpg" % (index, aimed), known, aimed)
+                )
+                mission.check_tasks.append(task)
+                in_flight.append(task)
+
+    except asyncio.CancelledError:
+        # The drive ended (arrived, blocked or halted) before the look-left ran.
+        # Record why: an absent look_left with no explanation reads in the run
+        # log as if the code forgot. The two causes are not the same fault —
+        # a bend deferral is the §7 guard doing its job on a route with corners,
+        # while "never came due" just means the drive was shorter than
+        # LOOK_LEFT_AT_FRACTION predicted, which is a calibration note.
+        if not look_done:
+            reason = ("look_left_deferred_by_bend" if deferred_logged
+                      else "look_left_not_due_before_end_of_drive")
+            mission.checks.append({
+                "kind": "skipped",
+                "reason": reason,
+                "t_rel_s": round(time.time() - started, 2),
+            })
+            log.warning("[mission %s] look-left never happened (%s)",
+                        mission.session_id, reason)
+        raise
 
 
 async def _drain_checks(mission: MissionSession) -> None:
@@ -416,6 +583,14 @@ async def _drain_checks(mission: MissionSession) -> None:
 
 async def _arrival_check(mission: MissionSession, rover, target: str, emit: Emit) -> None:
     t_rel = time.time() - mission.started_at
+    # Centre first, always. The pan cycle leaves the gimbal wherever the last
+    # progress check pointed it, and an arrival frame taken while still aimed
+    # left would be scored against the forward target — a false "not visible"
+    # that looks exactly like an honest one. Idempotent: the `observe` step
+    # already centres, and doing it twice costs nothing.
+    if hasattr(rover, "center_gimbal"):
+        await asyncio.to_thread(rover.center_gimbal)
+        await asyncio.sleep(0.5)
     frame = await asyncio.to_thread(rover.get_frame)
     if frame is None:
         mission.arrival = {"kind": "arrival", "target": target, "expected": [],
@@ -426,13 +601,15 @@ async def _arrival_check(mission: MissionSession, rover, target: str, emit: Emit
         return
 
     expected = _expected_things(mission, target)
+    known = _room_vocabulary(mission)
     frame_path = _save_frame(mission, "arrival.jpg", frame)
     started = time.perf_counter()
-    result = await asyncio.to_thread(check_arrival, frame, target, expected)
+    result = await asyncio.to_thread(check_arrival, frame, target, expected, known)
     record = {
         "kind": "arrival",
         "target": target,
         "expected": expected,
+        "known": known,
         "t_rel_s": round(t_rel, 2),
         "latency_s": round(time.perf_counter() - started, 2),
         "frame_path": frame_path,
@@ -576,6 +753,11 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
                     monitor.cancel()
                     await asyncio.gather(monitor, return_exceptions=True)
                     await _drain_checks(mission)
+                    # The pan cycle does not re-centre after each check (that
+                    # would double every settle for nothing), so put it back
+                    # once the drive is over.
+                    if hasattr(rover, "center_gimbal"):
+                        await asyncio.to_thread(rover.center_gimbal)
                     if hasattr(rover, "telemetry_snapshot"):
                         mission.rover_telemetry = rover.telemetry_snapshot()
 

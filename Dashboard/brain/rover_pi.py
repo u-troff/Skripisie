@@ -26,9 +26,9 @@ Action mapping (rover.py's RoverController.execute_step receives a plan step
                        choice. Travel of any real distance is follow_line's
                        job now.
 - turn             -> timed Twist with angular.z, direction from the step's
-                       target text (reuses rover.py's own _is_backward /
-                       _turn_degrees helpers so "left"/"right"/"backward"
-                       parsing stays in one place).
+                       target text ("left" -> positive, else negative — same
+                       convention as rover.py's own _do_turn; reuses
+                       rover.py's _is_backward for move/approach).
 - observe          -> centre the gimbal and hold, so the frame the arrival
                        check reads is the forward view, not the middle of a
                        sweep.
@@ -50,17 +50,33 @@ stall.
 ⚠️ halt() MUST send /line_follow/cmd STOP as well as a zero Twist. While the
 follower is running it republishes /cmd_vel at 100 Hz, so a zero Twist alone
 is overwritten within 10 ms and the rover keeps driving. This is the single
-most important safety property in this file.
+most important safety property in this file. It sends STOP *twice* — once
+immediately and again 0.7 s later — because a STOP that lands inside the
+node's 0.5 s "forward nudge" before a pivot turn does not cancel the turn
+that follows it (found during T0-T5; spec §6.2).
+
+Bends (spec §7): with `Dashboard/pi_client/line_follow_corner.py` running in
+place of the stock node, a 90-degree bend is a pivot turn rather than a
+crossbar park, announced on ~/corner. Two consequences live in this file: a
+pause must never land mid-pivot (corner_guard_active()), and the bends taken
+are cheap sensor-grounded evidence of the physical route, so they are kept
+and handed to the report.
+
+Gimbal (spec §8): both servos are mounted reversed relative to the labels in
+main.py, so "left" in code pointed right in the room. _pwm() is the single
+place that is compensated for; every caller that means a *direction* goes
+through it, and look() is the one deliberate exception (LOOK_LEFT_PAN is a
+raw PWM value set by eye against the physical robot).
 """
 
 import threading
 import time
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import config
 import httpx
 from log_setup import get_logger
-from rover import RoverController, _is_backward, _turn_degrees
+from rover import RoverController, _is_backward
 
 log = get_logger("rover_pi")
 
@@ -82,6 +98,17 @@ LF_NS = "/line_follow"
 SONAR_MIN_MM = 1
 SONAR_MAX_MM = 4000
 
+# Rough PWM safety clamp for both gimbal servos — tuned by feel, not from a
+# datasheet. Offsets are clamped to whichever side of centre is narrower, so a
+# held-down dashboard button can't wind the stored offset past the limit and
+# then snap when it comes back.
+GIMBAL_PWM_MIN = 1000
+GIMBAL_PWM_MAX = 2000
+
+# A STOP sent this soon after the previous one covers the stock node's 0.5 s
+# pre-turn forward nudge, during which a STOP is swallowed.
+HALT_REPEAT_S = 0.7
+
 
 class PiRoverController(RoverController):
     """Drives the real TurboPi over rosbridge_websocket."""
@@ -97,7 +124,10 @@ class PiRoverController(RoverController):
                  camera_port: int = 8080,
                  sonar_stop_mm: int = 200, sonar_clear_mm: int = 300,
                  obstacle_wait_s: float = 5.0, line_timeout_s: float = 40.0,
-                 pause_max_s: float = 10.0):
+                 pause_max_s: float = 10.0,
+                 line_route: str = "STOP_NEXT_ROAD", corner_guard_s: float = 5.0,
+                 pan_invert: bool = False, tilt_invert: bool = False,
+                 look_offset: int = 400, aim_settle_s: float = 0.5):
         if roslibpy is None:
             raise RuntimeError(
                 "roslibpy is not installed — add it to requirements.txt and "
@@ -113,8 +143,20 @@ class PiRoverController(RoverController):
         self.pan_servo_id = pan_servo_id
         self.gimbal_center = gimbal_center
         self.gimbal_sweep = gimbal_sweep
-        self._pan_position = gimbal_center
-        self._tilt_position = gimbal_center
+        self.pan_invert = pan_invert
+        self.tilt_invert = tilt_invert
+        # How far off centre aim("left"/"right") swings, as a LOGICAL offset —
+        # so the two directions are genuinely mirrored whichever way the servo
+        # is mounted. 400 is |1500 - 1100|, i.e. the same throw LOOK_LEFT_PAN
+        # was set to by eye.
+        self.look_offset = look_offset
+        self.aim_settle_s = aim_settle_s
+        # Logical offsets from centre, NOT raw PWM: negative pan = look left,
+        # positive tilt = look up (main.py's convention, kept deliberately).
+        # _pwm() turns one into the other and is the only place the servos'
+        # physical inversion is applied — spec §8.
+        self._pan_offset = 0
+        self._tilt_offset = 0
 
         self.snapshot_url = "http://%s:%d/snapshot?topic=/image_raw" % (host, camera_port)
         self.sonar_stop_mm = sonar_stop_mm
@@ -122,11 +164,28 @@ class PiRoverController(RoverController):
         self.obstacle_wait_s = obstacle_wait_s
         self.line_timeout_s = line_timeout_s
         self.pause_max_s = pause_max_s
+        # STOP_NEXT_ROAD parks at the first crossbar (a straight track). An
+        # L/R/C string instead makes the node turn at each crossroad in order
+        # and park at the next one — so the route belongs in config, not
+        # hard-coded here. Note this is the *crossroad* route; 90-degree bends
+        # are handled by line_follow_corner.py without consuming a letter.
+        self.line_route = line_route or "STOP_NEXT_ROAD"
+        self.corner_guard_s = corner_guard_s
 
         self._halted = threading.Event()
         self._arrived = threading.Event()
         self._pause_req = threading.Event()
         self._resume_req = threading.Event()
+        self._halted = threading.Event()
+        self._arrived = threading.Event()
+        self._pause_req = threading.Event()
+        self._resume_req = threading.Event()
+        # Distinct from _halted: this means "the named target was confirmed
+        # visible mid-drive", which _follow_line reports as a successful
+        # arrival, not an abort.
+        self._target_confirmed = threading.Event()
+        self._target_name: Optional[str] = None
+
 
         # _sonar_seq increments on every accepted reading. follow_line uses it
         # to tell "two consecutive readings below the stop threshold" from
@@ -135,9 +194,18 @@ class PiRoverController(RoverController):
         # 2-in-a-row rule on its own.
         self._sonar_mm: Optional[int] = None
         self._sonar_seq = 0
+
+        # Bends taken, from line_follow_corner.py's ~/corner topic. _corner_cursor
+        # is how much of it the mission has already been told about; _last_corner_t
+        # is what corner_guard_active() reads. It starts far in the past so the
+        # guard is open before the first bend rather than closed.
+        self._corners: List[dict] = []
+        self._corner_cursor = 0
+        self._last_corner_t = float("-inf")
+
         self._tlock = threading.Lock()
         self.telemetry = {"following": False, "paused": False, "sonar_mm": None,
-                          "t_start": None, "obstacle_events": 0}
+                          "t_start": None, "obstacle_events": 0, "bends": []}
 
         log.info("[pi] connecting to rosbridge at %s:%d", host, rosbridge_port)
         self.client = roslibpy.Ros(host=host, port=rosbridge_port)
@@ -147,11 +215,11 @@ class PiRoverController(RoverController):
 
         self._cmd_vel = roslibpy.Topic(self.client, "/cmd_vel", "geometry_msgs/msg/Twist")
         self._cmd_vel.advertise()
-        self._pwm = roslibpy.Topic(
+        self._pwm_topic = roslibpy.Topic(
             self.client, "/ros_robot_controller/pwm_servo/set_state",
             "ros_robot_controller_msgs/msg/SetPWMServoState",
         )
-        self._pwm.advertise()
+        self._pwm_topic.advertise()
 
         self._lf_cmd = roslibpy.Service(self.client, LF_NS + "/cmd",
                                         "interfaces/srv/SetString")
@@ -171,13 +239,24 @@ class PiRoverController(RoverController):
         )
         self._arrived_topic.subscribe(self._on_crossroads_stop)
 
-        log.info("[pi] connected (snapshot=%s)", self.snapshot_url)
+        # Only line_follow_corner.py publishes this; against the stock node the
+        # subscription simply never fires and everything below degrades to the
+        # straight-track behaviour.
+        self._corner_topic = roslibpy.Topic(
+            self.client, LF_NS + "/corner", "std_msgs/msg/Int32",
+        )
+        self._corner_topic.subscribe(self._on_corner)
+
+        log.info("[pi] connected (snapshot=%s, route=%s, pan_invert=%s, tilt_invert=%s)",
+                 self.snapshot_url, self.line_route, self.pan_invert, self.tilt_invert)
 
     # -- the contract --------------------------------------------------------
     def execute_step(self, step: dict) -> dict:
         self._halted.clear()
+        self._target_confirmed.clear()
         action = str(step.get("action") or "").strip().lower()
-        target = step.get("target")
+
+        
 
         if action == "follow_line":
             return self._follow_line()
@@ -187,8 +266,10 @@ class PiRoverController(RoverController):
             return self._timed_twist(linear_x=speed, seconds=self.move_seconds)
 
         if action == "turn":
-            degrees = _turn_degrees(target, 90.0)
-            direction = 1.0 if degrees > 0 else -1.0
+            # Real hardware has no distance/degrees in the plan step to act on
+            # (same as move/approach above) — only direction, at a fixed
+            # pulse duration. Same "left" convention as rover.py's _do_turn.
+            direction = 1.0 if "left" in str(target or "").lower() else -1.0
             return self._timed_twist(angular_z=direction * self.angular_speed,
                                       seconds=self.turn_seconds)
 
@@ -215,6 +296,28 @@ class PiRoverController(RoverController):
         # Twist, or it overwrites it within 10 ms and the rover drives on.
         self._lf("STOP")
         self._publish_twist()
+        # ...and again, off a timer. A STOP that lands inside the node's 0.5 s
+        # forward nudge before a pivot turn is swallowed, and the turn still
+        # happens. The timer thread is what keeps this non-blocking, which
+        # halt() must be (see the module docstring).
+        threading.Timer(HALT_REPEAT_S, self._halt_again).start()
+
+    def _halt_again(self) -> None:
+        try:
+            self._lf("STOP")
+            self._publish_twist()
+        except Exception:
+            log.exception("[pi] repeat HALT failed")
+
+    def confirm_target(self, target: str) -> None:
+        """Called mid-drive when a scan confirms the step's named target is
+        visible. Stops the chassis the same way halt() does, but as a
+        distinct event from _halted so _follow_line reports this as a
+        successful arrival, not an abort."""
+        log.warning("[pi] target confirmed mid-drive: %r", target)
+        self._target_name = target
+        self._target_confirmed.set()
+
 
     # -- line following ------------------------------------------------------
     def _follow_line(self) -> dict:
@@ -227,10 +330,15 @@ class PiRoverController(RoverController):
         self._arrived.clear()
         self._pause_req.clear()
         self._resume_req.clear()
+        with self._tlock:
+            self._corners = []
+            self._corner_cursor = 0
+            self._last_corner_t = float("-inf")
+            self.telemetry["bends"] = []
 
-        # STOP_NEXT_ROAD must land BEFORE set_running(True): in `default` mode
-        # the node turns RIGHT at every crossroad instead of parking on it.
-        self._lf("STOP_NEXT_ROAD")
+        # The route must land BEFORE set_running(True): in `default` mode the
+        # node turns RIGHT at every crossroad instead of parking on it.
+        self._lf(self.line_route)
         time.sleep(0.25)
         self._lf_run(True)
 
@@ -249,6 +357,12 @@ class PiRoverController(RoverController):
 
         try:
             while True:
+                if self._target_confirmed.is_set():
+                    self._lf("STOP")
+                    self._publish_twist()
+                    return self._lf_result("ok", None, t_start, stopped_s,
+                                           arrived=True, target_confirmed=self._target_name)
+
                 if self._halted.is_set():
                     self._lf("STOP")
                     self._publish_twist()
@@ -293,7 +407,8 @@ class PiRoverController(RoverController):
 
     def _lf_result(self, status: str, reason: Optional[str], t_start: float,
                    stopped_s: float, arrived: bool = False,
-                   sonar_mm: Optional[int] = None) -> dict:
+                   sonar_mm: Optional[int] = None,
+                   target_confirmed: Optional[str] = None) -> dict:
         detail = {
             "arrived": arrived,
             "elapsed_s": round(time.time() - t_start, 2),
@@ -304,8 +419,11 @@ class PiRoverController(RoverController):
             detail["reason"] = reason
         if sonar_mm is not None:
             detail["sonar_mm"] = sonar_mm
+        if target_confirmed:
+            detail["target_confirmed"] = target_confirmed
         log.info("[pi] follow_line -> %s %s", status, detail)
         return {"status": status, "detail": detail}
+
 
     def _do_pause(self) -> float:
         """Park for a look-left, then resume. Returns seconds spent stopped."""
@@ -364,11 +482,19 @@ class PiRoverController(RoverController):
         """Ask follow_line to park. Blocks until it has (max 1 s).
 
         Only meaningful while follow_line is running; returns False otherwise
-        so the caller can skip the look rather than take a frame at speed.
+        so the caller can skip the look rather than take a frame at speed. It
+        also returns False inside the corner guard — callers that want to wait
+        the bend out rather than give up should test corner_guard_active()
+        first, which is what mission.keyframe_monitor does.
         """
         with self._tlock:
             if not self.telemetry["following"]:
                 return False
+        if self.corner_guard_active():
+            # Not a failure: the caller is expected to try again in a moment.
+            log.info("[pi] pause() refused — a bend was taken less than %.0fs ago",
+                     self.corner_guard_s)
+            return False
         self._resume_req.clear()
         self._pause_req.set()
         deadline = time.time() + 1.0
@@ -400,18 +526,55 @@ class PiRoverController(RoverController):
         return response.content
 
     def look(self, pan_position: int, settle_s: float = 0.6) -> Optional[bytes]:
-        """Pan to an absolute position, grab a frame, re-centre.
+        """Pan to a RAW PWM position, grab a frame, re-centre.
 
-        Sign convention matches main.py's gimbal endpoint: "left" is a
-        *negative* pan delta, so a left look position is below gimbal_center.
+        `pan_position` (LOOK_LEFT_PAN) deliberately bypasses _pwm() and its
+        inversion — spec §8. It is set by eye against the physical robot, so
+        it already encodes whichever way the servo is mounted; running it
+        through the inversion as well would undo the measurement. Everything
+        that means a *direction* rather than a measured PWM value goes through
+        _pwm() instead.
+
+        The frame itself is upright and must NOT be rotated or flipped before
+        the VLM — checked against left_look.jpg on 2026-09-29.
         """
-        self._pan_position = int(pan_position)
-        self._set_pwm(self.pan_servo_id, self._pan_position)
+        self._set_pwm(self.pan_servo_id, int(pan_position))
         time.sleep(settle_s)
         frame = self.get_frame()
-        self._pan_position = self.gimbal_center
-        self._set_pwm(self.pan_servo_id, self._pan_position)
+        self._pan_offset = 0
+        self._set_pwm(self.pan_servo_id, self._pwm(0, self.pan_invert))
         return frame
+
+    # Logical pan offsets. "centre" is spelled both ways because callers come
+    # from config strings as well as code.
+    _AIM = {"left": -1, "centre": 0, "center": 0, "right": 1}
+
+    def aim(self, direction: str) -> Optional[str]:
+        """Point the camera left, centre or right and settle. No frame taken.
+
+        The counterpart to look(): look() takes a measured RAW PWM value and is
+        the §8 exception, while aim() takes a *direction* and goes through
+        _pwm(), so "left" is left in the room and right is its exact mirror.
+        That symmetry is the whole reason this exists — there is no way to
+        mirror LOOK_LEFT_PAN, because a measured PWM value has no sign.
+
+        Panning does not disturb the drive: the IR array is bolted to the
+        chassis, not the gimbal, which is exactly why §0 chose it over the
+        camera line-follower ("keeps the camera free for the VLM"). So this is
+        safe to call while following a line, with no pause.
+
+        Returns the direction actually aimed at, or None if it was not a
+        recognised direction — so a caller can log the physical direction
+        rather than a PWM number, per §8.
+        """
+        key = str(direction or "").strip().lower()
+        if key not in self._AIM:
+            log.warning("[pi] aim(%r): not a direction", direction)
+            return None
+        self._pan_offset = self._AIM[key] * self.look_offset
+        self._set_pwm(self.pan_servo_id, self._pwm(self._pan_offset, self.pan_invert))
+        time.sleep(self.aim_settle_s)
+        return "centre" if self._AIM[key] == 0 else key
 
     # -- subscriptions -------------------------------------------------------
     def _on_sonar(self, message: dict) -> None:
@@ -427,6 +590,48 @@ class PiRoverController(RoverController):
         if message.get("data"):
             log.info("[pi] crossroads_stop — parked at the end marker")
             self._arrived.set()
+
+    def _on_corner(self, message: dict) -> None:
+        """line_follow_corner.py took a 90-degree bend: -1 left, +1 right."""
+        value = message.get("data")
+        if not isinstance(value, int) or value == 0:
+            return
+        side = "left" if value < 0 else "right"
+        now = time.time()
+        with self._tlock:
+            self._last_corner_t = now
+            self._corners.append({"side": side, "at": now})
+            self.telemetry["bends"] = [c["side"] for c in self._corners]
+        log.info("[pi] bend taken: %s", side)
+
+    def corner_guard_active(self) -> bool:
+        """True while the follower may still be mid-pivot.
+
+        A STOP during the pivot cancels the turn, and the node then resumes
+        straight — off the tape. So the one planned stop waits this out rather
+        than risking the run. Known gap: the sonar's obstacle stop does NOT
+        respect this (a real obstacle outranks a lost line), so a box dropped
+        exactly on a bend is expected to end in line_timeout. Accepted for this
+        slice; the report says so.
+        """
+        with self._tlock:
+            last = self._last_corner_t
+        return (time.time() - last) < self.corner_guard_s
+
+    def drain_corners(self) -> List[dict]:
+        """Bends taken since the last call, as {"side", "at"} (wall clock).
+
+        Drained rather than read so the mission can file each bend once, at the
+        time it happened, instead of re-reporting the whole list every tick.
+        """
+        with self._tlock:
+            new = self._corners[self._corner_cursor:]
+            self._corner_cursor = len(self._corners)
+        return [dict(c) for c in new]
+
+    def corners(self) -> List[dict]:
+        with self._tlock:
+            return [dict(c) for c in self._corners]
 
     def _sonar(self) -> Tuple[Optional[int], int]:
         with self._tlock:
@@ -482,43 +687,69 @@ class PiRoverController(RoverController):
     def _gimbal_sweep(self) -> None:
         # Placeholder motion, not aimed at anything: "scan" has no bearing to
         # look at on real hardware the way VirtualRover's node table gives it
-        # one. Revisit once there's a real target to look at.
-        for pan in (self.gimbal_center - self.gimbal_sweep,
-                    self.gimbal_center + self.gimbal_sweep,
-                    self.gimbal_center):
-            self._set_pwm(self.pan_servo_id, pan)
+        # one. Revisit once there's a real target to look at. Written in
+        # logical offsets (left, right, centre) so it sweeps the same way in
+        # the room whichever way the servo is mounted.
+        for offset in (-self.gimbal_sweep, self.gimbal_sweep, 0):
+            self._pan_offset = offset
+            self._set_pwm(self.pan_servo_id, self._pwm(offset, self.pan_invert))
             time.sleep(0.4)
-        self._pan_position = self.gimbal_center
+        self._pan_offset = 0
 
     def _set_pwm(self, servo_id: int, position: int, duration: float = 0.3) -> None:
         msg = roslibpy.Message({
             "duration": duration,
             "state": [{"id": [servo_id], "position": [int(position)], "offset": [0]}],
         })
-        self._pwm.publish(msg)
+        self._pwm_topic.publish(msg)
 
     def close(self) -> None:
         try:
             self._lf("STOP")
             self._sonar_topic.unsubscribe()
             self._arrived_topic.unsubscribe()
+            self._corner_topic.unsubscribe()
             self._cmd_vel.unadvertise()
-            self._pwm.unadvertise()
+            self._pwm_topic.unadvertise()
             self.client.terminate()
         except Exception:
             log.exception("[pi] error during close(), ignoring")
 
+    def _pwm(self, offset: int, invert: bool) -> int:
+        """Logical offset from centre -> servo PWM. The ONLY inversion point.
+
+        Both servos are mounted reversed relative to main.py's labels, so
+        "left" in code pointed right in the room until this existed (spec §8).
+        Everything that means a direction — nudge_gimbal, the dashboard's
+        /pi/gimbal/{direction}, scan's sweep, centre — resolves through here,
+        so there is exactly one sign to get right rather than four.
+        """
+        value = self.gimbal_center - offset if invert else self.gimbal_center + offset
+        return max(GIMBAL_PWM_MIN, min(GIMBAL_PWM_MAX, int(value)))
+
+    def _offset_limit(self) -> int:
+        """Clamp offsets, not just PWM: otherwise a held-down dashboard button
+        winds the stored offset past the servo's range and the first nudge
+        back does nothing visible."""
+        return min(self.gimbal_center - GIMBAL_PWM_MIN, GIMBAL_PWM_MAX - self.gimbal_center)
+
+    def _apply_gimbal(self, duration: float = 0.3) -> dict:
+        pan_pwm = self._pwm(self._pan_offset, self.pan_invert)
+        tilt_pwm = self._pwm(self._tilt_offset, self.tilt_invert)
+        self._set_pwm(self.pan_servo_id, pan_pwm, duration=duration)
+        self._set_pwm(self.tilt_servo_id, tilt_pwm, duration=duration)
+        return {"pan": pan_pwm, "tilt": tilt_pwm,
+                "pan_offset": self._pan_offset, "tilt_offset": self._tilt_offset}
+
     def nudge_gimbal(self, pan_delta: int = 0, tilt_delta: int = 0, duration: float = 0.15) -> dict:
-        # Rough PWM safety clamp — tune by feel; these aren't from a datasheet.
-        self._pan_position = max(1000, min(2000, self._pan_position + pan_delta))
-        self._tilt_position = max(1000, min(2000, self._tilt_position + tilt_delta))
-        self._set_pwm(self.pan_servo_id, self._pan_position, duration=duration)
-        self._set_pwm(self.tilt_servo_id, self._tilt_position, duration=duration)
-        return {"pan": self._pan_position, "tilt": self._tilt_position}
+        """pan_delta/tilt_delta are LOGICAL: negative pan = left, positive
+        tilt = up, matching main.py's direction map unchanged."""
+        limit = self._offset_limit()
+        self._pan_offset = max(-limit, min(limit, self._pan_offset + int(pan_delta)))
+        self._tilt_offset = max(-limit, min(limit, self._tilt_offset + int(tilt_delta)))
+        return self._apply_gimbal(duration=duration)
 
     def center_gimbal(self) -> dict:
-        self._pan_position = self.gimbal_center
-        self._tilt_position = self.gimbal_center
-        self._set_pwm(self.pan_servo_id, self._pan_position)
-        self._set_pwm(self.tilt_servo_id, self._tilt_position)
-        return {"pan": self._pan_position, "tilt": self._tilt_position}
+        self._pan_offset = 0
+        self._tilt_offset = 0
+        return self._apply_gimbal()

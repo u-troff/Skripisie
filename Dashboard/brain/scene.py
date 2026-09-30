@@ -70,6 +70,36 @@ class Scene:
     def digest(self) -> str:
         return "\n".join(frame.text() for frame in self.frames)
 
+    def vocabulary(self, limit: int = 20) -> List[str]:
+        """Distinct catalogued names — objects first, then place labels.
+
+        The grounding list handed to the drive checks (vlm._known_block) and
+        the list report.py scores their answers against, so it lives here
+        rather than in either caller: two definitions of "what is in this room"
+        would drift, and the whole point is that both ends mean the same thing.
+
+        Objects before places because a check can point at an object; "kitchen"
+        is a weaker claim, so places only fill what room is left. Deduplicated
+        case-insensitively, first-seen casing kept. Capped because a small VLM
+        handed a long list starts reporting things because they are listed.
+        """
+        names: List[str] = []
+        seen = set()
+
+        def add(raw) -> None:
+            name = str(raw or "").strip()
+            key = name.lower()
+            if name and key not in seen:
+                seen.add(key)
+                names.append(name)
+
+        for frame in self.frames:
+            for obj in frame.objects:
+                add(obj.get("name"))
+        for frame in self.frames:
+            add(frame.place)
+        return names[:limit]
+
     def representative(self) -> Optional[bytes]:
         """One frame the VLM can actually look at during clarification."""
         for frame in self.frames:

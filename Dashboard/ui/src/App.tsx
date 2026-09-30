@@ -87,7 +87,12 @@ export default function App() {
     <main className="wrap">
       <header>
         <h1>Brain — voice &amp; plan test</h1>
-        <span className={`pill ${health}`}>backend {health}</span>
+        <div className="row" style={{ marginBottom: 0 }}>
+          <a className="navlink" href="#/logs">
+            Run logs →
+          </a>
+          <span className={`pill ${health}`}>backend {health}</span>
+        </div>
       </header>
 
       <section className="panel">

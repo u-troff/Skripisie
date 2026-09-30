@@ -543,6 +543,18 @@ def get_rover() -> RoverController:
             sonar_clear_mm=config.get_int("ROVER_PI_SONAR_CLEAR_MM", 300),
             obstacle_wait_s=config.get_float("ROVER_PI_OBSTACLE_WAIT_S", 5.0),
             line_timeout_s=config.get_float("ROVER_PI_LINE_TIMEOUT_S", 40.0),
+            # STOP_NEXT_ROAD = straight track. An L/R/C string turns at each
+            # crossroad in order; 90-degree bends are line_follow_corner.py's
+            # job and don't consume a letter.
+            line_route=config.get("ROVER_PI_LINE_ROUTE", "STOP_NEXT_ROAD"),
+            corner_guard_s=config.get_float("ROVER_PI_CORNER_GUARD_S", 5.0),
+            # Both gimbal servos are mounted reversed (spec §8). Flags, not a
+            # hardcoded sign, so a re-mounted servo is a .env edit.
+            pan_invert=config.get_bool("ROVER_PI_PAN_INVERT", False),
+            tilt_invert=config.get_bool("ROVER_PI_TILT_INVERT", False),
+            # aim("left"/"right") throw, as a logical offset from centre.
+            look_offset=config.get_int("ROVER_PI_LOOK_OFFSET", 400),
+            aim_settle_s=config.get_float("ROVER_PI_AIM_SETTLE_S", 0.5),
         )
     else:
         raise RoverError(f"unknown ROVER={name!r} — 'sim', 'virtual', and 'pi' are implemented")

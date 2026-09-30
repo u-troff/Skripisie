@@ -345,6 +345,48 @@ def mission_state(session_id:str):
     return mission.snapshot() if mission else {"error":"unknow mission"}
 
 
+@app.get("/logs")
+def list_logs():
+    """Summaries of every mission run log, newest first — for the Logs page.
+    Reads straight off disk rather than any in-memory store, so a run from a
+    previous process restart still shows up."""
+    files = sorted(mission_mod.LOGS_DIR.glob("mission_*.json"),
+                   key=lambda p: p.stat().st_mtime, reverse=True)
+    summaries = []
+    for path in files:
+        try:
+            data = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        timings = data.get("timings") or {}
+        summaries.append({
+            "session_id": data.get("session_id") or path.stem[len("mission_"):],
+            "command": data.get("command"),
+            "outcome": data.get("outcome"),
+            "rover": data.get("rover"),
+            "plan_was_revised": data.get("plan_was_revised"),
+            "target_confirmed": bool(data.get("target_confirmed")),
+            "step_count": len(data.get("steps") or []),
+            "checks_completed": timings.get("checks_completed"),
+            "checks_skipped": timings.get("checks_skipped"),
+            "checks_failed": timings.get("checks_failed"),
+            "total_s": timings.get("total_s"),
+            "revision_count": len(data.get("revisions") or []),
+            "mtime": path.stat().st_mtime,
+        })
+    return summaries
+
+
+@app.get("/logs/{session_id}")
+def get_log(session_id: str):
+    """Full report for one run, for the Logs page's detail view."""
+    path = mission_mod.LOGS_DIR / f"mission_{session_id}.json"
+    if not path.exists():
+        return Response(status_code=404, content=b"unknown run")
+    try:
+        return json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return Response(status_code=500, content=b"could not read log")
 
 
 

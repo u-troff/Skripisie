@@ -53,3 +53,20 @@ def get_float(name: str, default: float) -> float:
         return float(get(name, str(default)))
     except ValueError:
         return default
+
+
+# Deliberately permissive on the true side and strict on everything else: an
+# unset or misspelt flag must fall back to the default rather than silently
+# reading as False. Used by the ROVER_PI_*_INVERT gimbal flags (see
+# Progress/spec-grounded-line-mission.md §8).
+_TRUE = {"1", "true", "yes", "on"}
+_FALSE = {"0", "false", "no", "off"}
+
+
+def get_bool(name: str, default: bool = False) -> bool:
+    value = get(name, "").strip().lower()
+    if value in _TRUE:
+        return True
+    if value in _FALSE:
+        return False
+    return default

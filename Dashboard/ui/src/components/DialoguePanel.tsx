@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import useRecorder from '../hooks/useRecorder'
 import { blobToBase64, fetchDialogueSnapshot, openSocket, type Socket } from '../net'
 import { say, stopSpeaking } from '../speak'
@@ -26,6 +26,11 @@ export default function DialoguePanel() {
 
   const recorder = useRecorder()
   const { clip, recording, elapsed } = recorder
+
+  // Typed commands are the T7 path in spec-grounded-line-mission.md §4: a
+  // hardware run should not also be debugging the mic. Purely local — no
+  // other panel cares what is half-typed in the box.
+  const [draft, setDraft] = useState('')
 
   // The socket never echoes what Whisper heard, so pull the authoritative
   // turn history from the session snapshot after every exchange.
@@ -118,6 +123,32 @@ export default function DialoguePanel() {
       socket.send(payload)
     })()
   }, [clip])
+
+  // Same shape as the auto-send-on-stop path above, minus the recorder: the
+  // backend decides from the session phase whether this is an answer or the
+  // confirmation, so the only thing we choose here is the message type.
+  const sendText = useCallback(() => {
+    const text = draft.trim()
+    const socket = socketRef.current
+    if (!text || !socket?.isOpen()) return
+
+    const store = storeApi()
+    const confirmingNow = store.dialogue.phase === 'awaiting_confirmation'
+    const first = !store.dialogue.snapshot?.command
+
+    void (async () => {
+      const payload: Record<string, unknown> = {
+        type: confirmingNow ? 'confirmation_text' : 'text_command',
+        text,
+      }
+      // Only the opening command carries the reference still — the backend
+      // keeps it on the session. Same rule the voice path follows.
+      if (first && store.image) payload.image = await blobToBase64(store.image.file)
+      store.setDialogueThinking(true)
+      socket.send(payload)
+      setDraft('')
+    })()
+  }, [draft])
 
   const { status, sessionId, phase, snapshot, saying, planReady, outcome, thinking, error, log } =
     dialogue
@@ -240,6 +271,37 @@ export default function DialoguePanel() {
 
           {live && (
             <>
+              <div className="typebar">
+                <input
+                  type="text"
+                  value={draft}
+                  placeholder={
+                    confirming
+                      ? 'yes / ja to go, nee / cancel to stop'
+                      : awaitingAnswer
+                        ? 'answer the question…'
+                        : 'type a command…'
+                  }
+                  onChange={(event) => setDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') sendText()
+                  }}
+                  disabled={thinking || recording}
+                />
+                <button
+                  className="go alt"
+                  onClick={sendText}
+                  disabled={thinking || recording || !draft.trim()}
+                >
+                  Send
+                </button>
+              </div>
+              <p className="note" style={{ marginTop: 0 }}>
+                Typed commands need <code>ALLOW_TEXT_COMMANDS=1</code> in{' '}
+                <code>brain/.env</code>; without it the backend rejects them and the error
+                shows below. Voice is the demoed path — this is for bench runs.
+              </p>
+
               <button
                 className={`rec ${recording ? 'active' : ''} ${
                   confirming && !recording ? 'gate' : ''

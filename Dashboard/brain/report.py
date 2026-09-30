@@ -31,6 +31,8 @@ from typing import Any, Dict, List, Optional
 
 import config
 import planner
+import scene as scene_mod
+import vlm
 from log_setup import get_logger
 from providers import ProviderError, get_provider, log_completion, user_message
 
@@ -105,6 +107,105 @@ def _grounding_summary(grounding: List[dict], plan: dict, active_actions: dict) 
     return {"targets": targets, "unresolved": unresolved, "out_of_vocab_actions": out_of_vocab}
 
 
+def _names(values) -> List[str]:
+    out = []
+    for value in values or []:
+        name = str(value).strip()
+        if name:
+            out.append(name)
+    return out
+
+
+def _room_grounding(checks: List[dict], arrival: Optional[dict],
+                    known: List[str]) -> dict:
+    """What the drive checks saw, scored against the room video's catalogue.
+
+    The room video used to stop mattering the moment the rover moved — it
+    shaped the clarification and the plan, then went unused. Threading it into
+    the drive checks makes two things measurable that were previously a matter
+    of opinion:
+
+    * `never_seen` — catalogued things no check ever reported. Weak evidence on
+      its own (the camera points one way), so it is recorded but NOT flagged.
+    * `unexpected` — things the rover reported that the room does not contain.
+      This is the cleanest RQ2 hallucination signal in the run, because the
+      ground truth is a list we filmed rather than a human's recollection.
+
+    Matching is case-insensitive and exact-after-trim. Deliberately not fuzzy:
+    a substring match would score "chair" against "wheelchair" and quietly
+    inflate the hit rate, and an inflated hit rate is worse than no number.
+    """
+    catalogue = {name.lower(): name for name in known}
+    seen: Dict[str, str] = {}
+    unexpected: Dict[str, str] = {}
+
+    for check in list(checks) + ([arrival] if isinstance(arrival, dict) else []):
+        result = _result(check)
+        if not result or "_error" in result:
+            continue
+        for name in _names(result.get("seen")):
+            key = name.lower()
+            if key in catalogue:
+                seen[key] = catalogue[key]
+            else:
+                # Claimed as catalogued but is not in the catalogue — the model
+                # invented a list entry. Counts as unexpected, not as a match.
+                unexpected[key] = name
+        for name in _names(result.get("unexpected")):
+            unexpected.setdefault(name.lower(), name)
+
+    return {
+        "known": list(known),
+        "seen": sorted(seen.values()),
+        "never_seen": sorted(v for k, v in catalogue.items() if k not in seen),
+        "unexpected": sorted(unexpected.values()),
+        "grounded": bool(known),
+    }
+
+
+def _known_for(mission) -> List[str]:
+    """The same catalogue the checks were handed — Scene.vocabulary, not a
+    second opinion about what is in the room."""
+    scene_id = getattr(mission, "scene_id", None)
+    if not scene_id:
+        return []
+    room = scene_mod.store.get(scene_id)
+    return room.vocabulary(vlm.KNOWN_MAX) if room is not None else []
+
+
+def _looked(checks: List[dict], arrival: Optional[dict]) -> Dict[str, int]:
+    """Completed checks per physical camera direction (spec §8: directions, not
+    PWM values). Skips and failures are not counted — they saw nothing."""
+    counts: Dict[str, int] = {}
+    for check in list(checks) + ([arrival] if isinstance(arrival, dict) else []):
+        if check.get("kind") == "skipped" or check.get("kind") == "bend":
+            continue
+        if _errored(check):
+            continue
+        where = str(check.get("aimed") or "centre")
+        counts[where] = counts.get(where, 0) + 1
+    return counts
+
+
+def _route_summary(bends: List[dict]) -> str:
+    """"took 1 left bend" — the physical half of what the run proves.
+
+    Bends come off the IR sensor that did the steering, not off a model, so
+    this is the one line in the report that says where the rover actually went
+    and cannot have been hallucinated. Cheap evidence, deliberately kept.
+    """
+    if not bends:
+        return "no bends taken; the route was a single straight run"
+    counts = {"left": 0, "right": 0}
+    for bend in bends:
+        side = str(bend.get("side") or "").lower()
+        if side in counts:
+            counts[side] += 1
+    parts = ["%d %s bend%s" % (n, side, "" if n == 1 else "s")
+             for side, n in counts.items() if n]
+    return "took " + " and ".join(parts)
+
+
 def build_report(mission, spoken: bool = True) -> dict:
     """Assemble the run's report. `spoken=False` skips the one planner call,
     for the abort path where no network round-trip is allowed."""
@@ -116,6 +217,8 @@ def build_report(mission, spoken: bool = True) -> dict:
     skipped = [c for c in checks if c.get("kind") == "skipped"]
     completed = [c for c in progress if not _errored(c)]
     failed = [c for c in checks if _errored(c)]
+    bends = [c for c in checks if c.get("kind") == "bend"]
+    room_grounding = _room_grounding(checks, mission.arrival, _known_for(mission))
 
     latencies = [float(c["latency_s"]) for c in checks
                  if isinstance(c.get("latency_s"), (int, float))]
@@ -149,6 +252,16 @@ def build_report(mission, spoken: bool = True) -> dict:
         "checks": checks,
         "look_left": mission.look_left,
         "arrival": mission.arrival,
+        "target_confirmed"  :mission.target_confirmed,
+        "bends": [{"side": b.get("side"), "t_rel_s": b.get("t_rel_s"),
+                   "est_distance_cm": b.get("est_distance_cm")} for b in bends],
+        "route_summary": _route_summary(bends),
+        # Which way the camera was pointing, counted. A run whose checks were
+        # all centre frames saw a corridor; one that swept saw a room, and the
+        # difference matters when reading what `never_seen` means.
+        "looked": _looked(checks, mission.arrival),
+        "scene_id": mission.scene_id,
+        "room_grounding": room_grounding,
         "sonar_obstacle_events": telemetry.get("obstacle_events", 0),
         "rover_telemetry": telemetry,
         "digest": list(mission.digest),
@@ -176,7 +289,8 @@ def build_report(mission, spoken: bool = True) -> dict:
     }
     report["models"]["planner_profile"] = profile
 
-    report["uncertainties"] = _uncertainties(mission, progress, completed, failed, outcome)
+    report["uncertainties"] = _uncertainties(mission, progress, completed, failed,
+                                             outcome, bends, room_grounding)
     report["spoken_summary"] = (
         _spoken_summary(report) if spoken else _fallback_summary(report)
     )
@@ -184,9 +298,13 @@ def build_report(mission, spoken: bool = True) -> dict:
 
 
 def _uncertainties(mission, progress: List[dict], completed: List[dict],
-                   failed: List[dict], outcome: str) -> List[dict]:
+                   failed: List[dict], outcome: str,
+                   bends: Optional[List[dict]] = None,
+                   room_grounding: Optional[dict] = None) -> List[dict]:
     """Rule-based, no model. Each entry is something the run can prove."""
     out: List[dict] = []
+    bends = bends or []
+    room_grounding = room_grounding or {}
 
     def flag(code: str, detail: str) -> None:
         out.append({"code": code, "detail": detail})
@@ -257,10 +375,47 @@ def _uncertainties(mission, progress: List[dict], completed: List[dict],
     elif outcome == "aborted":
         flag("mission_aborted", "the mission was aborted by the operator")
 
+    # Spec §7's accepted limitation, made explicit instead of left for the
+    # reader to guess: the sonar's obstacle stop does not respect the corner
+    # guard, so a stop that lands inside a pivot cancels the turn and the rover
+    # resumes straight off the tape — which then times out.
+    timed_out = any(
+        isinstance(r.get("detail"), dict) and r["detail"].get("reason") == "line_timeout"
+        for r in mission.results
+    )
+    if timed_out and bends:
+        flag("line_timeout_after_bend",
+             "the drive timed out on a route with %d bend(s) — a stop landing "
+             "during a pivot turn cancels it and the rover resumes off the "
+             "tape (known limitation, not a planning failure)" % len(bends))
+
     if has_follow_line and len(completed) < 2:
         flag("thin_evidence",
              "only %d progress check(s) completed during the drive — too few to "
              "say much about what was passed on the way" % len(completed))
+
+    # -- room-video grounding ----------------------------------------------
+    if room_grounding.get("grounded"):
+        unexpected = room_grounding.get("unexpected") or []
+        if unexpected:
+            flag("unexpected_objects",
+                 "the rover reported %d thing(s) the filmed room does not contain: %s "
+                 "— either the room changed or the model invented them"
+                 % (len(unexpected), ", ".join(unexpected)))
+        # Gated on a check having actually succeeded. If every check errored,
+        # "recognised nothing" is a statement about the model being down, not
+        # about the room — and checks_failed already says that. Reporting both
+        # would double-count one fault as two kinds of doubt.
+        if completed and not (room_grounding.get("seen") or []):
+            flag("room_not_recognised",
+                 "no catalogued object from the room video was recognised in any "
+                 "completed check, so nothing visually confirms the rover was in "
+                 "the room the plan was built for")
+    elif has_follow_line:
+        flag("ungrounded_checks",
+             "no room video was loaded, so the camera checks had nothing to be "
+             "scored against — an empty 'unexpected' here is not evidence that "
+             "nothing was hallucinated")
 
     # -- planner-profiles / virtual-sweep additions (§3D) -------------------
     unresolved_targets = [g.get("target") for g in mission.grounding if not g.get("resolved")]
@@ -308,7 +463,7 @@ _SUMMARY_PROMPT = (
 # bulky check records; trimming keeps the prompt inside the planner's num_ctx.
 _SUMMARY_KEYS = ("outcome", "command", "resolved_command", "uncertainties",
                  "arrival", "look_left", "sonar_obstacle_events", "timings",
-                 "rover_summary")
+                 "rover_summary", "route_summary", "room_grounding", "looked")
 
 
 def _spoken_summary(report: dict) -> str:
