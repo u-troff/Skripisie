@@ -1,0 +1,18 @@
+{
+    "name": "room_studio",
+    "width_m": 4.0,
+    "height_m": 3.0,
+    "start": {"x": 0.6, "y": 0.6, "theta": 0},
+    "obstacles": [
+        {"name": "the couch", "box": [0.0, 1.6, 0.9, 2.8], "where": "along the left wall, toward the back"},
+        {"name": "the coffee table", "box": [1.9, 1.0, 2.7, 1.6], "where": "in the middle of the room"},
+        {"name": "the bookshelf", "box": [3.6, 1.0, 4.0, 2.4], "where": "along the right wall"}
+    ],
+    "landmarks": [
+        {"name": "couch", "x": 1.4, "y": 2.2, "aliases": ["sofa", "settee"], "where": "along the left wall, toward the back"},
+        {"name": "coffee table", "x": 2.3, "y": 0.5, "aliases": ["table", "low table"], "where": "in the middle of the room"},
+        {"name": "bookshelf", "x": 3.1, "y": 1.9, "aliases": ["shelf", "bookcase", "books"], "where": "along the right wall"},
+        {"name": "door", "x": 3.5, "y": 0.4, "aliases": ["doorway", "entrance"], "where": "on the front wall, toward the right"},
+        {"name": "window", "x": 2.0, "y": 2.6, "aliases": ["windows"], "where": "on the back wall"}
+    ]
+}

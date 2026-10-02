@@ -1,5 +1,6 @@
 import io
 import time
+from pathlib import Path
 from typing import Optional
 import asyncio
 import mission as mission_mod
@@ -387,6 +388,58 @@ def get_log(session_id: str):
         return json.loads(path.read_text())
     except (OSError, json.JSONDecodeError):
         return Response(status_code=500, content=b"could not read log")
+
+
+@app.get("/logs/{session_id}/trace")
+def get_log_trace(session_id: str):
+    """The virtual rover's recorded movement for one run, for the Logs page's
+    map. The mission log names the trace file and which run inside it; a trace
+    file holds every run since the process started, so filter to that one."""
+    path = mission_mod.LOGS_DIR / f"mission_{session_id}.json"
+    if not path.exists():
+        return Response(status_code=404, content=b"unknown run")
+    try:
+        summary = json.loads(path.read_text()).get("rover_summary") or {}
+    except (OSError, json.JSONDecodeError):
+        return Response(status_code=500, content=b"could not read log")
+
+    trace_name = summary.get("trace")
+    run = summary.get("run")
+    if not trace_name or run is None:
+        return Response(status_code=404, content=b"run has no virtual trace")
+    # Basename only: the stored path is absolute and from whichever machine ran it.
+    trace_path = mission_mod.LOGS_DIR / Path(str(trace_name).replace("\\", "/")).name
+    if not trace_path.exists():
+        return Response(status_code=404, content=b"trace file is gone")
+
+    start = None
+    steps = []
+    try:
+        with trace_path.open(encoding="utf-8") as handle:
+            for line in handle:
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if record.get("run") != run:
+                    continue
+                if record.get("event") == "run_start":
+                    start = record
+                elif record.get("event") == "step":
+                    steps.append({
+                        "pose": record.get("pose"),
+                        "planned_path": record.get("planned_path"),
+                        "status": record.get("status"),
+                        "odometer_m": record.get("odometer_m"),
+                        "sim_time_s": record.get("sim_time_s"),
+                    })
+    except OSError:
+        return Response(status_code=500, content=b"could not read trace")
+    if start is None:
+        return Response(status_code=404, content=b"run not found in trace")
+
+    return {"room": start.get("room"), "settings": start.get("settings"),
+            "start": start.get("pose"), "steps": steps, "summary": summary}
 
 
 
