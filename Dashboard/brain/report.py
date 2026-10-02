@@ -205,6 +205,63 @@ def _route_summary(bends: List[dict]) -> str:
              for side, n in counts.items() if n]
     return "took " + " and ".join(parts)
 
+def _approach_summary(mission) -> Optional[dict]:
+    cycles = [c for c in mission.checks if c.get("kind") == "approach_cycle"]
+    if not cycles:
+        return None
+    vlm_time = sum(c.get("vlm_latency_s") or 0 for c in cycles)
+    span = (cycles[-1].get("t_rel_s") or 0) - (cycles[0].get("t_rel_s") or 0)
+    motion_time_s = sum((c.get("pivot_cmd_s") or 0) + (c.get("hop_moved_s") or 0) for c in cycles)
+
+    search_cycles = [c for c in cycles if c.get("phase") == "search"]
+    sweeps_used = (max((c.get("sweep") or 0) for c in cycles) + 1) if cycles else 0
+    chassis_pivots = sum(1 for c in cycles if c.get("pivot_cmd_s"))
+    chassis_spin_deg_total = sum(c.get("pivot_requested_deg") or 0 for c in cycles)
+
+    lock_cycle = next((c for c in cycles if c.get("phase") == "lock"), None)
+
+    reject_counts: Dict[str, int] = {}
+    for c in cycles:
+        reason = c.get("reject_reason")
+        if reason:
+            reject_counts[reason] = reject_counts.get(reason, 0) + 1
+
+    sharpness_values = sorted(c.get("sharpness") for c in cycles
+                              if isinstance(c.get("sharpness"), (int, float)))
+    frames_skipped_blurry = sum(1 for c in mission.checks
+                                if c.get("kind") == "skipped" and c.get("reason") == "blurry")
+    hops_done = sum(1 for c in cycles if c.get("hop_moved_s"))
+
+    approach_result = next(
+        (r for r in reversed(mission.results)
+         if str((r.get("step") or {}).get("action") or "").lower() == "approach"),
+        None,
+    )
+    detail = (approach_result or {}).get("detail") or {}
+
+    return {
+        "cycles_used": detail.get("cycles", len(cycles)),
+        "sweeps_used": sweeps_used,
+        "gimbal_looks": len(search_cycles),
+        "chassis_pivots": chassis_pivots,
+        "chassis_spin_deg_total": round(chassis_spin_deg_total, 1),
+        "search_vlm_calls": len(search_cycles),
+        "bearing_deg_at_lock": (lock_cycle or {}).get("bearing_deg"),
+        "residual_e_at_lock": (lock_cycle or {}).get("residual_e"),
+        "hops_done": hops_done,
+        "frames_skipped_blurry": frames_skipped_blurry,
+        "sharpness_min": round(sharpness_values[0], 1) if sharpness_values else None,
+        "sharpness_median": round(sharpness_values[len(sharpness_values) // 2], 1) if sharpness_values else None,
+        "detections_rejected": reject_counts,
+        "arrival_cross_check": detail.get("arrival_cross_check"),
+        "gimbal_only_lock": detail.get("gimbal_only_lock"),
+        "vlm_time_s": round(vlm_time, 2),
+        "motion_time_s": round(motion_time_s, 2),
+        "wall_time_s": round(max(span - vlm_time, 0), 2),
+        "sonar_stops": sum(1 for c in cycles if "sonar_stop" in str(c.get("action") or "")),
+        "arrival_reason": detail.get("reason"),
+    }
+
 
 def build_report(mission, spoken: bool = True) -> dict:
     """Assemble the run's report. `spoken=False` skips the one planner call,
@@ -256,6 +313,7 @@ def build_report(mission, spoken: bool = True) -> dict:
         "bends": [{"side": b.get("side"), "t_rel_s": b.get("t_rel_s"),
                    "est_distance_cm": b.get("est_distance_cm")} for b in bends],
         "route_summary": _route_summary(bends),
+        "approach_summary": _approach_summary(mission),
         # Which way the camera was pointing, counted. A run whose checks were
         # all centre frames saw a corridor; one that swept saw a room, and the
         # difference matters when reading what `never_seen` means.
@@ -447,6 +505,79 @@ def _uncertainties(mission, progress: List[dict], completed: List[dict],
             flag("no_path",
                  "no collision-free route to %s" % target if target
                  else "no collision-free route was found")
+
+    # -- free-roam approach additions (spec-free-roam-approach.md §E / F8) --
+    approach_cycles = [c for c in mission.checks if c.get("kind") == "approach_cycle"]
+    if approach_cycles:
+        approach_result = next(
+            (r for r in reversed(mission.results)
+             if str((r.get("step") or {}).get("action") or "").lower() == "approach"),
+            None,
+        )
+        a_detail = (approach_result or {}).get("detail") or {}
+        reason = a_detail.get("reason")
+        if reason in ("fill", "bottom"):
+            flag("soft_target_arrival",
+                 "arrival was decided by vision only (%s) — sonar did not confirm" % reason)
+
+        lost_events = sum(
+            1 for c in approach_cycles
+            if "hop_back" in str(c.get("action") or "") or "relocate_look" in str(c.get("action") or "")
+        )
+        if lost_events >= 2:
+            flag("target_lost_repeatedly",
+                 "the target was lost and re-acquired %d time(s) during the approach" % lost_events)
+
+        cycles_used = a_detail.get("cycles", len(approach_cycles))
+        budget = config.get_int("APPROACH_MAX_CYCLES", 20)
+        if budget > 0 and cycles_used / budget > 0.5:
+            flag("approach_budget_overrun",
+                 "used %d of %d available cycles (>50%%)" % (cycles_used, budget))
+
+        if any(c.get("gate") == "low_confirmed" for c in approach_cycles):
+            flag("low_confidence_steering",
+                 "at least one low-confidence detection was used to steer during the approach")
+
+        rejected = [c for c in approach_cycles if c.get("reject_reason")]
+        if rejected:
+            flag("hallucinated_box_rejected",
+                 "%d detection(s) were rejected as implausible (%s) — counted, not believed"
+                 % (len(rejected), ", ".join(sorted({c["reject_reason"] for c in rejected}))))
+
+        if any(c.get("arrival_block") == "arrival_contradicted" for c in approach_cycles):
+            flag("false_arrival_rejected",
+                 "an apparent arrival was rejected because the arrival check contradicted it")
+
+        if reason in ("arrival_contradicted", "target_not_found") and "arrived" not in str(reason):
+            flag("arrival_unconfirmed",
+                 "the approach ended without a confirmed arrival")
+
+        blurry = sum(1 for c in mission.checks
+                     if c.get("kind") == "skipped" and c.get("reason") == "blurry")
+        if blurry:
+            flag("blurry_frames_skipped",
+                 "%d frame(s) were too blurry to check and were skipped" % blurry)
+
+        residual_limit = config.get_float("APPROACH_RESIDUAL_FLAG_E", 0.30)
+        residual_hits = [c for c in approach_cycles if c.get("phase") == "lock"
+                        and isinstance(c.get("residual_e"), (int, float))
+                        and abs(c["residual_e"]) > residual_limit]
+        if residual_hits:
+            flag("bearing_residual_high",
+                 "the pivot toward the target left a residual offset of %.2f — check pan/turn calibration"
+                 % residual_hits[0]["residual_e"])
+
+        if config.get_float("GIMBAL_DEG_PER_UNIT", 0.0) <= 0:
+            flag("gimbal_deg_per_unit_unmeasured",
+                 "GIMBAL_DEG_PER_UNIT is unmeasured — the search fell back to centre-only looks")
+
+        if config.get_int("APPROACH_TILT_OFFSET", 0) == 0:
+            flag("tilt_offset_unmeasured",
+                 "APPROACH_TILT_OFFSET is 0 — the approach gimbal tilt has likely not been measured")
+
+        if any(c.get("arrival_block") == "arrival_without_motion" for c in approach_cycles):
+            flag("arrival_without_motion",
+                 "arrival fired on sonar with zero prior hops")
 
     return out
 

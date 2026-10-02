@@ -17,13 +17,15 @@ async function nudge(direction: Direction): Promise<void> {
 
 export default function GimbalControl() {
     const [tick, setTick] = useState(0)
+    const [streaming, setStreaming] = useState(true)
     const imgRef = useRef<HTMLImageElement | null>(null)
     const holdRef = useRef<number | null>(null)
 
     useEffect(() => {
+        if (!streaming) return undefined
         const id = window.setInterval(() => setTick((t) => t + 1), POLL_MS)
         return () => window.clearInterval(id)
-    }, [])
+    }, [streaming])
 
     const stopHold = () => {
         if (holdRef.current !== null) {
@@ -63,9 +65,13 @@ export default function GimbalControl() {
             <img
                 ref={imgRef}
                 className="feed"
-                src={`/api/pi/camera/snapshot?t=${tick}`}
+                src={streaming ? `/api/pi/camera/snapshot?t=${tick}` : undefined}
                 alt="TurboPi live camera"
             />
+
+            <button className="ghost" onClick={() => setStreaming((s) => !s)}>
+                {streaming ? 'Stop streaming' : 'Resume streaming'}
+            </button>
 
             <div className="dpad">
                 <div />

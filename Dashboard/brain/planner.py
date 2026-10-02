@@ -28,6 +28,16 @@ def _profile():
         name = "pi" if config.get("ROVER", "sim").lower() == "pi" else "virtual"
     return _PROFILES.get(name, planner_virtual)
 
+def _guidance_for(profile) -> str:
+    """NAV_MODE only matters for the pi profile (spec-free-roam-approach.md
+    §C) — planner_virtual has no NAV_MODE concept, so other profiles are
+    unaffected."""
+    if profile is planner_pi and config.get("NAV_MODE", "line").strip().lower() == "free":
+        return planner_pi.FREE_GUIDANCE
+    return profile.GUIDANCE
+
+
+
 
 def _build_vocabulary(actions: dict, guidance: str) -> str:
     """Same shape _VOCABULARY was built in before the split, just parameterised
@@ -45,7 +55,7 @@ def profile_info() -> dict:
     """What's actually driving the planner right now — for report.py's
     models.planner_profile and the UI's header pill."""
     profile = _profile()
-    vocabulary = _build_vocabulary(profile.ACTIONS, profile.GUIDANCE)
+    vocabulary = _build_vocabulary(profile.ACTIONS, _guidance_for(profile))
     digest = hashlib.sha256((vocabulary + profile.STEP_SCHEMA).encode("utf-8")).hexdigest()[:12]
     return {"profile": profile.PROFILE_NAME, "prompt_sha": digest, "actions": dict(profile.ACTIONS)}
 
@@ -55,7 +65,7 @@ def build_plan_prompt(command: str, scene: str = "") -> str:
     tools/snapshot_prompt.py can print the exact prompt without calling a
     model. Nothing here may change what generate_plan sends."""
     profile = _profile()
-    vocabulary = _build_vocabulary(profile.ACTIONS, profile.GUIDANCE)
+    vocabulary = _build_vocabulary(profile.ACTIONS, _guidance_for(profile))
 
     scene_block = ""
     if scene:

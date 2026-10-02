@@ -10,7 +10,7 @@ log = get_logger("vlm")
 # ImageSource is re-exported so pipeline.py's existing import keeps working.
 __all__ = ["ImageSource", "check_ambiguity", "verify_plan", "describe_frame",
            "inventory_frame", "check_progress", "check_side_look",
-           "check_arrival", "failed", "KNOWN_MAX"]
+           "check_arrival", "failed", "KNOWN_MAX", "locate_target"]
 
 # Marker key on a result that never reached a usable answer. Without this a
 # failed call returns {} and .get("ambiguous") is falsy, so a broken model reads
@@ -230,6 +230,22 @@ def check_side_look(image: ImageSource, target: str,
     )
     return _ask("check_side_look", prompt, image)
 
+def locate_target(image: ImageSource, target: str) -> dict:
+    """Bounding-box localisation for the free-roam approach loop
+    (spec-free-roam-approach.md §3B). Distinct from check_progress/
+    check_arrival: those ask yes/no against a room catalogue, this asks
+    WHERE, in pixels, so mission.py can derive x_center/fill/bottom itself
+    rather than trusting the model's own notion of "left" or "close"."""
+    prompt = (
+        f'Find "{target}" in this image from a small floor robot\'s camera.\n'
+        "If it is visible, give its bounding box in pixel coordinates.\n"
+        "Respond ONLY with JSON: "
+        '{"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, '
+        '"confidence": "high"|"medium"|"low", "description": "one short sentence"}'
+    )
+    return _ask("locate_target", prompt, image)
+
+#this funciton calls the provider to give the prompt to the LLM
 
 def _ask(stage: str, prompt: str, image: Optional[ImageSource]) -> dict:
     started = time.perf_counter()

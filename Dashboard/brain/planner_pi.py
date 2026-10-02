@@ -16,7 +16,8 @@ ACTIONS = {
                     "travel more than a short distance"),
     "move": "drive forward or backward",
     "turn": "rotate on the spot",
-    "approach": "drive toward a visible target until close to it",
+    "approach": ("find a visible object and drive up to it (searches by "
+                "turning if it is not in view)"),
     "scan": "sweep the camera around without moving the base",
     "observe": "hold still and look at a named target",
     "stop": "halt",
@@ -27,5 +28,5 @@ GUIDANCE = (
     "To go somewhere, use one follow_line step whose target is what should be "
     "visible at the end, then observe that target, then report."
 )
-
+FREE_GUIDANCE = ("To go to an object without a floor line, use approach with the object as target, then observe it, then report")
 STEP_SCHEMA = '{"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}'

@@ -12,7 +12,7 @@ import json
 import re
 import time
 from pathlib import Path
-from typing import Awaitable, Callable, List, Optional
+from typing import Awaitable, Callable, List, Optional,Dict,Tuple
 
 import config
 import confirmation
@@ -27,7 +27,7 @@ from planner import revise_plan
 from providers import usage
 from rover import RoverController
 from stt import transcribe_audio
-from vlm import KNOWN_MAX, check_arrival, check_progress, check_side_look, describe_frame
+from vlm import KNOWN_MAX, check_arrival, check_progress, check_side_look, describe_frame, locate_target
 from vlm import failed as vlm_failed
 
 log = get_logger("mission")
@@ -59,6 +59,54 @@ PAN_CYCLE = [d.strip().lower() for d in
 # before giving up on it. At ~15s a frame on the local host, a check launched
 # near the crossbar routinely outlives the step it belongs to.
 CHECK_DRAIN_S = config.get_float("CHECK_DRAIN_S", 25.0)
+
+# Fixed sweep direction — the spec gives SEARCH_STEPS x SEARCH_PIVOT_S a
+# direction to sweep, not a config knob, so this is a constant, not .env.
+SEARCH_DIR = 1  # +1 = right, matching rover_pi.pivot()'s convention
+APPROACH_MAX_CYCLES = config.get_int("APPROACH_MAX_CYCLES", 20)
+APPROACH_MAX_S = config.get_float("APPROACH_MAX_S", 240.0)
+HOP_CM = config.get_float("HOP_CM", 30.0)
+HOP_NEAR_CM = config.get_float("HOP_NEAR_CM", 15.0)
+HOP_BACK_S = config.get_float("HOP_BACK_S", 0.6)
+NEAR_FILL = config.get_float("NEAR_FILL", 0.08)
+ARRIVE_FILL = config.get_float("ARRIVE_FILL", 0.20)
+ARRIVE_BOTTOM = config.get_float("ARRIVE_BOTTOM", 0.90)
+ARRIVE_MM = config.get_float("ARRIVE_MM", 250.0)
+CENTER_TOL = config.get_float("CENTER_TOL", 0.12)
+CAMERA_HFOV_DEG = config.get_float("CAMERA_HFOV_DEG", 60.0)
+FREE_TURN_DEG_PER_S = config.get_float("FREE_TURN_DEG_PER_S", 90.0)
+# Seconds of pivot per unit of x_center offset. e ranges -0.5..+0.5 as a
+# fraction of frame width, which maps 1:1 onto the full HFOV, so
+# angle_needed_deg = e * HFOV_DEG, and seconds = angle_needed_deg / DEG_PER_S.
+PIVOT_S_PER_UNIT = CAMERA_HFOV_DEG / FREE_TURN_DEG_PER_S if FREE_TURN_DEG_PER_S > 0 else 0.0
+
+# -- gimbal-first approach search (amendment 2026-10-02; rung F8) ----------
+APPROACH_TILT_OFFSET = config.get_int("APPROACH_TILT_OFFSET", 0)
+GIMBAL_DEG_PER_UNIT = config.get_float("GIMBAL_DEG_PER_UNIT", 0.0)
+PAN_SWEEP_UNITS = config.get_int("PAN_SWEEP_UNITS", 400)
+SWEEP_OVERLAP_FRAC = config.get_float("SWEEP_OVERLAP_FRAC", 0.15)
+SWEEP_MARGIN_DEG = config.get_float("SWEEP_MARGIN_DEG", 20.0)
+# NOT in the spec doc's .env block — it only specifies chassis-pivot timing
+# in prose ("ONE big pivot" between sweeps) without naming the knob. Added
+# here so the pivot has a size; 110° keeps 3 sweeps x 2 advances inside the
+# doc's own "≤232° worst case" budget. Flag this choice when you read the
+# spec doc again — it's a gap I filled, not something written there.
+SWEEP_ADVANCE_DEG = config.get_float("SWEEP_ADVANCE_DEG", 110.0)
+SEARCH_MAX_SWEEPS = config.get_int("SEARCH_MAX_SWEEPS", 3)
+SEARCH_MAX_VLM_CALLS = config.get_int("SEARCH_MAX_VLM_CALLS", 18)
+APPROACH_SETTLE_S = config.get_float("APPROACH_SETTLE_S", 0.8)
+APPROACH_MIN_SHARPNESS = config.get_float("APPROACH_MIN_SHARPNESS", 25.0)
+APPROACH_FRAME_RETRIES = config.get_int("APPROACH_FRAME_RETRIES", 2)
+MAX_FILL = config.get_float("MAX_FILL", 0.60)
+MAX_BOX_SIDE_FRAC = config.get_float("MAX_BOX_SIDE_FRAC", 0.95)
+MIN_FILL = config.get_float("MIN_FILL", 0.0008)
+MIN_HOPS_BEFORE_ARRIVAL = config.get_int("MIN_HOPS_BEFORE_ARRIVAL", 1)
+FILL_JUMP_MAX = config.get_float("FILL_JUMP_MAX", 3.0)
+MIN_PIVOT_DEG = config.get_float("MIN_PIVOT_DEG", 6.0)
+MIN_PIVOT_S = config.get_float("MIN_PIVOT_S", 0.12)
+APPROACH_ARRIVAL_CROSSCHECK = config.get_int("APPROACH_ARRIVAL_CROSSCHECK", 1)
+APPROACH_RESIDUAL_FLAG_E = config.get_float("APPROACH_RESIDUAL_FLAG_E", 0.30)
+
 
 LOGS_DIR = Path(__file__).parent / "logs"
 
@@ -581,14 +629,16 @@ async def _drain_checks(mission: MissionSession) -> None:
                     mission.session_id, len(unfinished))
 
 
-async def _arrival_check(mission: MissionSession, rover, target: str, emit: Emit) -> None:
+async def _arrival_check(mission: MissionSession, rover, target: str, emit: Emit,keep_tilt:Optional[int]=None) -> None:
     t_rel = time.time() - mission.started_at
     # Centre first, always. The pan cycle leaves the gimbal wherever the last
     # progress check pointed it, and an arrival frame taken while still aimed
     # left would be scored against the forward target — a false "not visible"
     # that looks exactly like an honest one. Idempotent: the `observe` step
     # already centres, and doing it twice costs nothing.
-    if hasattr(rover, "center_gimbal"):
+    if keep_tilt is not None and hasattr(rover, "set_gimbal"):
+        await asyncio.to_thread(rover.set_gimbal, 0, keep_tilt)
+    elif hasattr(rover, "center_gimbal"):
         await asyncio.to_thread(rover.center_gimbal)
         await asyncio.sleep(0.5)
     frame = await asyncio.to_thread(rover.get_frame)
@@ -645,6 +695,461 @@ async def _maybe_arrival_check(mission: MissionSession, rover, step: dict,
         return
 
     await _arrival_check(mission, rover, str(step.get("target") or ""), emit)
+
+# --------------------------------------------------------------------------
+# Free-roam approach controller (spec-free-roam-approach.md §2). Only reached
+# when NAV_MODE=free and the rover has pivot/hop/get_frame — see
+# run_mission's use_free_approach gate. Returns the same {"status", "detail"}
+# shape execute_step does, so nothing downstream needs a special case.
+#
+# Control split (§0): sonar is the fast reactive layer, inside hop()'s own
+# watchdog, at 20Hz, during every movement. The VLM only ever runs while the
+# rover is stationary, between movements — this loop never calls locate_target
+# while a Twist is being published.
+# --------------------------------------------------------------------------
+def _arrived(loc: dict, sonar_mm: Optional[int], e: float) -> bool:
+    if loc.get("fill") is not None and loc["fill"] >= ARRIVE_FILL:
+        return True
+    if loc.get("bottom") is not None and loc["bottom"] >= ARRIVE_BOTTOM:
+        return True
+    if sonar_mm is not None and sonar_mm <= ARRIVE_MM and abs(e) <= CENTER_TOL:
+        return True
+    return False
+
+
+def _derive_loc(raw: dict, frame_w: Optional[int], frame_h: Optional[int]) -> dict:
+    """bbox_2d (pixels) -> x_center/fill/bottom/w_frac/h_frac (frame fractions).
+
+    vlm_said_visible is carried through separately from `visible` so the trace
+    can tell "the model said no" from "we rejected what the model said".
+    """
+    vlm_said_visible = bool(raw.get("visible"))
+    bbox = raw.get("bbox_2d")
+    if (not vlm_said_visible or not frame_w or not frame_h
+            or not isinstance(bbox, list) or len(bbox) != 4):
+        return {"visible": False, "bbox_2d": None, "vlm_said_visible": vlm_said_visible}
+    x1, y1, x2, y2 = bbox
+    if not (x1 < x2 and y1 < y2 and x1 >= 0 and y1 >= 0
+            and x2 <= frame_w and y2 <= frame_h):
+        return {"visible": False, "bbox_2d": None, "vlm_said_visible": vlm_said_visible}
+    w_frac = (x2 - x1) / frame_w
+    h_frac = (y2 - y1) / frame_h
+    return {
+        "visible": True, "bbox_2d": bbox, "vlm_said_visible": vlm_said_visible,
+        "x_center": round(((x1 + x2) / 2) / frame_w, 3),
+        "fill": round(w_frac * h_frac, 3),
+        "bottom": round(y2 / frame_h, 3),
+        "w_frac": round(w_frac, 3), "h_frac": round(h_frac, 3),
+    }
+
+
+def _sweep_offsets() -> List[int]:
+    """Pan offsets for one sweep, centre-outward: [0, -u1, +u1, -u2, +u2, ...].
+
+    Step size is a fraction of the half-FOV so consecutive looks overlap by
+    SWEEP_OVERLAP_FRAC; SWEEP_MARGIN_DEG is held back from PAN_SWEEP_UNITS so
+    the rover's own mount never dominates the extreme frame. [0] (centre-only)
+    if the pan constant is unmeasured — never fabricate a bearing from zero.
+    """
+    if GIMBAL_DEG_PER_UNIT <= 0:
+        log.warning("[mission] gimbal_deg_per_unit_unmeasured — search will not pan")
+        return [0]
+
+    half_fov_deg = CAMERA_HFOV_DEG / 2.0
+    step_deg = half_fov_deg * (1.0 - SWEEP_OVERLAP_FRAC)
+    step_units = max(1, int(round(step_deg / GIMBAL_DEG_PER_UNIT)))
+    margin_units = int(round(SWEEP_MARGIN_DEG / GIMBAL_DEG_PER_UNIT))
+    max_units = max(0, PAN_SWEEP_UNITS - margin_units)
+
+    offsets = [0]
+    unit = step_units
+    while unit <= max_units:
+        offsets.append(-unit)
+        offsets.append(unit)
+        unit += step_units
+    return offsets
+
+
+async def _grab_sharp(mission: MissionSession, rover, filename: str) -> dict:
+    """Settle, grab, analyse sharpness; retry up to APPROACH_FRAME_RETRIES.
+
+    The VLM is never called on a blurry frame. On final failure the frame (if
+    any) is still saved — caller records it as kind="skipped" so
+    report.timings.checks_skipped counts it, matching the existing _skip
+    convention.
+    """
+    attempts = 0
+    frame = None
+    stats = None
+    for attempt in range(APPROACH_FRAME_RETRIES + 1):
+        attempts = attempt + 1
+        await asyncio.sleep(APPROACH_SETTLE_S)
+        frame = await asyncio.to_thread(rover.get_frame)
+        if frame is None:
+            continue
+        stats = await asyncio.to_thread(frames.analyse, frame)
+        if stats is not None and stats.sharpness >= APPROACH_MIN_SHARPNESS:
+            path = _save_frame(mission, filename, frame)
+            return {"frame": frame, "sharpness": stats.sharpness, "path": path,
+                    "width": stats.width, "height": stats.height,
+                    "attempts": attempts, "ok": True}
+
+    path = _save_frame(mission, filename, frame) if frame else None
+    return {"frame": None, "sharpness": stats.sharpness if stats else None,
+            "path": path, "width": None, "height": None,
+            "attempts": attempts, "ok": False}
+
+
+def _plausible(loc: dict, prev_fill: Optional[float], hops_done: int) -> Optional[str]:
+    """Pure, offline-runnable rejection gate (run it over tools/f3_frames/).
+    Returns a reject reason, or None if the detection stands. hops_done is
+    kept in the signature per spec even though no current rule reads it."""
+    if not loc.get("visible"):
+        return None
+
+    fill = loc.get("fill")
+    w_frac = loc.get("w_frac")
+    h_frac = loc.get("h_frac")
+    x_center = loc.get("x_center")
+
+    if fill is not None and fill > MAX_FILL:
+        return "degenerate_fill"
+    if (w_frac is not None and w_frac > MAX_BOX_SIDE_FRAC) or \
+       (h_frac is not None and h_frac > MAX_BOX_SIDE_FRAC):
+        return "degenerate_full_frame"
+    if fill is not None and fill < MIN_FILL:
+        return "degenerate_tiny"
+    if (prev_fill is not None and fill is not None
+            and prev_fill < NEAR_FILL and fill > prev_fill * FILL_JUMP_MAX):
+        return "fill_jump"
+    if (x_center is not None and fill is not None
+            and abs(x_center - 0.5) <= 0.003 and fill > 0.3):
+        return "degenerate_centre_box"
+    return None
+
+
+
+async def approach_controller(mission: MissionSession, rover, step: dict, emit: Emit) -> dict:
+    target = str(step.get("target") or "").strip()
+    started = time.time()
+    cycle = 0
+    low_pending: Dict[int, dict] = {}  # keyed by pan offset, per spec §B
+
+    has_gimbal = hasattr(rover, "set_gimbal")
+
+    def set_gimbal(pan: Optional[int] = None, tilt: Optional[int] = None) -> None:
+        if has_gimbal:
+            rover.set_gimbal(pan=pan, tilt=tilt)
+
+    async def grab_and_locate(filename: str) -> dict:
+        grabbed = await _grab_sharp(mission, rover, filename)
+        if not grabbed["ok"]:
+            return {"visible": False, "bbox_2d": None, "vlm_said_visible": False,
+                    "_skip": True, "sharpness": grabbed["sharpness"],
+                    "attempts": grabbed["attempts"], "_latency": None,
+                    "_path": grabbed["path"]}
+        t0 = time.perf_counter()
+        raw = await asyncio.to_thread(locate_target, grabbed["frame"], target)
+        latency = round(time.perf_counter() - t0, 2)
+        loc = _derive_loc(raw, grabbed["width"], grabbed["height"])
+        loc["confidence"] = raw.get("confidence")
+        loc["sharpness"] = grabbed["sharpness"]
+        loc["attempts"] = grabbed["attempts"]
+        loc["_latency"] = latency
+        loc["_path"] = grabbed["path"]
+        return loc
+
+    async def record(phase: str, action_desc: str, loc: dict, sonar_mm: Optional[int],
+                     extra: Optional[dict] = None) -> dict:
+        entry = {
+            "kind": "approach_cycle", "cycle": cycle, "phase": phase,
+            "t_rel_s": round(time.time() - started, 2),
+            "bbox": loc.get("bbox_2d"), "x_center": loc.get("x_center"),
+            "fill": loc.get("fill"), "bottom": loc.get("bottom"),
+            "confidence": loc.get("confidence"), "sharpness": loc.get("sharpness"),
+            "frame_attempts": loc.get("attempts"),
+            "vlm_said_visible": loc.get("vlm_said_visible"),
+            "accepted_as_visible": loc.get("visible"),
+            "sonar_mm": sonar_mm, "action": action_desc,
+            "vlm_latency_s": loc.get("_latency"), "frame_path": loc.get("_path"),
+        }
+        if extra:
+            entry.update(extra)
+        mission.checks.append(entry)
+        log.info("[mission %s] approach cycle %d (%s): %s", mission.session_id,
+                 cycle, phase, action_desc)
+        await emit({"type": "approach_cycle", "session_id": mission.session_id, "check": entry})
+        return entry
+
+    async def sonar_now() -> Optional[int]:
+        if not hasattr(rover, "telemetry_snapshot"):
+            return None
+        telemetry = await asyncio.to_thread(rover.telemetry_snapshot)
+        return telemetry.get("sonar_mm")
+
+    def gate_for(loc: dict, pan_offset: int, prev_fill: Optional[float],
+                hops_done: int) -> Tuple[Optional[dict], str]:
+        """_plausible, then the pan-keyed low-confidence second-look gate.
+        Returns (accepted_loc_or_None, gate_label)."""
+        if not loc.get("visible"):
+            low_pending.pop(pan_offset, None)
+            return None, "not_visible"
+
+        reject = _plausible(loc, prev_fill, hops_done)
+        if reject is not None:
+            low_pending.pop(pan_offset, None)
+            return None, reject
+
+        if loc.get("confidence") == "low":
+            pending = low_pending.get(pan_offset)
+            if pending is None:
+                low_pending[pan_offset] = loc
+                return None, "low_pending"
+            if abs((loc.get("x_center") or 0) - (pending.get("x_center") or 0)) <= 0.15:
+                low_pending.pop(pan_offset, None)
+                return loc, "low_confirmed"
+            low_pending[pan_offset] = loc
+            return None, "low_pending"
+
+        low_pending.pop(pan_offset, None)
+        return loc, "confirmed"
+
+    set_gimbal(pan=0, tilt=APPROACH_TILT_OFFSET)
+
+    # -- SEARCH: chassis stationary, gimbal does the looking -----------------
+    bearing_deg = None
+    found_loc = None
+    vlm_calls = 0
+    search_offsets = _sweep_offsets()
+
+    for pan_offset in search_offsets:
+        if vlm_calls >= SEARCH_MAX_VLM_CALLS:
+            break
+        accepted = None
+        while True:
+            cycle += 1
+            set_gimbal(pan=pan_offset)
+            loc = await grab_and_locate("ap_s%d_p%d.jpg" % (sweep, pan_offset))
+            if loc.get("_skip"):
+                await record("search", "skipped_blurry", loc, None,
+                                 {"sweep": sweep, "pan_offset": pan_offset})
+                mission.checks[-1]["kind"] = "skipped"
+                mission.checks[-1]["reason"] = "blurry"
+                break
+            vlm_calls += 1
+            accepted, gate = gate_for(loc, pan_offset, None, 0)
+            reject_reason = gate if gate not in ("confirmed", "low_confirmed",
+                                                 "low_pending", "not_visible") else None
+            pan_deg = pan_offset * GIMBAL_DEG_PER_UNIT if GIMBAL_DEG_PER_UNIT > 0 else None
+            await record("search", "look pan=%d gate=%s" % (pan_offset, gate), loc, None,
+                             {"sweep": sweep, "pan_offset": pan_offset, "pan_deg": pan_deg,
+                              "gate": gate, "reject_reason": reject_reason})
+            if gate != "low_pending" or vlm_calls >= SEARCH_MAX_VLM_CALLS:
+                break
+        if accepted is not None:
+            bearing_deg = (pan_deg or 0.0) + (accepted["x_center"] - 0.5) * CAMERA_HFOV_DEG
+            found_loc = accepted
+            break
+
+    for sweep in range(SEARCH_MAX_SWEEPS):
+        for pan_offset in search_offsets:
+            if vlm_calls >= SEARCH_MAX_VLM_CALLS:
+                break
+            cycle += 1
+            set_gimbal(pan=pan_offset)
+            loc = await grab_and_locate("ap_s%d_p%d.jpg" % (sweep, pan_offset))
+            if loc.get("_skip"):
+                await record("search", "skipped_blurry", loc, None,
+                             {"sweep": sweep, "pan_offset": pan_offset})
+                mission.checks[-1]["kind"] = "skipped"
+                mission.checks[-1]["reason"] = "blurry"
+                continue
+            vlm_calls += 1
+            accepted, gate = gate_for(loc, pan_offset, None, 0)
+            reject_reason = gate if gate not in ("confirmed", "low_confirmed",
+                                                 "low_pending", "not_visible") else None
+            pan_deg = pan_offset * GIMBAL_DEG_PER_UNIT if GIMBAL_DEG_PER_UNIT > 0 else None
+            await record("search", "look pan=%d gate=%s" % (pan_offset, gate), loc, None,
+                         {"sweep": sweep, "pan_offset": pan_offset, "pan_deg": pan_deg,
+                          "gate": gate, "reject_reason": reject_reason})
+            if accepted is not None:
+                bearing_deg = (pan_deg or 0.0) + (accepted["x_center"] - 0.5) * CAMERA_HFOV_DEG
+                found_loc = accepted
+                break
+        if found_loc is not None or vlm_calls >= SEARCH_MAX_VLM_CALLS:
+            break
+        set_gimbal(pan=0)
+        if SWEEP_ADVANCE_DEG > 0 and FREE_TURN_DEG_PER_S > 0:
+            pivot_s = SWEEP_ADVANCE_DEG / FREE_TURN_DEG_PER_S
+            await asyncio.to_thread(rover.pivot, SEARCH_DIR, pivot_s)
+            cycle += 1
+            await record("search", "sweep_advance_pivot", {"visible": False}, None,
+                         {"sweep": sweep, "pivot_requested_deg": SWEEP_ADVANCE_DEG,
+                          "pivot_cmd_s": pivot_s, "pivot_dir": SEARCH_DIR})
+
+    if found_loc is None:
+        return {"status": "blocked",
+                "detail": {"reason": "target_not_found", "cycles": cycle}}
+
+    # -- LOCK: re-centre gimbal, ONE pivot toward the measured bearing -------
+    set_gimbal(pan=0)
+    pivot_dir = 0
+    pivot_s = 0.0
+    if abs(bearing_deg) >= MIN_PIVOT_DEG and FREE_TURN_DEG_PER_S > 0:
+        pivot_dir = 1 if bearing_deg > 0 else -1
+        pivot_s = max(MIN_PIVOT_S, abs(bearing_deg) / FREE_TURN_DEG_PER_S)
+        await asyncio.to_thread(rover.pivot, pivot_dir, pivot_s)
+    cycle += 1
+
+    await asyncio.sleep(APPROACH_SETTLE_S)
+    verify = await grab_and_locate("ap_lock_verify.jpg")
+    if verify.get("_skip"):
+        accepted, gate = None, "skipped_blurry"
+    else:
+        accepted, gate = gate_for(verify, 0, None, 0)
+    residual_e = (accepted["x_center"] - 0.5) if accepted and accepted.get("x_center") is not None else None
+
+    await record("lock", "verify pivot_dir=%s pivot_s=%.2f gate=%s" % (pivot_dir, pivot_s, gate),
+                 verify, None,
+                 {"bearing_deg": round(bearing_deg, 2),
+                  "pivot_requested_deg": round(bearing_deg, 2),
+                  "pivot_cmd_s": round(pivot_s, 2) if pivot_dir else None,
+                  "pivot_dir": pivot_dir or None,
+                  "residual_e": round(residual_e, 3) if residual_e is not None else None,
+                  "gate": gate})
+
+    if residual_e is not None and abs(residual_e) > APPROACH_RESIDUAL_FLAG_E:
+        log.warning("[mission %s] bearing_residual_high: residual_e=%.3f",
+                    mission.session_id, residual_e)
+
+    loc = accepted if accepted is not None else {"visible": False, "bbox_2d": None}
+
+    # -- APPROACH --------------------------------------------------------------
+    deadline = started + APPROACH_MAX_S
+    hops_done = 0
+    prev_fill: Optional[float] = loc.get("fill")
+    lost = 0
+
+    while cycle < APPROACH_MAX_CYCLES and time.time() < deadline:
+        cycle += 1
+
+        if not loc.get("visible"):
+            lost += 1
+            if lost >= 2:
+                loc2 = await grab_and_locate("ap_%02d_relocate.jpg" % cycle)
+                accepted, gate = (None, "skipped_blurry") if loc2.get("_skip") \
+                    else gate_for(loc2, 0, prev_fill, hops_done)
+                await record("approach", "relocate_look gate=%s" % gate, loc2, None, {"gate": gate})
+                if accepted is None:
+                    return {"status": "blocked",
+                            "detail": {"reason": "target_not_found", "cycles": cycle}}
+                loc = accepted
+                lost = 0
+                continue
+            back_cm = HOP_BACK_S * getattr(rover, "free_speed_cmps", 15.0)
+            hop_result = await asyncio.to_thread(rover.hop, back_cm, True)
+            loc2 = await grab_and_locate("ap_%02d_lostlook.jpg" % cycle)
+            accepted, gate = (None, "skipped_blurry") if loc2.get("_skip") \
+                else gate_for(loc2, 0, prev_fill, hops_done)
+            await record("approach", "hop_back %.1fs gate=%s" % (HOP_BACK_S, gate), loc2, None,
+                         {"gate": gate, "hop_moved_s": hop_result.get("moved_s")})
+            loc = accepted or {"visible": False, "bbox_2d": None}
+            continue
+        lost = 0
+
+        e = loc["x_center"] - 0.5
+        sonar_mm = await sonar_now()
+
+        sonar_hit = sonar_mm is not None and sonar_mm <= ARRIVE_MM and abs(e) <= CENTER_TOL
+        vision_hit = (
+            (loc.get("fill") is not None and loc["fill"] >= ARRIVE_FILL)
+            or (loc.get("bottom") is not None and loc["bottom"] >= ARRIVE_BOTTOM)
+        )
+        arrived = False
+        arrival_reason = None
+        arrival_block = None
+        if sonar_hit:
+            arrived, arrival_reason = True, "sonar"
+            if hops_done == 0:
+                arrival_block = "arrival_without_motion"
+        elif vision_hit and hops_done >= MIN_HOPS_BEFORE_ARRIVAL:
+            non_shrinking = prev_fill is None or (loc.get("fill") or 0) >= prev_fill
+            if non_shrinking:
+                arrived = True
+                arrival_reason = "fill" if (loc.get("fill") or 0) >= ARRIVE_FILL else "bottom"
+
+        if arrived:
+            if APPROACH_ARRIVAL_CROSSCHECK:
+                await _arrival_check(mission, rover, target, emit, keep_tilt=APPROACH_TILT_OFFSET)
+                cross = (mission.arrival or {}).get("result") or {}
+                if "_error" not in cross and cross.get("target_visible") is False:
+                    back_cm = HOP_BACK_S * getattr(rover, "free_speed_cmps", 15.0)
+                    await asyncio.to_thread(rover.hop, back_cm, True)
+                    recheck = await grab_and_locate("ap_%02d_arrival_recheck.jpg" % cycle)
+                    accepted, gate = (None, "skipped_blurry") if recheck.get("_skip") \
+                        else gate_for(recheck, 0, prev_fill, hops_done)
+                    await record("approach", "arrival_recheck gate=%s" % gate, recheck, sonar_mm,
+                                 {"gate": gate, "arrival_block": "arrival_contradicted"})
+                    if accepted is None:
+                        return {"status": "blocked",
+                                "detail": {"reason": "arrival_contradicted", "cycles": cycle,
+                                           "arrival_cross_check": "contradicted"}}
+                    loc = accepted
+                    continue
+
+            await record("approach", "arrived (%s)" % arrival_reason, loc, sonar_mm,
+                         {"hops_done": hops_done, "fill_prev": prev_fill,
+                          "arrival_block": arrival_block})
+            return {"status": "ok",
+                    "detail": {"reason": arrival_reason, "cycles": cycle,
+                               "arrival_cross_check": "confirmed" if APPROACH_ARRIVAL_CROSSCHECK else "skipped",
+                               "gimbal_only_lock": True}}
+
+        action_desc = ""
+        pivot_dir2 = None
+        pivot_s2 = None
+        if abs(e) > CENTER_TOL:
+            pivot_dir2 = 1 if e > 0 else -1
+            pivot_s2 = PIVOT_S_PER_UNIT * abs(e)
+            await asyncio.to_thread(rover.pivot, pivot_dir2, pivot_s2)
+            action_desc = "pivot %s %.2fs " % ("R" if pivot_dir2 > 0 else "L", pivot_s2)
+
+        hop_cm = HOP_NEAR_CM if loc.get("fill", 0) > NEAR_FILL else HOP_CM
+        hop_result = await asyncio.to_thread(rover.hop, hop_cm)
+        action_desc += "hop %d" % hop_cm
+        hops_done += 1
+        prev_fill = loc.get("fill")
+
+        if hop_result.get("status") == "sonar_stop":
+            sonar_mm = hop_result.get("sonar_mm")
+            if loc.get("fill", 0) > NEAR_FILL and abs(e) <= CENTER_TOL:
+                await record("approach", action_desc + " sonar_stop", loc, sonar_mm,
+                             {"pivot_cmd_s": pivot_s2, "pivot_dir": pivot_dir2,
+                              "hop_moved_s": hop_result.get("moved_s"), "hops_done": hops_done})
+                await _arrival_check(mission, rover, target, emit, keep_tilt=APPROACH_TILT_OFFSET)
+                return {"status": "ok",
+                        "detail": {"reason": "sonar", "cycles": cycle,
+                                   "arrival_cross_check": "confirmed", "gimbal_only_lock": True}}
+            await record("approach", action_desc + " sonar_stop_blocked", loc, sonar_mm,
+                         {"pivot_cmd_s": pivot_s2, "pivot_dir": pivot_dir2,
+                          "hop_moved_s": hop_result.get("moved_s")})
+            return {"status": "blocked",
+                    "detail": {"reason": "obstacle", "sonar_mm": sonar_mm, "cycles": cycle}}
+
+        loc2 = await grab_and_locate("ap_%02d_check.jpg" % cycle)
+        accepted, gate = (None, "skipped_blurry") if loc2.get("_skip") \
+            else gate_for(loc2, 0, prev_fill, hops_done)
+        reject_reason = gate if gate not in ("confirmed", "low_confirmed",
+                                             "low_pending", "not_visible") else None
+        await record("approach", action_desc + " gate=%s" % gate, loc2, None,
+                     {"pivot_cmd_s": pivot_s2, "pivot_dir": pivot_dir2,
+                      "hop_moved_s": hop_result.get("moved_s"), "gate": gate,
+                      "hops_done": hops_done, "fill_prev": prev_fill,
+                      "reject_reason": reject_reason})
+        loc = accepted or {"visible": False, "bbox_2d": None}
+
+    return {"status": "blocked", "detail": {"reason": "cycle_budget_exhausted", "cycles": cycle}}
+
 
 
 def _grounding(mission: MissionSession, rover: RoverController) -> List[dict]:
@@ -746,9 +1251,19 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
                 monitor = asyncio.ensure_future(keyframe_monitor(mission, rover, step, emit))
 
             step_started_at = time.time()
+            use_free_approach = (
+                action == "approach"
+                and config.get("NAV_MODE", "line").strip().lower() == "free"
+                and all(hasattr(rover, name) for name in ("pivot", "hop", "get_frame", "set_gimbal"))
+            )
+
             try:
-                result = await asyncio.to_thread(rover.execute_step, step)
+                if use_free_approach:
+                    result = await approach_controller(mission, rover, step, emit)
+                else:
+                    result = await asyncio.to_thread(rover.execute_step, step)
             finally:
+
                 if monitor is not None:
                     monitor.cancel()
                     await asyncio.gather(monitor, return_exceptions=True)

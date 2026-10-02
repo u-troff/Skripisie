@@ -118,6 +118,8 @@ class PiRoverController(RoverController):
     def __init__(self, host: str, rosbridge_port: int = 9090,
                  move_seconds: float = 1.0, turn_seconds: float = 1.0,
                  linear_speed: float = 0.3, angular_speed: float = 4.0,
+                 free_speed_x:float = 0.25,free_speed_cmps:float = 15.0,
+                 free_turn_z:float = 3.0,fallback_hop_cm:float =30.0,
                  tilt_servo_id: int = 1, pan_servo_id: int = 2,
                  gimbal_center: int = 1500, gimbal_sweep: int = 300,
                  connect_timeout: float = 10.0,
@@ -139,6 +141,11 @@ class PiRoverController(RoverController):
         self.turn_seconds = turn_seconds
         self.linear_speed = linear_speed
         self.angular_speed = angular_speed
+        #self driving angular speed
+        self.free_speed_x = free_speed_x
+        self.free_speed_cmps = free_speed_cmps
+        self.free_turn_z = free_turn_z
+        self.fallback_hop_cm = fallback_hop_cm
         self.tilt_servo_id = tilt_servo_id
         self.pan_servo_id = pan_servo_id
         self.gimbal_center = gimbal_center
@@ -261,17 +268,26 @@ class PiRoverController(RoverController):
         if action == "follow_line":
             return self._follow_line()
 
-        if action in ("move", "approach"):
+        target = step.get("target")
+
+        if action == "approach":
+            # Blocking fallback for callers without the NAV_MODE=free
+            # controller (mission.py runs the real search/approach loop
+            # instead when NAV_MODE=free — see spec-free-roam-approach.md §2).
+            return self.hop(self.fallback_hop_cm)
+
+        if action == "move":
             speed = -self.linear_speed if _is_backward(target) else self.linear_speed
             return self._timed_twist(linear_x=speed, seconds=self.move_seconds)
 
         if action == "turn":
             # Real hardware has no distance/degrees in the plan step to act on
-            # (same as move/approach above) — only direction, at a fixed
-            # pulse duration. Same "left" convention as rover.py's _do_turn.
+            # (same as move above) — only direction, at a fixed pulse
+            # duration. Same "left" convention as rover.py's _do_turn.
             direction = 1.0 if "left" in str(target or "").lower() else -1.0
             return self._timed_twist(angular_z=direction * self.angular_speed,
                                       seconds=self.turn_seconds)
+
 
         if action == "observe":
             # Centre and hold: the arrival check reads the frame right after
@@ -571,9 +587,7 @@ class PiRoverController(RoverController):
         if key not in self._AIM:
             log.warning("[pi] aim(%r): not a direction", direction)
             return None
-        self._pan_offset = self._AIM[key] * self.look_offset
-        self._set_pwm(self.pan_servo_id, self._pwm(self._pan_offset, self.pan_invert))
-        time.sleep(self.aim_settle_s)
+        self.set_gimbal(pan=self._AIM[key] * self.look_offset)
         return "centre" if self._AIM[key] == 0 else key
 
     # -- subscriptions -------------------------------------------------------
@@ -684,17 +698,73 @@ class PiRoverController(RoverController):
         self._publish_twist()  # stop
         return {"status": "ok", "detail": None}
 
+
+    def pivot(self, direction: int, seconds: float) -> dict:
+        """Timed in-place turn for the free-roam approach loop
+        (spec-free-roam-approach.md §2/§3A).
+
+        direction: +1 = right (clockwise), -1 = left — the OPPOSITE sign
+        convention from execute_step's "turn" (where +1 means left). Kept
+        separate deliberately: mission.py's approach loop derives direction
+        from e = x_center - 0.5 (right of centre = positive), and this
+        mirrors that directly rather than making the caller flip a sign.
+
+        Sign flipped 2026-10-02: the approach loop's correction pivot was
+        observed pushing the target further off-centre instead of toward it
+        (mission_c613de320269.json — target at x_center=0.113, corrected
+        left, then lost entirely). -direction was wrong; direction is right.
+        """
+        self._lf("STOP")
+        return self._timed_twist(angular_z=direction * self.free_turn_z, seconds=seconds)
+
+    def hop(self, cm: float, backwards: bool = False) -> dict:
+        """Timed forward/back Twist pulse with its own 20 Hz sonar watchdog.
+
+        Distinct from _timed_twist's halt-only watchdog: two consecutive NEW
+        sonar readings below sonar_stop_mm zero the Twist immediately and
+        return {"status": "sonar_stop", "sonar_mm": ..., "moved_s": ...}
+        instead of running the full duration. Backwards hops skip the sonar —
+        it faces forward, so a reading taken while reversing says nothing
+        about what is behind the direction of travel.
+        """
+        self._lf("STOP")
+        seconds = abs(cm) / self.free_speed_cmps if self.free_speed_cmps > 0 else 0.0
+        linear_x = -self.free_speed_x if backwards else self.free_speed_x
+
+        self._publish_twist(linear_x=linear_x)
+        deadline = time.perf_counter() + seconds
+        started = time.perf_counter()
+        near_count = 0
+        last_seq = -1
+
+        while time.perf_counter() < deadline:
+            if self._halted.is_set():
+                self._publish_twist()
+                return {"status": "halted", "detail": "halted mid-hop"}
+            if not backwards:
+                mm, seq = self._sonar()
+                if seq != last_seq:
+                    last_seq = seq
+                    if mm is not None and mm < self.sonar_stop_mm:
+                        near_count += 1
+                    else:
+                        near_count = 0
+                    if near_count >= 2:
+                        self._publish_twist()
+                        return {"status": "sonar_stop", "sonar_mm": mm,
+                                "moved_s": round(time.perf_counter() - started, 2)}
+            time.sleep(0.05)
+
+        self._publish_twist()
+        return {"status": "ok", "moved_s": round(time.perf_counter() - started, 2)}
+
+
     def _gimbal_sweep(self) -> None:
-        # Placeholder motion, not aimed at anything: "scan" has no bearing to
-        # look at on real hardware the way VirtualRover's node table gives it
-        # one. Revisit once there's a real target to look at. Written in
-        # logical offsets (left, right, centre) so it sweeps the same way in
-        # the room whichever way the servo is mounted.
+        # Placeholder motion, not aimed at anything — see the original
+        # docstring note this replaces (kept for context, not removed).
         for offset in (-self.gimbal_sweep, self.gimbal_sweep, 0):
-            self._pan_offset = offset
-            self._set_pwm(self.pan_servo_id, self._pwm(offset, self.pan_invert))
-            time.sleep(0.4)
-        self._pan_offset = 0
+            self.set_gimbal(pan=offset, settle_s=0.4)
+
 
     def _set_pwm(self, servo_id: int, position: int, duration: float = 0.3) -> None:
         msg = roslibpy.Message({
@@ -748,6 +818,21 @@ class PiRoverController(RoverController):
         self._pan_offset = max(-limit, min(limit, self._pan_offset + int(pan_delta)))
         self._tilt_offset = max(-limit, min(limit, self._tilt_offset + int(tilt_delta)))
         return self._apply_gimbal(duration=duration)
+
+    def set_gimbal(self, pan: Optional[int] = None, tilt: Optional[int] = None,
+                    settle_s: Optional[float] = None, duration: float = 0.35) -> dict:
+        """Absolute counterpart to nudge_gimbal. pan/tilt are LOGICAL offsets
+        (negative pan = left, positive tilt = up); None leaves that axis alone
+        — the search sweep must be able to move pan without disturbing tilt."""
+        limit = self._offset_limit()
+        if pan is not None:
+            self._pan_offset = max(-limit, min(limit, int(pan)))
+        if tilt is not None:
+            self._tilt_offset = max(-limit, min(limit, int(tilt)))
+        result = self._apply_gimbal(duration=duration)
+        time.sleep(settle_s if settle_s is not None else self.aim_settle_s)
+        return result
+
 
     def center_gimbal(self) -> dict:
         self._pan_offset = 0

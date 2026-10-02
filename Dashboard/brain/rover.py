@@ -555,6 +555,10 @@ def get_rover() -> RoverController:
             # aim("left"/"right") throw, as a logical offset from centre.
             look_offset=config.get_int("ROVER_PI_LOOK_OFFSET", 400),
             aim_settle_s=config.get_float("ROVER_PI_AIM_SETTLE_S", 0.5),
+            free_speed_x=config.get_float("FREE_SPEED_X",0.25),
+            free_speed_cmps=config.get_float("FREE_SPEED_CMPS",15.0),
+            free_turn_z=config.get_float("FREE_TURN_Z",3.0),
+            fallback_hop_cm=config.get_float("HOP_CM",30.0),
         )
     else:
         raise RoverError(f"unknown ROVER={name!r} — 'sim', 'virtual', and 'pi' are implemented")
