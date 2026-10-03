@@ -24,6 +24,18 @@ log = get_logger("pipeline")
 # --------------------------------------------------------------------------
 # Existing single-shot HTTP flow — unchanged.
 # --------------------------------------------------------------------------
+def _replan_note(concerns) -> str:
+    """The verifier's concerns as advice, not a new command. Without the
+    framing a model answered "multiple boxes match" with scan/report/stop, a
+    plan that never moves, and the mission then 'completed' in a second."""
+    return (
+        "Advice from a plan checker: %s\n"
+        "Keep the original goal. The plan must still travel to and reach what the "
+        "command names. If several things could match, choose the closest or first "
+        "visible one — do not replace the trip with scan, report or stop."
+    ) % concerns
+
+
 def handle_voice_command(
     audio,
     image: Optional[ImageSource] = None,
@@ -53,7 +65,7 @@ def handle_voice_command(
     verified = verification.get("verified", True)
     if not verified:
         log.info("[run] verifier rejected, replanning. concerns=%s", verification.get("concerns"))
-        plan = generate_plan(f"{text}\n\nNote: {verification.get('concerns')}")
+        plan = generate_plan(f"{text}\n\n{_replan_note(verification.get('concerns'))}")
 
     log.info("[run] done in %.1fs (verified=%s)", time.perf_counter() - started, verified)
     return {
@@ -192,7 +204,7 @@ def _advance_to_confirmation(session: DialogueSession) -> List[dict]:
         log.info("[dlg %s] verifier rejected, replanning. concerns=%s",
                  session.session_id, verification.get("concerns"))
         session.plan = generate_plan(
-            "%s\n\nNote: %s" % (session.effective_command(), verification.get("concerns")),
+            "%s\n\n%s" % (session.effective_command(), _replan_note(verification.get("concerns"))),
             scene=session.scene_text,
         )
     session.verified = verification.get("verified")

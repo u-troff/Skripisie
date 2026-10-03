@@ -1,11 +1,5 @@
+import { frameUrl } from '../frameUrl'
 import { useStore } from '../store'
-
-function thumbUrl(framePath?: string | null): string | null {
-    if (!framePath) return null
-    // frame_path is like "logs/frames/<session_id>/ap_03_check.jpg"
-    const idx = framePath.indexOf('logs/frames/')
-    return idx === -1 ? null : '/' + framePath.slice(idx)
-}
 
 export default function ApproachDebugPanel() {
     const checks = useStore((state) => state.mission.liveChecks)
@@ -16,7 +10,7 @@ export default function ApproachDebugPanel() {
             <h2>Live frame trace</h2>
             <div className="frametrace">
                 {[...checks].reverse().map((check, index) => {
-                    const url = thumbUrl(check.frame_path)
+                    const url = frameUrl(check.frame_path)
                     return (
                         <div key={index} className="frametrace-row">
                             {url && <img src={url} alt="" className="frametrace-thumb" />}

@@ -260,7 +260,7 @@ def _save_frame(mission: MissionSession, name: str, raw: bytes) -> Optional[str]
     try:
         path = _frames_dir(mission.session_id) / name
         path.write_bytes(raw)
-        return str(path.relative_to(Path(__file__).parent))
+        return path.relative_to(Path(__file__).parent).as_posix()
     except OSError:
         log.warning("[mission %s] could not save frame %s", mission.session_id, name,
                     exc_info=True)
@@ -773,6 +773,11 @@ def _sweep_offsets() -> List[int]:
         offsets.append(-unit)
         offsets.append(unit)
         unit += step_units
+    if len(offsets) == 1:
+        log.warning("[mission] sweep_offsets_degenerate: pan range %d units minus margin "
+                    "leaves %d, less than one step (%d) — search will not pan; lower "
+                    "SWEEP_MARGIN_DEG or raise PAN_SWEEP_UNITS",
+                    PAN_SWEEP_UNITS, max_units, step_units)
     return offsets
 
 

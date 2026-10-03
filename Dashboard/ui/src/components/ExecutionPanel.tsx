@@ -4,6 +4,7 @@ import { blobToBase64, openSocket, type Socket } from '../net'
 import { say } from '../speak'
 import { storeApi, useStore } from '../store'
 import type { MissionEvent } from '../types'
+import RoverMap from './RoverMap'
 
 // One frame per second is plenty: the backend's Tier 0 discards most of them,
 // and Tier 1 is rate-limited by PERCEPTION_MIN_INTERVAL_S anyway.
@@ -179,6 +180,8 @@ export default function ExecutionPanel() {
         playsInline
       />
       <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+      <RoverMap />
 
       {steps.length > 0 && (
         <ol className="steps mission">

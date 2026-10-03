@@ -1,0 +1,174 @@
+{
+  "session_id": "4d6d4d177340",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Please go oberserve the couch",
+  "resolved_command": "Please go oberserve the couch",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "couch"
+      }
+    ],
+    "notes": "Navigation assumes the rover can find a clear path to the couch while avoiding known floor obstacles (couch body itself, coffee table area). The observation is performed once successfully at the target location."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "couch"
+      }
+    ],
+    "notes": "Navigation assumes the rover can find a clear path to the couch while avoiding known floor obstacles (couch body itself, coffee table area). The observation is performed once successfully at the target location."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 15.34
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.78
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 16.12,
+    "per_step_s": [
+      15.34,
+      0.78
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 1,
+    "seed": 1898395821,
+    "steps": 2,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 2.563,
+    "sim_time_s": 16.078,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "couch"
+    ],
+    "final_pose": {
+      "x": 1.7,
+      "y": 2.9,
+      "theta": 0.0
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20260928-222336.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "observe",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "couch",
+      "couch"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "There are floor obstacles in view 1 that could pose a risk to safety. The robot should avoid these areas while navigating the room for optimal performance and security.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 2.909,
+      "latency_mean_s": 1.454,
+      "prompt_tokens_total": 622,
+      "completion_tokens_total": 129,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 25.61,
+      "latency_mean_s": 12.805,
+      "prompt_tokens_total": 1050,
+      "completion_tokens_total": 1269,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The task to observe the couch was completed successfully. The rover traveled 2.563 meters during this run and visited the couch. The final position of the rover is at coordinates x=1.7, y=2.9."
+}

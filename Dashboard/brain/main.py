@@ -1,4 +1,5 @@
 import io
+import os
 import time
 from pathlib import Path
 from typing import Optional
@@ -47,7 +48,8 @@ def _bool_env(name: str, default: bool) -> bool:
 TEXT_COMMANDS_ENABLED = _bool_env("ALLOW_TEXT_COMMANDS", False)
 
 app = FastAPI()
-app.mount("/logs/frames", StaticFiles(directory="logs/frames") , name="frames") 
+os.makedirs("logs/frames", exist_ok=True)
+app.mount("/logs/frames", StaticFiles(directory="logs/frames"), name="frames")
 
 app.add_middleware(
     CORSMiddleware,
@@ -89,10 +91,11 @@ def runtime():
 @app.get("/room")
 def room_endpoint():
     """The static room geometry for the live map (§4). Virtual-only — a Pi
-    run has no RoomMap to serve."""
+    run has no RoomMap to serve, so it gets JSON null (200) rather than a 404
+    the browser console would log as a failed request on every page load."""
     rover = get_rover()
     if getattr(rover, "name", None) != "virtual":
-        return Response(status_code=404, content=b"ROVER is not virtual")
+        return None
     return rover.room.to_dict()
 
 

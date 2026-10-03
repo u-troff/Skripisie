@@ -1,0 +1,146 @@
+{
+  "session_id": "c2d96b756d08",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "go to the couch",
+  "resolved_command": "go to the couch",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      }
+    ],
+    "notes": "The rover approached the couch as requested."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      }
+    ],
+    "notes": "The rover approached the couch as requested."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.79
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.79,
+    "per_step_s": [
+      0.79
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 19,
+    "seed": 963301117,
+    "steps": 1,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 2.563,
+    "sim_time_s": 15.306,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "couch"
+    ],
+    "final_pose": {
+      "x": 1.7,
+      "y": 2.9,
+      "theta": 69.44
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20260928-223617.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "couch"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "robot cannot pick up and touch anything",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 30.059,
+      "latency_mean_s": 15.029,
+      "prompt_tokens_total": 449,
+      "completion_tokens_total": 46,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 30.958,
+      "latency_mean_s": 15.479,
+      "prompt_tokens_total": 862,
+      "completion_tokens_total": 863,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The rover successfully completed the command to go to the couch. It arrived at its destination, visiting the couch location during the run. Its total travel time for this task was 0.79 seconds."
+}

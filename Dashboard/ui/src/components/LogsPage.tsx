@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
-import { fetchLog, fetchLogs } from '../net'
-import type { CheckRecord, RunReport, RunSummary } from '../types'
+import { frameUrl } from '../frameUrl'
+import { fetchLog, fetchLogs, fetchRunTrace } from '../net'
+import type { CheckRecord, RunReport, RunSummary, RunTrace } from '../types'
+import { RoomMapView } from './RoverMap'
 
 function fmtTime(mtime: number): string {
   return new Date(mtime * 1000).toLocaleString()
@@ -26,6 +28,9 @@ export default function LogsPage() {
   const [loadingReport, setLoadingReport] = useState(false)
   const [reportError, setReportError] = useState<string | null>(null)
 
+  const [trace, setTrace] = useState<RunTrace | null>(null)
+  const [loadingTrace, setLoadingTrace] = useState(false)
+
   const loadRuns = () => {
     setLoadingList(true)
     setListError(null)
@@ -48,6 +53,23 @@ export default function LogsPage() {
       .finally(() => setLoadingReport(false))
   }, [selected])
 
+  useEffect(() => {
+    if (!selected) return undefined
+    let cancelled = false
+    setLoadingTrace(true)
+    setTrace(null)
+    void fetchRunTrace(selected).then((result) => {
+      if (cancelled) return
+      setTrace(result)
+      setLoadingTrace(false)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [selected])
+
+  const lastStep = trace?.steps[trace.steps.length - 1]
+
   return (
     <main className="wrap wide">
       <header>
@@ -61,6 +83,46 @@ export default function LogsPage() {
           </a>
         </div>
       </header>
+
+      <section className="panel">
+        <h2>Run map</h2>
+        {!selected && (
+          <p className="note" style={{ marginTop: 0 }}>
+            Select a run below to see the room and the route the rover took.
+          </p>
+        )}
+        {selected && loadingTrace && (
+          <p className="note" style={{ marginTop: 0 }}>
+            Loading…
+          </p>
+        )}
+        {selected && !loadingTrace && !trace && (
+          <p className="note" style={{ marginTop: 0 }}>
+            No recorded map for this run — only virtual-rover runs with a saved trace have one.
+          </p>
+        )}
+        {trace && (
+          <RoomMapView
+            room={trace.room}
+            robot={{
+              length_m: trace.settings.robot_length_m,
+              width_m: trace.settings.robot_width_m,
+              clearance_m: trace.settings.clearance_m,
+            }}
+            travelled={[
+              [trace.start.x, trace.start.y],
+              ...trace.steps.map((s): [number, number] => [s.pose.x, s.pose.y]),
+            ]}
+            planned={lastStep?.planned_path ?? null}
+            pose={lastStep?.pose ?? trace.start}
+            footer={
+              lastStep
+                ? `${trace.room.name} · odometer ${lastStep.odometer_m.toFixed(2)}m · sim time ${lastStep.sim_time_s.toFixed(1)}s`
+                : trace.room.name
+            }
+          />
+        )}
+      </section>
 
       <section className="panel">
         <h2>Runs ({runs.length})</h2>
@@ -129,6 +191,16 @@ export default function LogsPage() {
         </section>
       )}
     </main>
+  )
+}
+
+function FrameThumb({ path, size = 96 }: { path?: string | null; size?: number }) {
+  const url = frameUrl(path)
+  if (!url) return <span>—</span>
+  return (
+    <a href={url} target="_blank" rel="noreferrer">
+      <img src={url} alt="" loading="lazy" style={{ width: size, height: 'auto', borderRadius: 4, display: 'block' }} />
+    </a>
   )
 }
 
@@ -245,6 +317,7 @@ function RunDetail({ report }: { report: RunReport }) {
         <table className="logtable">
           <thead>
             <tr>
+              <th>frame</th>
               <th>kind</th>
               <th>aimed</th>
               <th>t</th>
@@ -265,8 +338,9 @@ function RunDetail({ report }: { report: RunReport }) {
                     : ''
                 }
               >
+                <td><FrameThumb path={check.frame_path} /></td>
                 <td>{check.kind}</td>
-                <td>{check.aimed ?? check.reason ?? '—'}</td>
+                <td>{check.aimed ?? check.action ?? check.reason ?? '—'}{check.gate ? ` · ${check.gate}` : ''}</td>
                 <td>{fmtNum(check.t_rel_s)}s</td>
                 <td>{fmtNum(check.est_distance_cm, 0)}</td>
                 <td>{fmtNum(check.latency_s)}s</td>
@@ -297,6 +371,7 @@ function RunDetail({ report }: { report: RunReport }) {
           <p className="note" style={{ marginTop: 0 }}>
             {report.arrival.result?.description}
           </p>
+          <FrameThumb path={report.arrival.frame_path} size={240} />
           <dl>
             <div>
               <dt>target visible</dt>

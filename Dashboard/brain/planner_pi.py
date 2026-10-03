@@ -28,5 +28,6 @@ GUIDANCE = (
     "To go somewhere, use one follow_line step whose target is what should be "
     "visible at the end, then observe that target, then report."
 )
-FREE_GUIDANCE = ("To go to an object without a floor line, use approach with the object as target, then observe it, then report")
+FREE_GUIDANCE = ("To go to an object without a floor line, use approach with the object as target, then observe it, then report. "
+                 "Never use move to reach an object or place: move is only a short hop forward or backward.")
 STEP_SCHEMA = '{"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}'

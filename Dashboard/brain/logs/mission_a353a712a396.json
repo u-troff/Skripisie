@@ -1,0 +1,255 @@
+{
+  "session_id": "a353a712a396",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "can you go toward the blue and red lights",
+  "resolved_command": "can you go toward the blue and red lights",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "target": "living room area"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "wall-mounted device with blue and red lights"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "blue and red lights found on wall-mounted device"
+      }
+    ],
+    "notes": "The sequence assumes the rover navigates to the Living Room area (View 1) where the target object is located. Since no floor lines exist, standard navigation commands are used to move toward that general location for observation."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "target": "living room area"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "wall-mounted device with blue and red lights"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "blue and red lights found on wall-mounted device"
+      }
+    ],
+    "notes": "The sequence assumes the rover navigates to the Living Room area (View 1) where the target object is located. Since no floor lines exist, standard navigation commands are used to move toward that general location for observation."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "move",
+      "target": "living room area",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.05
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "wall-mounted device with blue and red lights",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "blue and red lights found on wall-mounted device",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "wall-mounted device with blue and red lights",
+    "expected": [
+      "wall-mounted device with blue and red lights"
+    ],
+    "known": [
+      "Wall-mounted device with blue and red lights",
+      "Yellow line on floor",
+      "power supply unit with red and green lights",
+      "yellow tape on floor",
+      "monitor with blue screen and red lights",
+      "yellow line on wall",
+      "Television Stand",
+      "Red Ball on Wall",
+      "monitor with red and green lights",
+      "black cables on the floor under monitor",
+      "computer tower with green lights and red button",
+      "wires hanging from the computer tower",
+      "computer monitor with red light",
+      "black cable on floor under desk",
+      "cutting board",
+      "glass bowl on a stand",
+      "Blue coat hanger with clothes hanging from it.",
+      "Green and white shoes",
+      "chair with patterned cushioning and metal frame",
+      "black suitcase on wheels next to chair"
+    ],
+    "t_rel_s": 1.56,
+    "latency_s": 4.05,
+    "frame_path": "logs\\frames\\a353a712a396\\arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "Wall-mounted device with blue and red lights"
+      ],
+      "missing": [],
+      "unexpected": "",
+      "description": "The image shows a room where the wall mounted device has both blue and red lights. There is also yellow tape on the floor."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {
+    "centre": 1
+  },
+  "scene_id": "b7cb9b96ec25",
+  "room_grounding": {
+    "known": [
+      "Wall-mounted device with blue and red lights",
+      "Yellow line on floor",
+      "power supply unit with red and green lights",
+      "yellow tape on floor",
+      "monitor with blue screen and red lights",
+      "yellow line on wall",
+      "Television Stand",
+      "Red Ball on Wall",
+      "monitor with red and green lights",
+      "black cables on the floor under monitor",
+      "computer tower with green lights and red button",
+      "wires hanging from the computer tower",
+      "computer monitor with red light",
+      "black cable on floor under desk",
+      "cutting board",
+      "glass bowl on a stand",
+      "Blue coat hanger with clothes hanging from it.",
+      "Green and white shoes",
+      "chair with patterned cushioning and metal frame",
+      "black suitcase on wheels next to chair"
+    ],
+    "seen": [
+      "Wall-mounted device with blue and red lights"
+    ],
+    "never_seen": [
+      "Blue coat hanger with clothes hanging from it.",
+      "Green and white shoes",
+      "Red Ball on Wall",
+      "Television Stand",
+      "Yellow line on floor",
+      "black cable on floor under desk",
+      "black cables on the floor under monitor",
+      "black suitcase on wheels next to chair",
+      "chair with patterned cushioning and metal frame",
+      "computer monitor with red light",
+      "computer tower with green lights and red button",
+      "cutting board",
+      "glass bowl on a stand",
+      "monitor with blue screen and red lights",
+      "monitor with red and green lights",
+      "power supply unit with red and green lights",
+      "wires hanging from the computer tower",
+      "yellow line on wall",
+      "yellow tape on floor"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 6.43,
+    "per_step_s": [
+      1.05,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 4.05,
+    "vlm_latency_max_s": 4.05,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": [
+      "It is not clear what specific action should be taken after approaching this object."
+    ],
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 3,
+      "latency_total_s": 31.712,
+      "latency_mean_s": 10.571,
+      "prompt_tokens_total": 4750,
+      "completion_tokens_total": 141,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 51.015,
+      "latency_mean_s": 25.507,
+      "prompt_tokens_total": 1526,
+      "completion_tokens_total": 1841,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The command to go toward the blue and red lights was completed successfully. The rover arrived at the wall-mounted device with blue and red lights. Yellow tape on the floor was also observed."
+}

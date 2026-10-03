@@ -1,0 +1,190 @@
+{
+  "session_id": "c7b23318749d",
+  "outcome": "halted",
+  "rover": "virtual",
+  "command": "go to the lamp on the desk",
+  "resolved_command": "go to the lamp on the desk",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "lamp"
+      }
+    ],
+    "notes": "The final target 'lamp' was not in the list of named things that could be approached. Assuming proximity to a major object ('desk') allows for finding smaller items on it, and proceeding directly to observe the inferred location."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "lamp"
+      }
+    ],
+    "notes": "The final target 'lamp' was not in the list of named things that could be approached. Assuming proximity to a major object ('desk') allows for finding smaller items on it, and proceeding directly to observe the inferred location."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.28
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "lamp",
+      "status": "blocked",
+      "detail": {
+        "reason": "unresolved_target",
+        "target": "lamp"
+      },
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.28,
+    "per_step_s": [
+      1.28,
+      0.0
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 36,
+    "seed": 963301117,
+    "steps": 2,
+    "blocked": 1,
+    "hallucinations": 1,
+    "unresolved_targets": [
+      "lamp"
+    ],
+    "odometer_m": 3.925,
+    "sim_time_s": 23.93,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "desk"
+    ],
+    "final_pose": {
+      "x": 3.6,
+      "y": 2.8,
+      "theta": 14.29
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20260928-223617.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "observe",
+      "target": "lamp",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "desk",
+      "lamp"
+    ],
+    "unresolved": [
+      "lamp"
+    ],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "lamp not observed",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 0.68,
+      "latency_mean_s": 0.34,
+      "prompt_tokens_total": 480,
+      "completion_tokens_total": 42,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 31.633,
+      "latency_mean_s": 15.816,
+      "prompt_tokens_total": 864,
+      "completion_tokens_total": 1819,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (unresolved_target)"
+    },
+    {
+      "code": "plan_target_unresolved",
+      "detail": "the plan named a target the room doesn't have: lamp"
+    }
+  ],
+  "spoken_summary": "The mission halted after attempting to follow a command. The primary reason for stopping is that the planned target did not exist in the room.\nSpecifically, the route named 'lamp,' which was an unresolved and blocked target."
+}

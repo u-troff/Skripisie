@@ -14,6 +14,7 @@ import type {
   SceneResponse,
   SceneSummary,
   SocketStatus,
+  RoverState,
   StepResult,
 } from './types'
 
@@ -80,7 +81,7 @@ interface MissionState {
   error: string | null
   ended: boolean
   liveChecks: Array<CheckRecord | ApproachCycleRecord>
-
+  roverState: RoverState | null
 }
 
 interface MissionSlice {
@@ -120,6 +121,7 @@ const emptyMission: MissionState = {
   error: null,
   ended: false,
   liveChecks: [],
+  roverState: null,
 }
 
 const createSessionSlice: StateCreator<Store, [], [], SessionSlice> = (set) => ({
@@ -232,6 +234,8 @@ const createMissionSlice: StateCreator<Store, [], [], MissionSlice> = (set) => (
               results: [...mission.results, { index: event.index, ...event.result }],
             },
           }
+        case 'rover_state':
+          return { mission: { ...mission, roverState: event.state } }
         case 'observation':
           return { mission: { ...mission, digest: event.digest } }
         case 'revision':

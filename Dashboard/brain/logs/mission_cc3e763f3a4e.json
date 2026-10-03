@@ -1,0 +1,146 @@
+{
+  "session_id": "cc3e763f3a4e",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "go to the lamp on the desk",
+  "resolved_command": "go to the lamp on the desk",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      }
+    ],
+    "notes": "The rover approached the desk as the reference point for finding the lamp location on it."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      }
+    ],
+    "notes": "The rover approached the desk as the reference point for finding the lamp location on it."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.3
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.3,
+    "per_step_s": [
+      1.3
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 35,
+    "seed": 963301117,
+    "steps": 1,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 3.925,
+    "sim_time_s": 23.93,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "desk"
+    ],
+    "final_pose": {
+      "x": 3.6,
+      "y": 2.8,
+      "theta": 14.29
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20260928-223617.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "desk"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot cannot pick up and touch anything. It can only drive.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 0.964,
+      "latency_mean_s": 0.482,
+      "prompt_tokens_total": 465,
+      "completion_tokens_total": 53,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 38.586,
+      "latency_mean_s": 19.293,
+      "prompt_tokens_total": 874,
+      "completion_tokens_total": 2120,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The command to go to the lamp on the desk was completed successfully in 1.3 seconds. The rover traveled a distance of 3.925 meters during this task. No obstacles or collisions were detected."
+}

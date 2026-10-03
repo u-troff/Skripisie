@@ -1,0 +1,209 @@
+{
+  "session_id": "2bdcbb33175b",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "go to the cardboard box",
+  "resolved_command": "Go to the orange-and-white cardboard box beside the black electronics cabinet.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": "surrounding room for orange-and-white cardboard boxes beside black electronics cabinets"
+      },
+      {
+        "id": 2,
+        "action": "report",
+        "target": "whether a single orange-and-white cardboard box beside a black electronics cabinet can be uniquely identified"
+      },
+      {
+        "id": 3,
+        "action": "stop",
+        "target": "rover"
+      }
+    ],
+    "notes": "Do not depart or approach yet. Multiple plausible targets are documented, including boxes in Views 8 and 9, and the approach may be obstructed by hanging or trailing cables and nearby equipment. A unique target must be identified before travel."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": "surrounding room for orange-and-white cardboard boxes beside black electronics cabinets"
+      },
+      {
+        "id": 2,
+        "action": "report",
+        "target": "whether a single orange-and-white cardboard box beside a black electronics cabinet can be uniquely identified"
+      },
+      {
+        "id": 3,
+        "action": "stop",
+        "target": "rover"
+      }
+    ],
+    "notes": "Do not depart or approach yet. Multiple plausible targets are documented, including boxes in Views 8 and 9, and the approach may be obstructed by hanging or trailing cables and nearby equipment. A unique target must be identified before travel."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "scan",
+      "target": "surrounding room for orange-and-white cardboard boxes beside black electronics cabinets",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.22
+    },
+    {
+      "index": 1,
+      "action": "report",
+      "target": "whether a single orange-and-white cardboard box beside a black electronics cabinet can be uniquely identified",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    },
+    {
+      "index": 2,
+      "action": "stop",
+      "target": "rover",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "30cdee3112a1",
+  "room_grounding": {
+    "known": [
+      "white tiled wall",
+      "black horizontal wall stripe",
+      "yellow floor or wall marking",
+      "red circular wall fixture",
+      "black equipment cabinet",
+      "illuminated equipment panel",
+      "hanging electrical cables",
+      "brown wooden panel or stand",
+      "white paper sign",
+      "green wall board or poster",
+      "white shelving or cabinet unit",
+      "stacked white boards or trays",
+      "lower display or poster panel",
+      "small green rectangular label",
+      "pink light reflection",
+      "ceiling or overhead structural beam",
+      "black horizontal wall strip",
+      "yellow diagonal wall marking",
+      "red wall or ceiling sensor",
+      "dark electronic equipment cabinet"
+    ],
+    "seen": [],
+    "never_seen": [
+      "black equipment cabinet",
+      "black horizontal wall strip",
+      "black horizontal wall stripe",
+      "brown wooden panel or stand",
+      "ceiling or overhead structural beam",
+      "dark electronic equipment cabinet",
+      "green wall board or poster",
+      "hanging electrical cables",
+      "illuminated equipment panel",
+      "lower display or poster panel",
+      "pink light reflection",
+      "red circular wall fixture",
+      "red wall or ceiling sensor",
+      "small green rectangular label",
+      "stacked white boards or trays",
+      "white paper sign",
+      "white shelving or cabinet unit",
+      "white tiled wall",
+      "yellow diagonal wall marking",
+      "yellow floor or wall marking"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.22,
+    "per_step_s": [
+      1.22,
+      0.0,
+      0.0
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The target is ambiguous because multiple orange-and-white cardboard boxes appear beside black electronics cabinets. The approach may also be obstructed by hanging/trailing cables and nearby equipment, so the specific box should be uniquely identified before departure.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 9.062,
+      "latency_mean_s": 4.531,
+      "prompt_tokens_total": 9910,
+      "completion_tokens_total": 741,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 9.661,
+      "latency_mean_s": 4.831,
+      "prompt_tokens_total": 9924,
+      "completion_tokens_total": 899,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "Completed the command to go to the orange-and-white cardboard box beside the black electronics cabinet. The route was a single straight run with no obstacle events."
+}

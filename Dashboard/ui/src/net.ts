@@ -1,7 +1,10 @@
 import type {
   DialogueSnapshot,
+  RoomData,
   RunReport,
   RunSummary,
+  RunTrace,
+  RuntimeInfo,
   SceneResponse,
   SceneSummary,
   SocketStatus,
@@ -71,6 +74,25 @@ export async function fetchHealth(): Promise<boolean> {
   }
 }
 
+/** Static room geometry for the live map. Null on a non-virtual rover. */
+export async function fetchRoom(): Promise<RoomData | null> {
+  try {
+    const response = await fetch('/api/room')
+    return response.ok ? ((await response.json()) as RoomData) : null
+  } catch {
+    return null
+  }
+}
+
+export async function fetchRuntime(): Promise<RuntimeInfo | null> {
+  try {
+    const response = await fetch('/api/runtime')
+    return response.ok ? ((await response.json()) as RuntimeInfo) : null
+  } catch {
+    return null
+  }
+}
+
 export async function fetchDialogueSnapshot(id: string): Promise<DialogueSnapshot | null> {
   try {
     const response = await fetch(`/api/dialogue/${id}`)
@@ -112,6 +134,16 @@ export async function fetchLogs(): Promise<RunSummary[]> {
   const response = await fetch('/api/logs')
   if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
   return (await response.json()) as RunSummary[]
+}
+
+/** A run's recorded movement for the map. Null when it has none (non-virtual rover, old log). */
+export async function fetchRunTrace(sessionId: string): Promise<RunTrace | null> {
+  try {
+    const response = await fetch(`/api/logs/${sessionId}/trace`)
+    return response.ok ? ((await response.json()) as RunTrace) : null
+  } catch {
+    return null
+  }
 }
 
 /** One run's full report, for the Logs page's detail view. */

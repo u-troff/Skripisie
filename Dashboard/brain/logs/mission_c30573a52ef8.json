@@ -1,0 +1,152 @@
+{
+  "session_id": "c30573a52ef8",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "turn left 90 degrees then move forward one metre",
+  "resolved_command": "turn left 90 degrees then move forward one metre",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "turn",
+        "degrees": 90
+      },
+      {
+        "id": 2,
+        "action": "move",
+        "distance_m": 1
+      }
+    ],
+    "notes": "The command was executed literally as requested. Since no specific location for an 'exit' or a named destination requiring navigation towards it was provided in the input, subsequent instructions regarding moving towards an exit were not included."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "turn",
+        "degrees": 90
+      },
+      {
+        "id": 2,
+        "action": "move",
+        "distance_m": 1
+      }
+    ],
+    "notes": "The command was executed literally as requested. Since no specific location for an 'exit' or a named destination requiring navigation towards it was provided in the input, subsequent instructions regarding moving towards an exit were not included."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 1,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.3
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.37,
+    "per_step_s": [
+      0.06,
+      0.3
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 30,
+    "seed": 963301117,
+    "steps": 2,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 1.0,
+    "sim_time_s": 6.882,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [],
+    "final_pose": {
+      "x": 1.8,
+      "y": 0.5,
+      "theta": 0.0
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20260928-223617.jsonl"
+  },
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "Plan does not specify the robot's destination. It should include instructions to move towards an exit and then stop at that point if possible",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 0.988,
+      "latency_mean_s": 0.494,
+      "prompt_tokens_total": 467,
+      "completion_tokens_total": 65,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 24.919,
+      "latency_mean_s": 12.459,
+      "prompt_tokens_total": 896,
+      "completion_tokens_total": 1420,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The rover successfully completed the command to turn left and move forward one meter. The total simulation time for this run was 0.37 seconds.\nNo collisions or sonar obstacle events were recorded during the operation."
+}

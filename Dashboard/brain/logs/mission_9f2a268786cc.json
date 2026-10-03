@@ -1,0 +1,515 @@
+{
+  "session_id": "9f2a268786cc",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "go to the organge and white box",
+  "resolved_command": "go to the orange and white cardboard box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "brown and white cardboard box at the lower right of the computer rack in View 3"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "brown and white cardboard box at the lower right of the computer rack in View 3"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "brown and white cardboard box at the lower right of the computer rack in View 3"
+      }
+    ],
+    "notes": "The orange and white cardboard box is not explicitly identified. The brown and white cardboard box in View 3 is the closest listed match and is selected as the target."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "brown and white cardboard box at the lower right of the computer rack in View 3"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "brown and white cardboard box at the lower right of the computer rack in View 3"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "brown and white cardboard box at the lower right of the computer rack in View 3"
+      }
+    ],
+    "notes": "The orange and white cardboard box is not explicitly identified. The brown and white cardboard box in View 3 is the closest listed match and is selected as the target."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "brown and white cardboard box at the lower right of the computer rack in View 3",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 7,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 40.03
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "brown and white cardboard box at the lower right of the computer rack in View 3",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "brown and white cardboard box at the lower right of the computer rack in View 3",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 5.82,
+      "bbox": [
+        206,
+        275,
+        307,
+        364
+      ],
+      "x_center": 0.401,
+      "fill": 0.029,
+      "bottom": 0.758,
+      "confidence": "high",
+      "sharpness": 781.3547973632812,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 2.19,
+      "frame_path": "logs\\frames\\9f2a268786cc\\ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 10.46,
+      "bbox": [
+        205,
+        274,
+        307,
+        364
+      ],
+      "x_center": 0.4,
+      "fill": 0.03,
+      "bottom": 0.758,
+      "confidence": "high",
+      "sharpness": 848.6290893554688,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=0 pivot_s=0.00 gate=confirmed",
+      "vlm_latency_s": 2.38,
+      "frame_path": "logs\\frames\\9f2a268786cc\\ap_lock_verify.jpg",
+      "bearing_deg": -5.54,
+      "pivot_requested_deg": -5.54,
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "residual_e": -0.1,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 16.23,
+      "bbox": [
+        110,
+        273,
+        239,
+        390
+      ],
+      "x_center": 0.273,
+      "fill": 0.049,
+      "bottom": 0.812,
+      "confidence": "high",
+      "sharpness": 758.0503540039062,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 50 gate=confirmed",
+      "vlm_latency_s": 2.43,
+      "frame_path": "logs\\frames\\9f2a268786cc\\ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.44,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.03,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 21.59,
+      "bbox": [
+        165,
+        245,
+        356,
+        414
+      ],
+      "x_center": 0.407,
+      "fill": 0.105,
+      "bottom": 0.863,
+      "confidence": "high",
+      "sharpness": 707.176513671875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot L 0.11s hop 50 gate=confirmed",
+      "vlm_latency_s": 1.89,
+      "frame_path": "logs\\frames\\9f2a268786cc\\ap_04_check.jpg",
+      "pivot_cmd_s": 0.10772881355932203,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.42,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.049,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 25.64,
+      "bbox": [
+        68,
+        219,
+        293,
+        427
+      ],
+      "x_center": 0.282,
+      "fill": 0.152,
+      "bottom": 0.89,
+      "confidence": "high",
+      "sharpness": 561.6665649414062,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 2.11,
+      "frame_path": "logs\\frames\\9f2a268786cc\\ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 1.0,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.105,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 30.15,
+      "bbox": [
+        158,
+        196,
+        452,
+        455
+      ],
+      "x_center": 0.477,
+      "fill": 0.248,
+      "bottom": 0.948,
+      "confidence": "high",
+      "sharpness": 786.1844482421875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot L 0.10s hop 20 gate=confirmed",
+      "vlm_latency_s": 2.42,
+      "frame_path": "logs\\frames\\9f2a268786cc\\ap_06_check.jpg",
+      "pivot_cmd_s": 0.10345762711864408,
+      "pivot_dir": -1,
+      "hop_moved_s": 0.99,
+      "gate": "confirmed",
+      "hops_done": 4,
+      "fill_prev": 0.152,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 40.03,
+      "bbox": [
+        158,
+        196,
+        452,
+        455
+      ],
+      "x_center": 0.477,
+      "fill": 0.248,
+      "bottom": 0.948,
+      "confidence": "high",
+      "sharpness": 786.1844482421875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 543,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 2.42,
+      "frame_path": "logs\\frames\\9f2a268786cc\\ap_06_check.jpg",
+      "hops_done": 4,
+      "fill_prev": 0.152,
+      "arrival_block": null
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "brown and white cardboard box at the lower right of the computer rack in View 3",
+    "expected": [
+      "brown and white cardboard box at the lower right of the computer rack in View 3",
+      "cardboard box"
+    ],
+    "known": [
+      "large whiteboard",
+      "wall-mounted black equipment cabinet",
+      "orange-and-white wall box",
+      "vertical wooden post",
+      "upper-left display screen",
+      "white storage shelving unit",
+      "stack of white papers or boards",
+      "lower control panel or equipment face",
+      "small green object",
+      "black power and signal cables",
+      "black floor stand or tripod",
+      "red floor-level object",
+      "dark wall cable or conduit",
+      "small dark wall fixtures",
+      "green wall sign or panel",
+      "black equipment rack or cabinet",
+      "electronic control unit",
+      "wooden upright post",
+      "cardboard box",
+      "black hanging cables"
+    ],
+    "t_rel_s": 30.15,
+    "latency_s": 9.14,
+    "frame_path": "logs\\frames\\9f2a268786cc\\arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "brown and white cardboard box at the lower right of the computer rack in View 3",
+        "cardboard box",
+        "black equipment rack or cabinet",
+        "black hanging cables",
+        "black power and signal cables"
+      ],
+      "missing": [],
+      "unexpected": [
+        "pink illuminated light",
+        "white cylindrical container"
+      ],
+      "description": "A brown-and-white cardboard box is clearly visible in front of the black equipment rack. Several black cables hang around the rack, with a pink illuminated light and a white cylindrical container also visible."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 7,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 2,
+    "chassis_spin_deg_total": -5.5,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -5.54,
+    "residual_e_at_lock": -0.1,
+    "hops_done": 4,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 561.7,
+    "sharpness_median": 781.4,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 15.84,
+    "motion_time_s": 7.06,
+    "wall_time_s": 18.37,
+    "sonar_stops": 0,
+    "arrival_reason": "fill"
+  },
+  "looked": {
+    "centre": 8
+  },
+  "scene_id": "462d9d7dfea1",
+  "room_grounding": {
+    "known": [
+      "large whiteboard",
+      "wall-mounted black equipment cabinet",
+      "orange-and-white wall box",
+      "vertical wooden post",
+      "upper-left display screen",
+      "white storage shelving unit",
+      "stack of white papers or boards",
+      "lower control panel or equipment face",
+      "small green object",
+      "black power and signal cables",
+      "black floor stand or tripod",
+      "red floor-level object",
+      "dark wall cable or conduit",
+      "small dark wall fixtures",
+      "green wall sign or panel",
+      "black equipment rack or cabinet",
+      "electronic control unit",
+      "wooden upright post",
+      "cardboard box",
+      "black hanging cables"
+    ],
+    "seen": [
+      "black equipment rack or cabinet",
+      "black hanging cables",
+      "black power and signal cables",
+      "cardboard box"
+    ],
+    "never_seen": [
+      "black floor stand or tripod",
+      "dark wall cable or conduit",
+      "electronic control unit",
+      "green wall sign or panel",
+      "large whiteboard",
+      "lower control panel or equipment face",
+      "orange-and-white wall box",
+      "red floor-level object",
+      "small dark wall fixtures",
+      "small green object",
+      "stack of white papers or boards",
+      "upper-left display screen",
+      "vertical wooden post",
+      "wall-mounted black equipment cabinet",
+      "white storage shelving unit",
+      "wooden upright post"
+    ],
+    "unexpected": [
+      "brown and white cardboard box at the lower right of the computer rack in View 3",
+      "pink illuminated light",
+      "white cylindrical container"
+    ],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 40.54,
+    "per_step_s": [
+      40.03,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 9.14,
+    "vlm_latency_max_s": 9.14,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The target orange and white cardboard box is not clearly identified in the room inventory; only brown or brown-and-white boxes are listed, so the report destination is ambiguous.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 9,
+      "latency_total_s": 28.126,
+      "latency_mean_s": 3.125,
+      "prompt_tokens_total": 5937,
+      "completion_tokens_total": 1825,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 9.131,
+      "latency_mean_s": 4.565,
+      "prompt_tokens_total": 2545,
+      "completion_tokens_total": 622,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "unexpected_objects",
+      "detail": "the rover reported 3 thing(s) the filmed room does not contain: brown and white cardboard box at the lower right of the computer rack in View 3, pink illuminated light, white cylindrical container \u2014 either the room changed or the model invented them"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    }
+  ],
+  "spoken_summary": "The rover completed a single straight run for the orange-and-white cardboard box command. It arrived at a brown-and-white cardboard box in front of a black equipment rack. Arrival was decided by vision only, sonar did not confirm it, and the box was unexpected."
+}

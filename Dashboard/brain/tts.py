@@ -24,7 +24,10 @@ from typing import Optional
 
 from piper import PiperVoice
 
+_BRAIN_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.getenv("PIPER_VOICE_MODEL", "")
+if MODEL_PATH and not os.path.isabs(MODEL_PATH):
+    MODEL_PATH = os.path.join(_BRAIN_DIR, MODEL_PATH)
 
 _voice: Optional[PiperVoice] = None
 

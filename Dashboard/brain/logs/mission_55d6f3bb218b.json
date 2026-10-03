@@ -1,0 +1,112 @@
+{
+  "session_id": "55d6f3bb218b",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "go to the lamp on the desk",
+  "resolved_command": "go to the lamp on the desk",
+  "plan": {
+    "steps": [],
+    "notes": "The lamp is not listed among the known room objects, so the rover cannot go to it."
+  },
+  "confirmed_plan": {
+    "steps": [],
+    "notes": "The lamp is not listed among the known room objects, so the rover cannot go to it."
+  },
+  "plan_was_revised": false,
+  "steps": [],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.0,
+    "per_step_s": [],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 18,
+    "seed": 963301117,
+    "steps": 2,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 4.245,
+    "sim_time_s": 28.269,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "door"
+    ],
+    "final_pose": {
+      "x": 0.4,
+      "y": 3.8,
+      "theta": -13.08
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20260928-223617.jsonl"
+  },
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 4.355,
+      "latency_mean_s": 2.177,
+      "prompt_tokens_total": 408,
+      "completion_tokens_total": 274,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 1.804,
+      "latency_mean_s": 1.804,
+      "prompt_tokens_total": 410,
+      "completion_tokens_total": 78,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "Command completed: go to the lamp on the desk. The rover took 2 steps and traveled 4.245 meters with no obstacles or collisions."
+}

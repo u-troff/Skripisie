@@ -112,7 +112,11 @@ def inventory_frame(image: ImageSource) -> dict:
     prompt = (
         "You are cataloguing one frame from a video of a room. A robot will later be "
         "told to drive somewhere in this room and look at something.\n"
-        "List EVERY distinct object you can see, even small ones. Do not summarise.\n"
+        "List EVERY distinct object you can see, even small ones — furniture, "
+        "equipment, screens, cables, lights, signs, items on shelves and floor. "
+        "Aim for at least 8 objects if the frame contains them. Do not summarise.\n"
+        "For each object give specific attributes (colour, material, shape, size, "
+        "any text or lights) and where it is relative to the frame and to nearby objects.\n"
         "Respond ONLY with JSON: "
         '{"place": "short name for this part of the room", '
         '"objects": [{"name": "...", "attributes": ["colour", "size"], '

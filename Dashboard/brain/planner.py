@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import time
 
 import config
@@ -86,6 +87,30 @@ def build_plan_prompt(command: str, scene: str = "") -> str:
     )
 
 
+_DIRECTIONAL = re.compile(
+    r"\b(forward|forwards|backward|backwards|back|ahead|reverse|straight|"
+    r"\d+(\.\d+)?\s*(cm|m|metres?|meters?|steps?))\b",
+    re.IGNORECASE,
+)
+
+
+def _promote_moves_to_approach(steps: list) -> None:
+    """A small planner model often writes `move -> <object or place>`, which on
+    the Pi is one timed pulse and then done. In free-roam Pi mode only
+    `approach` runs the search/drive-up loop, so a move whose target is a
+    thing rather than a direction becomes an approach."""
+    if _profile() is not planner_pi:
+        return
+    if config.get("NAV_MODE", "line").strip().lower() != "free":
+        return
+    for step in steps:
+        target = str(step.get("target") or "")
+        if step.get("action") == "move" and target and not _DIRECTIONAL.search(target):
+            log.info("[plan] step %s: move -> %r is not a direction, promoting to approach",
+                     step.get("id"), target)
+            step["action"] = "approach"
+
+
 def generate_plan(command: str, scene: str = "") -> dict:
     prompt = build_plan_prompt(command, scene)
 
@@ -116,6 +141,7 @@ def generate_plan(command: str, scene: str = "") -> dict:
         return {"steps": [], "notes": "planner returned unparseable output"}
 
     steps = plan.get("steps", [])
+    _promote_moves_to_approach(steps)
     log.info("[plan] %d step(s)", len(steps))
     for step in steps:
         log.info("       %s. %s -> %s", step.get("id"), step.get("action"), step.get("target"))

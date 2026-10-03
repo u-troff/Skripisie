@@ -1,0 +1,297 @@
+{
+  "session_id": "34ce9631bf7b",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "go to the couch, then the coffee table, then the desk",
+  "resolved_command": "go to the couch, then the coffee table, then the desk",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "move",
+        "distance_m": 0.5
+      },
+      {
+        "id": 3,
+        "action": "turn",
+        "degrees": -45
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "distance_m": 1.0
+      },
+      {
+        "id": 6,
+        "action": "stop"
+      },
+      {
+        "id": 7,
+        "action": "turn",
+        "degrees": -90
+      },
+      {
+        "id": 8,
+        "action": "approach",
+        "target": "desk"
+      }
+    ],
+    "notes": "The sequence is designed to navigate from the assumed starting point sequentially to each target. Since no initial position or specific movement coordinates were provided for navigating around obstacles (couch, coffee table), arbitrary but plausible distance and turn values are used in steps 2-7 to establish a navigable path between objects before approaching the final destination."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "move",
+        "distance_m": 0.5
+      },
+      {
+        "id": 3,
+        "action": "turn",
+        "degrees": -45
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "distance_m": 1.0
+      },
+      {
+        "id": 6,
+        "action": "stop"
+      },
+      {
+        "id": 7,
+        "action": "turn",
+        "degrees": -90
+      },
+      {
+        "id": 8,
+        "action": "approach",
+        "target": "desk"
+      }
+    ],
+    "notes": "The sequence is designed to navigate from the assumed starting point sequentially to each target. Since no initial position or specific movement coordinates were provided for navigating around obstacles (couch, coffee table), arbitrary but plausible distance and turn values are used in steps 2-7 to establish a navigable path between objects before approaching the final destination."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.78
+    },
+    {
+      "index": 1,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.16
+    },
+    {
+      "index": 2,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.03
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.03
+    },
+    {
+      "index": 4,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.3
+    },
+    {
+      "index": 5,
+      "action": "stop",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.0
+    },
+    {
+      "index": 6,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 7,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.71
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 4.08,
+    "per_step_s": [
+      0.78,
+      0.16,
+      0.03,
+      1.03,
+      0.3,
+      1.0,
+      0.06,
+      0.71
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 23,
+    "seed": 963301117,
+    "steps": 8,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 8.967,
+    "sim_time_s": 58.499,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "couch",
+      "coffee table",
+      "desk"
+    ],
+    "final_pose": {
+      "x": 3.6,
+      "y": 2.8,
+      "theta": 86.2
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20260928-223617.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 8,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "couch",
+      "coffee table",
+      "desk"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "Approaching each object is not enough to determine if they are obstacles for the robot's pathfinding. The plan should include turning distances and specific instructions on how far it needs to move from one point before approaching another.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 1.324,
+      "latency_mean_s": 0.662,
+      "prompt_tokens_total": 504,
+      "completion_tokens_total": 82,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 32.403,
+      "latency_mean_s": 16.202,
+      "prompt_tokens_total": 916,
+      "completion_tokens_total": 1805,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "Command execution was completed successfully after visiting the couch, coffee table, and desk. The rover traveled a total distance of 8.967 meters for this task."
+}

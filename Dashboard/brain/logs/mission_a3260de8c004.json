@@ -1,0 +1,179 @@
+{
+  "session_id": "a3260de8c004",
+  "outcome": "halted",
+  "rover": "virtual",
+  "command": "turn left 90 degrees then move forward one metre",
+  "resolved_command": "turn left 90 degrees then move forward one metre",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "turn",
+        "degrees": 90
+      },
+      {
+        "id": 2,
+        "action": "move",
+        "distance_m": 1
+      }
+    ],
+    "notes": "The plan executes the specified rotations and linear movement. Since no specific targets were named for approach or observation points in this command, navigation relies solely on geometric calculations to avoid contact with floor obstacles (couch, coffee table, bookshelf)."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "turn",
+        "degrees": 90
+      },
+      {
+        "id": 2,
+        "action": "move",
+        "distance_m": 1
+      }
+    ],
+    "notes": "The plan executes the specified rotations and linear movement. Since no specific targets were named for approach or observation points in this command, navigation relies solely on geometric calculations to avoid contact with floor obstacles (couch, coffee table, bookshelf)."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 1,
+      "action": "move",
+      "target": null,
+      "status": "blocked",
+      "detail": {
+        "reason": "collision",
+        "obstacle": "the room boundary",
+        "commanded_m": 1.0,
+        "travelled_m": 0.42
+      },
+      "elapsed_s": 0.78
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_studio",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.84,
+    "per_step_s": [
+      0.06,
+      0.78
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 12,
+    "seed": 1769418342,
+    "steps": 2,
+    "blocked": 1,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 0.42,
+    "sim_time_s": 6.882,
+    "collisions": 1,
+    "no_path_count": 0,
+    "visits": [],
+    "final_pose": {
+      "x": 0.6,
+      "y": 0.18,
+      "theta": -90.0
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261002-235903.jsonl"
+  },
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot needs to avoid obstacles and navigate through the room. The current plan does not specify how it will move around these objects safely without touching them.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 1.19,
+      "latency_mean_s": 0.595,
+      "prompt_tokens_total": 462,
+      "completion_tokens_total": 69,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 22.559,
+      "latency_mean_s": 11.28,
+      "prompt_tokens_total": 870,
+      "completion_tokens_total": 1138,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (collision)"
+    },
+    {
+      "code": "collision",
+      "detail": "the rover collided with the room boundary"
+    }
+  ],
+  "spoken_summary": "The rover attempted to follow a movement command but experienced a collision with the room boundary.\nAs a result of this incident, the mission was halted immediately.\nThe final position recorded was 0.42 meters from the starting point."
+}

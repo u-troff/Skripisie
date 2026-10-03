@@ -1,0 +1,350 @@
+{
+  "session_id": "47de13a44df3",
+  "outcome": "halted",
+  "rover": "pi",
+  "command": "Go to monitor with red and green lights",
+  "resolved_command": "Go to monitor with red and green lights",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "under desk area"
+      }
+    ],
+    "notes": "Since no floor line connects views explicitly for traversal, movement commands are used hypothetically to reach a general proximity of the under-desk area. The final action assumes 'approach' and subsequent observation allows reaching the specific monitor with red and green lights (View 5)."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "under desk area"
+      }
+    ],
+    "notes": "Since no floor line connects views explicitly for traversal, movement commands are used hypothetically to reach a general proximity of the under-desk area. The final action assumes 'approach' and subsequent observation allows reaching the specific monitor with red and green lights (View 5)."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "under desk area",
+      "status": "blocked",
+      "detail": {
+        "reason": "target_not_found",
+        "cycles": 6
+      },
+      "elapsed_s": 16.74
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 4.78,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": 1206.5791015625,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 2.86,
+      "frame_path": "logs\\frames\\47de13a44df3\\ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "search",
+      "t_rel_s": 6.22,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": null,
+      "frame_attempts": null,
+      "vlm_said_visible": null,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "sweep_advance_pivot",
+      "vlm_latency_s": null,
+      "frame_path": null,
+      "sweep": 0,
+      "pivot_requested_deg": 110.0,
+      "pivot_cmd_s": 0.9322033898305084,
+      "pivot_dir": 1
+    },
+    {
+      "kind": "skipped",
+      "cycle": 3,
+      "phase": "search",
+      "t_rel_s": 9.56,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": 18.3554630279541,
+      "frame_attempts": 3,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "skipped_blurry",
+      "vlm_latency_s": null,
+      "frame_path": "logs\\frames\\47de13a44df3\\ap_s1_p0.jpg",
+      "sweep": 1,
+      "pan_offset": 0,
+      "reason": "blurry"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "search",
+      "t_rel_s": 11.02,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": null,
+      "frame_attempts": null,
+      "vlm_said_visible": null,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "sweep_advance_pivot",
+      "vlm_latency_s": null,
+      "frame_path": null,
+      "sweep": 1,
+      "pivot_requested_deg": 110.0,
+      "pivot_cmd_s": 0.9322033898305084,
+      "pivot_dir": 1
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "search",
+      "t_rel_s": 15.29,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": 292.4608459472656,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 2.84,
+      "frame_path": "logs\\frames\\47de13a44df3\\ap_s2_p0.jpg",
+      "sweep": 2,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "search",
+      "t_rel_s": 16.74,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": null,
+      "frame_attempts": null,
+      "vlm_said_visible": null,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "sweep_advance_pivot",
+      "vlm_latency_s": null,
+      "frame_path": null,
+      "sweep": 2,
+      "pivot_requested_deg": 110.0,
+      "pivot_cmd_s": 0.9322033898305084,
+      "pivot_dir": 1
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 6,
+    "sweeps_used": 3,
+    "gimbal_looks": 5,
+    "chassis_pivots": 3,
+    "chassis_spin_deg_total": 330.0,
+    "search_vlm_calls": 5,
+    "bearing_deg_at_lock": null,
+    "residual_e_at_lock": null,
+    "hops_done": 0,
+    "frames_skipped_blurry": 1,
+    "sharpness_min": 292.5,
+    "sharpness_median": 1206.6,
+    "detections_rejected": {},
+    "arrival_cross_check": null,
+    "gimbal_only_lock": null,
+    "vlm_time_s": 5.7,
+    "motion_time_s": 2.8,
+    "wall_time_s": 6.26,
+    "sonar_stops": 0,
+    "arrival_reason": "target_not_found"
+  },
+  "looked": {
+    "centre": 5
+  },
+  "scene_id": "b7cb9b96ec25",
+  "room_grounding": {
+    "known": [
+      "Wall-mounted device with blue and red lights",
+      "Yellow line on floor",
+      "power supply unit with red and green lights",
+      "yellow tape on floor",
+      "monitor with blue screen and red lights",
+      "yellow line on wall",
+      "Television Stand",
+      "Red Ball on Wall",
+      "monitor with red and green lights",
+      "black cables on the floor under monitor",
+      "computer tower with green lights and red button",
+      "wires hanging from the computer tower",
+      "computer monitor with red light",
+      "black cable on floor under desk",
+      "cutting board",
+      "glass bowl on a stand",
+      "Blue coat hanger with clothes hanging from it.",
+      "Green and white shoes",
+      "chair with patterned cushioning and metal frame",
+      "black suitcase on wheels next to chair"
+    ],
+    "seen": [],
+    "never_seen": [
+      "Blue coat hanger with clothes hanging from it.",
+      "Green and white shoes",
+      "Red Ball on Wall",
+      "Television Stand",
+      "Wall-mounted device with blue and red lights",
+      "Yellow line on floor",
+      "black cable on floor under desk",
+      "black cables on the floor under monitor",
+      "black suitcase on wheels next to chair",
+      "chair with patterned cushioning and metal frame",
+      "computer monitor with red light",
+      "computer tower with green lights and red button",
+      "cutting board",
+      "glass bowl on a stand",
+      "monitor with blue screen and red lights",
+      "monitor with red and green lights",
+      "power supply unit with red and green lights",
+      "wires hanging from the computer tower",
+      "yellow line on wall",
+      "yellow tape on floor"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 16.84,
+    "per_step_s": [
+      16.74
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 1,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "No floor line was specified connecting View 1 to the desk/under-desk areas where monitors are located. The steps assume that a path exists through environmental knowledge allowing navigation using 'approach'/'observe'. Since no explicit lines connect these views for traversal and initial position is not given relative goal location, movement commands (move) must cover any necessary distance within established boundaries.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 14,
+      "latency_total_s": 78.697,
+      "latency_mean_s": 5.621,
+      "prompt_tokens_total": 18538,
+      "completion_tokens_total": 1274,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 66.869,
+      "latency_mean_s": 33.434,
+      "prompt_tokens_total": 1622,
+      "completion_tokens_total": 2264,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (target_not_found)"
+    },
+    {
+      "code": "arrival_unconfirmed",
+      "detail": "the approach ended without a confirmed arrival"
+    },
+    {
+      "code": "blurry_frames_skipped",
+      "detail": "1 frame(s) were too blurry to check and were skipped"
+    }
+  ],
+  "spoken_summary": "The rover halted after receiving a command to go to the monitor with red and green lights. The route followed a single straight run without any bends. The mission was stopped because the target could not be found."
+}

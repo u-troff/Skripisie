@@ -110,10 +110,18 @@ def keyframes(
     min_distance: float = 0.06,
     max_edge: int = 512,
 ) -> List[bytes]:
-    """Codec keyframes, deduplicated by visual distance, ranked by sharpness.
+    """Codec keyframes, deduplicated by visual distance, spread across the
+    whole video, sharpest-in-each-slice.
 
     skip_frame="NONKEY" avoids decoding the whole video — only I-frames are
     reconstructed, which is fast and a decent proxy for scene changes.
+
+    The video is read to the end (no early cap on candidates), then split into
+    max_frames equal time slices and the sharpest candidate in each slice is
+    taken, so the picks cover the whole clip instead of clustering wherever
+    the camera happened to be still. Ranking purely by sharpness, or stopping
+    after N candidates, would leave parts of the room unrepresented — and an
+    object that is not in any keyframe can never be asked about later.
     """
     picked: List[bytes] = []
     try:
@@ -121,6 +129,8 @@ def keyframes(
             stream = container.streams.video[0]
             stream.codec_context.skip_frame = "NONKEY"
 
+            # (sharpness, moment, jpeg) — encode now so decoded frames are not
+            # all held in memory while the rest of the video is read.
             candidates = []
             last: Optional[FrameStats] = None
             last_t = -1e9
@@ -131,16 +141,32 @@ def keyframes(
                 stats = _stats(frame)
                 if last is not None and distance(stats, last) < min_distance:
                     continue
-                candidates.append((stats.sharpness, moment, frame))
+                candidates.append((stats.sharpness, moment, _encode_jpeg(frame, max_edge)))
                 last, last_t = stats, moment
-                if len(candidates) >= 40:
-                    break
 
-            # A blurred pan frame wastes a whole VLM call, so prefer the
-            # sharpest survivors, then restore chronological order.
-            candidates.sort(key=lambda item: item[0], reverse=True)
-            chosen = sorted(candidates[:max_frames], key=lambda item: item[1])
-            picked = [_encode_jpeg(item[2], max_edge) for item in chosen]
+            if len(candidates) <= max_frames:
+                chosen = candidates
+            else:
+                start = candidates[0][1]
+                span = max(1e-6, candidates[-1][1] - start)
+                slices = [[] for _ in range(max_frames)]
+                for item in candidates:
+                    index = min(max_frames - 1, int((item[1] - start) / span * max_frames))
+                    slices[index].append(item)
+
+                # Sharpest candidate per time slice; a blurred pan frame wastes
+                # a whole VLM call, so sharpness still breaks ties inside a slice.
+                chosen = [max(group, key=lambda item: item[0]) for group in slices if group]
+
+                # Empty slices (a long still stretch) leave spare slots: fill
+                # them with the sharpest candidates not already taken.
+                if len(chosen) < max_frames:
+                    taken = {id(item) for item in chosen}
+                    spare = sorted((c for c in candidates if id(c) not in taken),
+                                   key=lambda item: item[0], reverse=True)
+                    chosen += spare[:max_frames - len(chosen)]
+
+            picked = [item[2] for item in sorted(chosen, key=lambda item: item[1])]
     except Exception as exc:
         log.error("keyframe extraction failed: %s", exc)
 

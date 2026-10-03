@@ -79,7 +79,54 @@ export interface StepResult {
   detail: string | null
 }
 
+// --- virtual rover live map -------------------------------------------------
+
+export interface RoverPose {
+  x: number
+  y: number
+  /** degrees */
+  theta: number
+}
+
+export interface RoverState {
+  pose: RoverPose
+  path: RoverPose[]
+  planned_path: Array<[number, number]> | null
+  odometer_m: number
+  sim_time_s: number
+}
+
+export interface RoomData {
+  name: string
+  width_m: number
+  height_m: number
+  start: RoverPose
+  obstacles: Array<{ name: string; polygon: Array<[number, number]>; where: string | null }>
+  landmarks: Array<{ name: string; x: number; y: number; aliases: string[]; where: string | null }>
+  source: string
+}
+
+export interface RuntimeInfo {
+  rover: string
+  robot: { length_m: number; width_m: number; clearance_m: number }
+}
+
+export interface RunTrace {
+  room: RoomData
+  settings: { robot_length_m: number; robot_width_m: number; clearance_m: number }
+  start: RoverPose
+  steps: Array<{
+    pose: RoverPose
+    planned_path: Array<[number, number]> | null
+    status: string
+    odometer_m: number
+    sim_time_s: number
+  }>
+  summary: Record<string, unknown>
+}
+
 export type MissionEvent =
+  | { type: 'rover_state'; session_id: string; state: RoverState }
   | { type: 'mission_started'; session_id: string; plan: Plan }
   | { type: 'step_started'; session_id: string; index: number; step: PlanStep }
   | { type: 'step_done'; session_id: string; index: number; step: PlanStep; result: StepResult }
@@ -216,6 +263,11 @@ export interface CheckRecord {
   est_distance_cm?: number
   latency_s?: number
   frame_path?: string
+  // approach-loop records (kind "approach_cycle" / "skipped") carry these
+  phase?: string
+  cycle?: number
+  gate?: string | null
+  action?: string
   result?: CheckResult
 }
 

@@ -24,6 +24,17 @@ log = get_logger("scene")
 KEYFRAMES_MAX = config.get_int("KEYFRAMES_MAX", 10)
 FRAME_MAX_EDGE = config.get_int("FRAME_MAX_EDGE", 512)
 
+# The digest is what the planner and verifier read, so it is deliberately much
+# terser than the stored inventory: the full inventory is kept on disk and in
+# vocabulary(), but ten frames of five attributes per object ran to ~5k prompt
+# tokens and made the verifier see "multiple matching boxes" everywhere.
+DIGEST_MAX_OBJECTS = config.get_int("DIGEST_MAX_OBJECTS_PER_FRAME", 8)
+DIGEST_MAX_ATTRS = config.get_int("DIGEST_MAX_ATTRS", 2)
+DIGEST_WHERE_CHARS = config.get_int("DIGEST_WHERE_CHARS", 50)
+# Surfaces a rover cannot go to or look "at"; dropped from the digest only.
+_STRUCTURAL = ("wall", "floor", "tile", "ceiling", "grout", "stripe", "tape",
+               "marking", "baseboard", "skirting", "line")
+
 # Persisted scenes, sibling to rooms/ and logs/. A scene built once survives a
 # backend restart here, so re-uploading the same room video — and paying the
 # ~15s/frame VLM inventory cost again — is a choice, not a requirement.
@@ -48,10 +59,18 @@ class SceneFrame:
 
         parts = []
         for obj in self.objects:
-            attributes = " ".join(str(a) for a in (obj.get("attributes") or []))
-            label = (attributes + " " + str(obj.get("name") or "")).strip()
-            where = str(obj.get("where") or "").strip()
+            name = str(obj.get("name") or "").strip()
+            if not name or any(word in name.lower() for word in _STRUCTURAL):
+                continue
+            raw = obj.get("attributes") or []
+            if isinstance(raw, dict):
+                raw = list(raw.values())
+            attributes = " ".join(str(a) for a in list(raw)[:DIGEST_MAX_ATTRS])
+            label = (attributes + " " + name).strip()
+            where = str(obj.get("where") or "").strip()[:DIGEST_WHERE_CHARS].strip()
             parts.append(label + (f" ({where})" if where else ""))
+            if len(parts) >= DIGEST_MAX_OBJECTS:
+                break
         if self.obstacles:
             parts.append("floor obstacles: " + ", ".join(str(o) for o in self.obstacles))
         return f"{head}: " + ("; ".join(parts) if parts else "nothing identifiable")

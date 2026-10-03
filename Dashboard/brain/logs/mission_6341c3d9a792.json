@@ -1,0 +1,178 @@
+{
+  "session_id": "6341c3d9a792",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "go to the door and then turn around",
+  "resolved_command": "go to the door and then turn around",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "degrees": 180
+      }
+    ],
+    "notes": "The plan approaches the door and then performs a 180-degree rotation."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "degrees": 180
+      }
+    ],
+    "notes": "The plan approaches the door and then performs a 180-degree rotation."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.89
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.11
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_studio",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.0,
+    "per_step_s": [
+      0.89,
+      0.11
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 16,
+    "seed": 1769418342,
+    "steps": 2,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 2.907,
+    "sim_time_s": 19.143,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "door"
+    ],
+    "final_pose": {
+      "x": 3.5,
+      "y": 0.4,
+      "theta": 176.05
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261002-235903.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "door"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot's plan does not specify what it should do after approaching the door. It only mentions turning 180 degrees but doesn't indicate whether this is to exit through a doorway (if there are any) and if so, which one.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 1.368,
+      "latency_mean_s": 0.684,
+      "prompt_tokens_total": 455,
+      "completion_tokens_total": 89,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 30.953,
+      "latency_mean_s": 15.476,
+      "prompt_tokens_total": 886,
+      "completion_tokens_total": 1585,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The command to go to the door and turn around was completed successfully. I traveled 2.907 meters during this run. The route involved a single straight run with no bends taken."
+}

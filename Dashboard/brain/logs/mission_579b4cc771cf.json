@@ -1,0 +1,179 @@
+{
+  "session_id": "579b4cc771cf",
+  "outcome": "halted",
+  "rover": "virtual",
+  "command": "turn left 90 degrees then move forward one metre",
+  "resolved_command": "Turn left 90 degrees, then move forward one metre.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "turn",
+        "degrees": 90
+      },
+      {
+        "id": 2,
+        "action": "move",
+        "distance_m": 1
+      }
+    ],
+    "notes": "The starting position and orientation are unspecified, so the 1-metre forward move cannot be verified as collision-free around the room's floor obstacles."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "turn",
+        "degrees": 90
+      },
+      {
+        "id": 2,
+        "action": "move",
+        "distance_m": 1
+      }
+    ],
+    "notes": "The starting position and orientation are unspecified, so the 1-metre forward move cannot be verified as collision-free around the room's floor obstacles."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 1,
+      "action": "move",
+      "target": null,
+      "status": "blocked",
+      "detail": {
+        "reason": "collision",
+        "obstacle": "the room boundary",
+        "commanded_m": 1.0,
+        "travelled_m": 0.42
+      },
+      "elapsed_s": 0.31
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_studio",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.36,
+    "per_step_s": [
+      0.06,
+      0.31
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 14,
+    "seed": 1789838962,
+    "steps": 2,
+    "blocked": 1,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 0.42,
+    "sim_time_s": 6.882,
+    "collisions": 1,
+    "no_path_count": 0,
+    "visits": [],
+    "final_pose": {
+      "x": 0.6,
+      "y": 0.18,
+      "theta": -90.0
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261003-001737.jsonl"
+  },
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The room layout and robot's starting position/orientation are unspecified, so a 90-degree turn followed by a 1-metre move cannot be verified as collision-free around the couch, coffee table, and bookshelf.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 4.954,
+      "latency_mean_s": 2.477,
+      "prompt_tokens_total": 423,
+      "completion_tokens_total": 277,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 7.416,
+      "latency_mean_s": 3.708,
+      "prompt_tokens_total": 845,
+      "completion_tokens_total": 536,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (collision)"
+    },
+    {
+      "code": "collision",
+      "detail": "the rover collided with the room boundary"
+    }
+  ],
+  "spoken_summary": "The rover halted while turning left 90 degrees and moving forward one metre. It collided with the room boundary before finishing."
+}

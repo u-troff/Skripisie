@@ -1,0 +1,183 @@
+{
+  "session_id": "341e31ed60fc",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "go to the door and then turn around",
+  "resolved_command": "Go to the door and then turn around.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "right",
+        "degrees": 180
+      }
+    ],
+    "notes": "Turn around interpreted as a 180-degree turn to the right."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "right",
+        "degrees": 180
+      }
+    ],
+    "notes": "Turn around interpreted as a 180-degree turn to the right."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.43
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": "right",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.11
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.54,
+    "per_step_s": [
+      1.43,
+      0.11
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 18,
+    "seed": 963301117,
+    "steps": 2,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 4.245,
+    "sim_time_s": 28.269,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "door"
+    ],
+    "final_pose": {
+      "x": 0.4,
+      "y": 3.8,
+      "theta": -13.08
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20260928-223617.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "turn",
+      "target": "right",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "door",
+      "right"
+    ],
+    "unresolved": [
+      "right"
+    ],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 3.709,
+      "latency_mean_s": 1.854,
+      "prompt_tokens_total": 445,
+      "completion_tokens_total": 212,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 3.096,
+      "latency_mean_s": 3.096,
+      "prompt_tokens_total": 411,
+      "completion_tokens_total": 215,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "plan_target_unresolved",
+      "detail": "the plan named a target the room doesn't have: right"
+    }
+  ],
+  "spoken_summary": "Completed the command to go to the door and turn around. The rover visited the door, with zero sonar obstacle events and zero collisions. The plan named a target the room doesn't have: right."
+}

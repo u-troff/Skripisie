@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="996" height="816" font-family="Helvetica,Arial,sans-serif" font-size="12">
+<rect width="100%%" height="100%%" fill="white"/>
+<rect x="48.0" y="48.0" width="900.0" height="720.0" fill="none" stroke="#222" stroke-width="2"/>
+<polygon points="16.7,367.3 313.3,367.3 313.3,124.7 16.7,124.7" fill="#f3ecec" stroke="#d9c8c8" stroke-dasharray="4 3"/>
+<polygon points="376.7,547.3 619.3,547.3 619.3,340.7 376.7,340.7" fill="#f3ecec" stroke="#d9c8c8" stroke-dasharray="4 3"/>
+<polygon points="628.7,223.3 943.3,223.3 943.3,16.7 628.7,16.7" fill="#f3ecec" stroke="#d9c8c8" stroke-dasharray="4 3"/>
+<polygon points="844.7,799.3 979.3,799.3 979.3,376.7 844.7,376.7" fill="#f3ecec" stroke="#d9c8c8" stroke-dasharray="4 3"/>
+<polygon points="48.0,336.0 282.0,336.0 282.0,156.0 48.0,156.0" fill="#e2e2e2" stroke="#9a9a9a"/>
+<text x="165.0" y="246.0" fill="#666" text-anchor="middle">the couch</text>
+<polygon points="408.0,516.0 588.0,516.0 588.0,372.0 408.0,372.0" fill="#e2e2e2" stroke="#9a9a9a"/>
+<text x="498.0" y="444.0" fill="#666" text-anchor="middle">the coffee table</text>
+<polygon points="660.0,192.0 912.0,192.0 912.0,48.0 660.0,48.0" fill="#e2e2e2" stroke="#9a9a9a"/>
+<text x="786.0" y="120.0" fill="#666" text-anchor="middle">the desk</text>
+<polygon points="876.0,768.0 948.0,768.0 948.0,408.0 876.0,408.0" fill="#e2e2e2" stroke="#9a9a9a"/>
+<text x="912.0" y="588.0" fill="#666" text-anchor="middle">the bookshelf</text>
+<circle cx="354.0" cy="246.0" r="4" fill="#2a6fdb"/>
+<text x="361.0" y="250.0" fill="#2a6fdb">couch</text>
+<circle cx="498.0" cy="588.0" r="4" fill="#2a6fdb"/>
+<text x="505.0" y="592.0" fill="#2a6fdb">coffee table</text>
+<circle cx="696.0" cy="264.0" r="4" fill="#2a6fdb"/>
+<text x="703.0" y="268.0" fill="#2a6fdb">desk</text>
+<circle cx="804.0" cy="588.0" r="4" fill="#2a6fdb"/>
+<text x="811.0" y="592.0" fill="#2a6fdb">bookshelf</text>
+<circle cx="120.0" cy="84.0" r="4" fill="#2a6fdb"/>
+<text x="127.0" y="88.0" fill="#2a6fdb">door</text>
+<circle cx="516.0" cy="66.0" r="4" fill="#2a6fdb"/>
+<text x="523.0" y="70.0" fill="#2a6fdb">window</text>
+<polyline points="192.0,678.0 354.0,246.0" fill="none" stroke="#3d78d1" stroke-width="1" />
+<polyline points="192.0,678.0 354.0,246.0 543.6,-259.6" fill="none" stroke="#aaaaaa" stroke-width="2" stroke-dasharray="6 4"/>
+<polyline points="192.0,678.0 354.0,246.0 415.5,81.9" fill="none" stroke="#444444" stroke-width="2" />
+<line x1="354.0" y1="246.0" x2="359.6" y2="231.0" stroke="#2e8b57"/>
+<circle cx="354.0" cy="246.0" r="5" fill="#2e8b57"/>
+<text x="362.0" y="238.0" fill="#2e8b57">1</text>
+<line x1="415.5" y1="81.9" x2="421.1" y2="66.9" stroke="#c02626"/>
+<circle cx="415.5" cy="81.9" r="5" fill="#c02626"/>
+<text x="423.5" y="73.9" fill="#c02626">2 collision</text>
+<line x1="409.5" y1="75.9" x2="421.5" y2="87.9" stroke="#c02626" stroke-width="2"/>
+<line x1="409.5" y1="87.9" x2="421.5" y2="75.9" stroke="#c02626" stroke-width="2"/>
+<text x="48.0" y="800.0" fill="#222">room_tour1 — run 1, seed 639633582 — 2 step(s), 1 blocked, 0 unresolved target(s), 1 collision(s); odometer 3.54m; sim time 33.0s; dashed grey = intended, solid = achieved, blue = planned route</text>
+</svg>
