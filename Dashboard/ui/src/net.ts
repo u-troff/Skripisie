@@ -1,4 +1,11 @@
-import type { DialogueSnapshot, RunReport, RunSummary, SceneResponse, SocketStatus } from './types'
+import type {
+  DialogueSnapshot,
+  RunReport,
+  RunSummary,
+  SceneResponse,
+  SceneSummary,
+  SocketStatus,
+} from './types'
 
 export function socketUrl(path: string): string {
   const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
@@ -75,11 +82,27 @@ export async function fetchDialogueSnapshot(id: string): Promise<DialogueSnapsho
   }
 }
 
-/** Room video upload. Slow — one VLM call per surviving keyframe. */
-export async function postScene(file: File): Promise<SceneResponse> {
+/** Room video upload. Slow — one VLM call per surviving keyframe. The result
+ * is persisted on the backend, so this only needs to run once per room. */
+export async function postScene(file: File, name = ''): Promise<SceneResponse> {
   const form = new FormData()
   form.append('video', file, file.name)
+  if (name) form.append('name', name)
   const response = await fetch('/api/scene', { method: 'POST', body: form })
+  if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
+  return (await response.json()) as SceneResponse
+}
+
+/** Previously catalogued rooms, newest first — for the room picker. */
+export async function fetchScenes(): Promise<SceneSummary[]> {
+  const response = await fetch('/api/scenes')
+  if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
+  return (await response.json()) as SceneSummary[]
+}
+
+/** Reload a previously built scene by id — no re-upload, no VLM calls. */
+export async function fetchScene(sceneId: string): Promise<SceneResponse> {
+  const response = await fetch(`/api/scene/${sceneId}`)
   if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
   return (await response.json()) as SceneResponse
 }

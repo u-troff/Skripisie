@@ -92,6 +92,9 @@ export type MissionEvent =
   | { type: 'mission_ended'; session_id: string; phase: MissionPhase; snapshot: unknown }
   | { type: 'speak'; session_id: string; text: string; phase: MissionPhase }
   | { type: 'error'; message: string }
+  | { type: 'check'; session_id: string; check: CheckRecord }
+  | { type: 'approach_cycle'; session_id: string; check: ApproachCycleRecord }
+
 
 export interface TranscribeResult {
   text: string
@@ -100,6 +103,24 @@ export interface TranscribeResult {
   duration: number | null
   elapsed: number
 }
+
+export interface ApproachCycleRecord {
+  kind: 'approach_cycle'
+  cycle: number
+  phase: string
+  t_rel_s: number
+  bbox?: [number, number, number, number] | null
+  x_center?: number | null
+  fill?: number | null
+  bottom?: number | null
+  confidence?: string | null
+  sharpness?: number | null
+  gate?: string | null
+  reject_reason?: string | null
+  action?: string
+  frame_path?: string | null
+}
+
 
 export interface CommandResult {
   status: 'ready' | 'needs_clarification'
@@ -131,10 +152,20 @@ export interface SceneFrameInfo {
 
 export interface SceneResponse {
   scene_id: string
+  name: string
   frame_count: number
   elapsed: number
   digest: string
   frames: SceneFrameInfo[]
+}
+
+/** One row from GET /scenes — a previously catalogued room, picked without
+ * re-uploading the video or re-running the VLM inventory. */
+export interface SceneSummary {
+  scene_id: string
+  name: string
+  frame_count: number
+  created_at: number
 }
 
 // --- run logs / reports (Logs page) ---------------------------------------

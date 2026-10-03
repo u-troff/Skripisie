@@ -23,5 +23,48 @@
 \mysection{Navigation as instrumentation}{Navigation as Instrumentation}
 \label{sec:navigation}
 
+\mysubsection{The line follower as the reactive layer}{The Line Follower}
+\label{ssec:line_follower}
+
+Section~\ref{ssec:rates} showed that the Mac-hosted models cannot sit in a
+steering loop. A VLM call takes about 15\,s, and keeping a mecanum chassis on a
+line needs control at 10 to 30\,Hz. I therefore left steering to the TurboPi's
+stock \texttt{line\_follow} ROS2 node, which closes the loop on the Pi using the
+chassis-mounted 4-channel IR array. I used the IR array instead of the gimbal
+camera so the camera stays free for the VLM to look wherever the mission needs,
+regardless of where the chassis is steering (\texttt{rover\_pi.py},
+\texttt{aim()}).
+
+\texttt{PiRoverController} does not reimplement steering. It only supervises the
+node on three things the node has no logic for itself:
+\begin{itemize}
+  \item Arrival: the node's own \texttt{/line\_follow/crossroads\_stop} topic
+    decides when the end of the line is reached, not a model's judgement.
+  \item Obstacles: the ultrasonic sensor is polled independently of the line
+    sensor. Two consecutive readings below the stop threshold pause the follower
+    until the path clears, and then it resumes.
+  \item Giving up: a wall-clock timeout. The stock node has no lost-line exit,
+    so without one the rover would drive straight on indefinitely.
+\end{itemize}
+
+I also use a modified variant, \texttt{line\_follow\_corner.py}. When it takes a
+90\textdegree{} bend instead of parking at a crossbar, it publishes a
+\texttt{/line\_follow/corner} event. This lets a route be given as an ordered
+string of turns (e.g.\ \texttt{"L"}, \texttt{"R"}) and not only the
+straight-track default. It adds one constraint: a planned pause, such as a
+mid-drive look, must not land while the follower is mid-pivot. A \texttt{STOP}
+sent during the node's pre-turn nudge cancels the turn instead of the forward
+motion. \texttt{corner\_guard\_active()} reports a short window after each bend,
+and callers must defer their pause until it ends.
+
+Halting the follower is where a naive design fails without any error. While
+running, the node republishes \texttt{/cmd\_vel} at 100\,Hz, so a single
+zero-velocity \texttt{Twist} is overwritten within 10\,ms and the rover keeps
+driving. \texttt{halt()} therefore sends an explicit \texttt{STOP} service call
+to the node \emph{before} the zero \texttt{Twist}. It repeats both 0.7\,s later,
+in case the first \texttt{STOP} landed inside the node's pre-turn nudge window
+and was swallowed. This is the most safety-critical part of the hardware
+integration.
+
 \mysection{Summary of design decisions}{Summary of Design Decisions}
 \label{sec:design_decisions}

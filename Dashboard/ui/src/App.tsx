@@ -2,10 +2,11 @@ import { useEffect } from 'react'
 import DialoguePanel from './components/DialoguePanel'
 import ExecutionPanel from './components/ExecutionPanel'
 import OneShotPanel from './components/OneShotPanel'
-import { fetchHealth, postScene } from './net'
+import { fetchHealth, fetchScene, fetchScenes, postScene } from './net'
 import { useStore } from './store'
 import type { Language } from './types'
 import GimbalControl from './components/GimbalControl'
+import ApproachDebugPanel from './components/ApproachDebugPanel'
 
 // qwen2.5vl turns image resolution into vision tokens, and a phone photo alone
 // can exceed the model's context window. Cap the long edge before upload.
@@ -54,10 +55,16 @@ export default function App() {
   const setSceneUploading = useStore((state) => state.setSceneUploading)
   const sceneError = useStore((state) => state.sceneError)
   const setSceneError = useStore((state) => state.setSceneError)
+  const savedScenes = useStore((state) => state.savedScenes)
+  const setSavedScenes = useStore((state) => state.setSavedScenes)
 
   useEffect(() => {
     void fetchHealth().then((ok) => setHealth(ok ? 'up' : 'down'))
   }, [setHealth])
+
+  useEffect(() => {
+    void fetchScenes().then(setSavedScenes).catch(() => {})
+  }, [setSavedScenes])
 
   const onPickVideo = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -67,7 +74,28 @@ export default function App() {
     setScene(null)
     setSceneUploading(true)
     try {
-      setScene(await postScene(file))
+      const built = await postScene(file)
+      setScene(built)
+      // The just-built scene belongs at the top of the picker without a
+      // round trip back to the server.
+      setSavedScenes([
+        { scene_id: built.scene_id, name: built.name, frame_count: built.frame_count,
+          created_at: Date.now() / 1000 },
+        ...savedScenes.filter((s) => s.scene_id !== built.scene_id),
+      ])
+    } catch (err) {
+      setSceneError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setSceneUploading(false)
+    }
+  }
+
+  const onPickSavedScene = async (sceneId: string) => {
+    if (!sceneId) return
+    setSceneError(null)
+    setSceneUploading(true)
+    try {
+      setScene(await fetchScene(sceneId))
     } catch (err) {
       setSceneError(err instanceof Error ? err.message : String(err))
     } finally {
@@ -102,6 +130,24 @@ export default function App() {
           catalogue is what the clarifying questions and the planner reason over — without it the
           model has no way to know whether "the thing by the window" is ambiguous.
         </p>
+
+        {savedScenes.length > 0 && (
+          <select
+            className="saved-scenes"
+            defaultValue=""
+            disabled={sceneUploading}
+            onChange={(e) => void onPickSavedScene(e.target.value)}
+          >
+            <option value="" disabled>
+              Or pick a previously catalogued room…
+            </option>
+            {savedScenes.map((s) => (
+              <option key={s.scene_id} value={s.scene_id}>
+                {s.name || s.scene_id} — {s.frame_count} frame(s)
+              </option>
+            ))}
+          </select>
+        )}
 
         <label className={`drop ${sceneUploading ? 'off' : ''}`}>
           <input type="file" accept="video/*" onChange={(e) => void onPickVideo(e)}
@@ -180,6 +226,7 @@ export default function App() {
       <OneShotPanel />
       <DialoguePanel />
       <ExecutionPanel />
+      <ApproachDebugPanel />
       <GimbalControl />
     </main>
   )
