@@ -1,0 +1,412 @@
+{
+  "session_id": "4aa720af1b51",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "please find where the red ball is as you travel down the black strip",
+  "resolved_command": "please find where the red ball is as you travel down the black strip",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "black long narrow black floor strip or cable"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "black long narrow black floor strip or cable"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "whether a red ball is present"
+      }
+    ],
+    "notes": "No red ball is visible in the recorded room descriptions, so its location cannot be determined."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "black long narrow black floor strip or cable"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "black long narrow black floor strip or cable"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "whether a red ball is present"
+      }
+    ],
+    "notes": "No red ball is visible in the recorded room descriptions, so its location cannot be determined."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "black long narrow black floor strip or cable",
+      "status": "ok",
+      "detail": {
+        "arrived": true,
+        "elapsed_s": 21.94,
+        "stopped_s": 0.74,
+        "obstacle_events": 0
+      },
+      "elapsed_s": 22.19
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "black long narrow black floor strip or cable",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.5
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "whether a red ball is present",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "progress",
+      "target": "black long narrow black floor strip or cable",
+      "known_count": 20,
+      "t_rel_s": 2.81,
+      "est_distance_cm": 43.1,
+      "latency_s": 3.02,
+      "frame_path": "logs/frames/4aa720af1b51/kf_01.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable",
+          "white wall",
+          "wall"
+        ],
+        "unexpected": [],
+        "description": "A long narrow black floor strip is visible on the otherwise clear floor leading toward the wall."
+      }
+    },
+    {
+      "kind": "look_left",
+      "target": "black long narrow black floor strip or cable",
+      "known_count": 20,
+      "t_rel_s": 5.3,
+      "est_distance_cm": 81.0,
+      "latency_s": 6.79,
+      "frame_path": "logs/frames/4aa720af1b51/left_01.jpg",
+      "result": {
+        "objects": [
+          "black floor strip or cable",
+          "white wall"
+        ],
+        "target_visible": true,
+        "seen": [
+          "black floor strip or cable",
+          "wall",
+          "white wall"
+        ],
+        "unexpected": [
+          "light-colored tiled floor"
+        ],
+        "description": "A light-colored tiled floor meets a white wall, with a thin black strip or cable visible along the base."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "black long narrow black floor strip or cable",
+      "known_count": 20,
+      "t_rel_s": 8.89,
+      "est_distance_cm": 136.0,
+      "latency_s": 4.96,
+      "frame_path": "logs/frames/4aa720af1b51/kf_02.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable",
+          "dark rectangular floor strip",
+          "wall",
+          "white wall"
+        ],
+        "unexpected": [],
+        "description": "A black floor strip runs ahead across the otherwise clear light-colored floor."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 11.52,
+      "est_distance_cm": 176.3
+    },
+    {
+      "kind": "bend",
+      "side": "left",
+      "t_rel_s": 11.72,
+      "est_distance_cm": 179.4
+    },
+    {
+      "kind": "progress",
+      "target": "black long narrow black floor strip or cable",
+      "known_count": 20,
+      "t_rel_s": 14.33,
+      "est_distance_cm": 219.3,
+      "latency_s": 7.3,
+      "frame_path": "logs/frames/4aa720af1b51/kf_03.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable",
+          "loose black cable"
+        ],
+        "unexpected": [
+          "light-colored floor"
+        ],
+        "description": "A black narrow cable or strip is visible across the light-colored floor."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 17.14,
+      "est_distance_cm": 262.2
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 19.95,
+      "est_distance_cm": 305.3
+    }
+  ],
+  "look_left": {
+    "kind": "look_left",
+    "target": "black long narrow black floor strip or cable",
+    "known_count": 20,
+    "t_rel_s": 5.3,
+    "est_distance_cm": 81.0,
+    "latency_s": 6.79,
+    "frame_path": "logs/frames/4aa720af1b51/left_01.jpg",
+    "result": {
+      "objects": [
+        "black floor strip or cable",
+        "white wall"
+      ],
+      "target_visible": true,
+      "seen": [
+        "black floor strip or cable",
+        "wall",
+        "white wall"
+      ],
+      "unexpected": [
+        "light-colored tiled floor"
+      ],
+      "description": "A light-colored tiled floor meets a white wall, with a thin black strip or cable visible along the base."
+    }
+  },
+  "arrival": {
+    "kind": "arrival",
+    "target": "black long narrow black floor strip or cable",
+    "expected": [
+      "black long narrow black floor strip or cable"
+    ],
+    "known": [
+      "large white projection screen or whiteboard",
+      "black border around screen or whiteboard",
+      "yellow horizontal stripe",
+      "wall-mounted black monitor",
+      "black wall fan",
+      "loose black cable",
+      "tall equipment rack or cabinet",
+      "wooden vertical support or shelf side",
+      "electronic equipment",
+      "small white objects on shelf",
+      "wall outlet or switch",
+      "ceiling",
+      "wall",
+      "small wheeled robot",
+      "black floor strip or cable",
+      "dark rectangular floor strip",
+      "open storage cabinet or shelving unit",
+      "shelves inside storage unit",
+      "stored items",
+      "white wall"
+    ],
+    "t_rel_s": 22.7,
+    "latency_s": 4.05,
+    "frame_path": "logs/frames/4aa720af1b51/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "medium",
+      "seen": [
+        "black floor strip or cable"
+      ],
+      "missing": [],
+      "unexpected": [],
+      "description": "A thin dark strip or cable is visibly running diagonally across the floor from the lower left toward the dark background."
+    }
+  },
+  "bends": [
+    {
+      "side": "left",
+      "t_rel_s": 11.72,
+      "est_distance_cm": 179.4
+    }
+  ],
+  "route_summary": "took 1 left bend",
+  "scene_id": "41002c4bd562",
+  "room_grounding": {
+    "known": [
+      "large white projection screen or whiteboard",
+      "black border around screen or whiteboard",
+      "yellow horizontal stripe",
+      "wall-mounted black monitor",
+      "black wall fan",
+      "loose black cable",
+      "tall equipment rack or cabinet",
+      "wooden vertical support or shelf side",
+      "electronic equipment",
+      "small white objects on shelf",
+      "wall outlet or switch",
+      "ceiling",
+      "wall",
+      "small wheeled robot",
+      "black floor strip or cable",
+      "dark rectangular floor strip",
+      "open storage cabinet or shelving unit",
+      "shelves inside storage unit",
+      "stored items",
+      "white wall"
+    ],
+    "seen": [
+      "black floor strip or cable",
+      "dark rectangular floor strip",
+      "loose black cable",
+      "wall",
+      "white wall"
+    ],
+    "never_seen": [
+      "black border around screen or whiteboard",
+      "black wall fan",
+      "ceiling",
+      "electronic equipment",
+      "large white projection screen or whiteboard",
+      "open storage cabinet or shelving unit",
+      "shelves inside storage unit",
+      "small wheeled robot",
+      "small white objects on shelf",
+      "stored items",
+      "tall equipment rack or cabinet",
+      "wall outlet or switch",
+      "wall-mounted black monitor",
+      "wooden vertical support or shelf side",
+      "yellow horizontal stripe"
+    ],
+    "unexpected": [
+      "light-colored floor",
+      "light-colored tiled floor"
+    ],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 511,
+    "t_start": 1790714627.983988,
+    "obstacle_events": 0,
+    "bends": [
+      "left"
+    ]
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 26.86,
+    "per_step_s": [
+      22.19,
+      0.5,
+      0.0
+    ],
+    "vlm_latency_mean_s": 5.22,
+    "vlm_latency_max_s": 7.3,
+    "checks_completed": 3,
+    "checks_skipped": 3,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "f354fbc3099a",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "drive toward a visible target until close to it",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": "The black floor strip or cable is present in View 2, but following it may be unsafe because it is a loose floor obstacle. No red ball is visible, so its presence cannot be confirmed.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 7,
+      "latency_total_s": 32.873,
+      "latency_mean_s": 4.696,
+      "prompt_tokens_total": 8733,
+      "completion_tokens_total": 2283,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 6.117,
+      "latency_mean_s": 6.117,
+      "prompt_tokens_total": 2720,
+      "completion_tokens_total": 464,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "unexpected_objects",
+      "detail": "the rover reported 2 thing(s) the filmed room does not contain: light-colored floor, light-colored tiled floor \u2014 either the room changed or the model invented them"
+    }
+  ],
+  "spoken_summary": "I completed the route and found the black floor strip or cable, but the red ball was not reported. Uncertainty: light-colored floor and light-colored tiled floor were reported even though the filmed room does not contain them; either the room changed or the model invented them."
+}

@@ -1,0 +1,426 @@
+{
+  "session_id": "f5b10c5b77b9",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "drive down the line and find the red ball at the end of the trip",
+  "resolved_command": "drive down the line and find the red ball at the end of the trip\nClarification \u2014 Which line should I follow, and what object should I find instead of the red ball? You should find the red ball and follow the black line\nClarification \u2014 Where is the red ball, and which black line should I follow: the floor strip near the robot, the wall stripe behind the equipment, or the floor tape strip beside the bunk bed? The floor strip near the robot. you will find the red ball at the end of the floor strip",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "end of the black floor strip near the robot"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "end of the black floor strip"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "what is visible at the end of the black floor strip"
+      }
+    ],
+    "notes": "The red ball is not listed among the known objects, so it cannot be confirmed or found."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "end of the black floor strip near the robot"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "end of the black floor strip"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "what is visible at the end of the black floor strip"
+      }
+    ],
+    "notes": "The red ball is not listed among the known objects, so it cannot be confirmed or found."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "end of the black floor strip near the robot",
+      "status": "ok",
+      "detail": {
+        "arrived": true,
+        "elapsed_s": 21.08,
+        "stopped_s": 0.91,
+        "obstacle_events": 0
+      },
+      "elapsed_s": 22.47
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "end of the black floor strip",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.5
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "what is visible at the end of the black floor strip",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "progress",
+      "target": "end of the black floor strip near the robot",
+      "known_count": 20,
+      "t_rel_s": 2.81,
+      "est_distance_cm": 43.0,
+      "latency_s": 5.03,
+      "frame_path": "logs/frames/f5b10c5b77b9/kf_01.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable",
+          "dark rectangular floor strip",
+          "white wall",
+          "wall"
+        ],
+        "unexpected": [],
+        "description": "The black floor strip is clearly visible and appears to end near the far wall."
+      }
+    },
+    {
+      "kind": "look_left",
+      "target": "end of the black floor strip near the robot",
+      "known_count": 20,
+      "t_rel_s": 5.29,
+      "est_distance_cm": 80.9,
+      "latency_s": 5.24,
+      "frame_path": "logs/frames/f5b10c5b77b9/left_01.jpg",
+      "result": {
+        "objects": [
+          "wall",
+          "floor",
+          "dark opening"
+        ],
+        "target_visible": false,
+        "seen": [
+          "wall",
+          "white wall"
+        ],
+        "unexpected": [
+          "light-colored floor",
+          "dark opening"
+        ],
+        "description": "The camera faces a bare white wall and light-colored floor with a dark opening at the upper left, but the black floor strip is not visible."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "end of the black floor strip near the robot",
+      "known_count": 20,
+      "t_rel_s": 9.0,
+      "est_distance_cm": 137.8,
+      "latency_s": 5.38,
+      "frame_path": "logs/frames/f5b10c5b77b9/kf_02.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable",
+          "dark rectangular floor strip",
+          "white wall",
+          "wall"
+        ],
+        "unexpected": [],
+        "description": "A black floor strip is clearly visible ending at a horizontal dark strip on the floor."
+      }
+    },
+    {
+      "kind": "bend",
+      "side": "left",
+      "t_rel_s": 10.75,
+      "est_distance_cm": 164.5
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 11.66,
+      "est_distance_cm": 178.4
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 14.47,
+      "est_distance_cm": 221.5
+    },
+    {
+      "kind": "progress",
+      "target": "end of the black floor strip near the robot",
+      "known_count": 20,
+      "t_rel_s": 17.29,
+      "est_distance_cm": 264.5,
+      "latency_s": 4.84,
+      "frame_path": "logs/frames/f5b10c5b77b9/kf_03.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable",
+          "dark rectangular floor strip",
+          "loose black cable"
+        ],
+        "unexpected": [
+          "red ball",
+          "yellow object"
+        ],
+        "description": "The black floor strip runs straight ahead to its visible end, with cables crossing near the far edge."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 20.05,
+      "est_distance_cm": 306.8
+    }
+  ],
+  "look_left": {
+    "kind": "look_left",
+    "target": "end of the black floor strip near the robot",
+    "known_count": 20,
+    "t_rel_s": 5.29,
+    "est_distance_cm": 80.9,
+    "latency_s": 5.24,
+    "frame_path": "logs/frames/f5b10c5b77b9/left_01.jpg",
+    "result": {
+      "objects": [
+        "wall",
+        "floor",
+        "dark opening"
+      ],
+      "target_visible": false,
+      "seen": [
+        "wall",
+        "white wall"
+      ],
+      "unexpected": [
+        "light-colored floor",
+        "dark opening"
+      ],
+      "description": "The camera faces a bare white wall and light-colored floor with a dark opening at the upper left, but the black floor strip is not visible."
+    }
+  },
+  "arrival": {
+    "kind": "arrival",
+    "target": "end of the black floor strip",
+    "expected": [
+      "end of the black floor strip",
+      "wall"
+    ],
+    "known": [
+      "large white projection screen or whiteboard",
+      "black border around screen or whiteboard",
+      "yellow horizontal stripe",
+      "wall-mounted black monitor",
+      "black wall fan",
+      "loose black cable",
+      "tall equipment rack or cabinet",
+      "wooden vertical support or shelf side",
+      "electronic equipment",
+      "small white objects on shelf",
+      "wall outlet or switch",
+      "ceiling",
+      "wall",
+      "small wheeled robot",
+      "black floor strip or cable",
+      "dark rectangular floor strip",
+      "open storage cabinet or shelving unit",
+      "shelves inside storage unit",
+      "stored items",
+      "white wall"
+    ],
+    "t_rel_s": 22.98,
+    "latency_s": 6.91,
+    "frame_path": "logs/frames/f5b10c5b77b9/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "medium",
+      "seen": [
+        "black floor strip or cable"
+      ],
+      "missing": [
+        "wall"
+      ],
+      "unexpected": [],
+      "description": "A black strip or cable is visible diagonally across the floor and appears to end at the dark area near the back. The surrounding wall is not clearly visible."
+    }
+  },
+  "bends": [
+    {
+      "side": "left",
+      "t_rel_s": 10.75,
+      "est_distance_cm": 164.5
+    }
+  ],
+  "route_summary": "took 1 left bend",
+  "scene_id": "41002c4bd562",
+  "room_grounding": {
+    "known": [
+      "large white projection screen or whiteboard",
+      "black border around screen or whiteboard",
+      "yellow horizontal stripe",
+      "wall-mounted black monitor",
+      "black wall fan",
+      "loose black cable",
+      "tall equipment rack or cabinet",
+      "wooden vertical support or shelf side",
+      "electronic equipment",
+      "small white objects on shelf",
+      "wall outlet or switch",
+      "ceiling",
+      "wall",
+      "small wheeled robot",
+      "black floor strip or cable",
+      "dark rectangular floor strip",
+      "open storage cabinet or shelving unit",
+      "shelves inside storage unit",
+      "stored items",
+      "white wall"
+    ],
+    "seen": [
+      "black floor strip or cable",
+      "dark rectangular floor strip",
+      "loose black cable",
+      "wall",
+      "white wall"
+    ],
+    "never_seen": [
+      "black border around screen or whiteboard",
+      "black wall fan",
+      "ceiling",
+      "electronic equipment",
+      "large white projection screen or whiteboard",
+      "open storage cabinet or shelving unit",
+      "shelves inside storage unit",
+      "small wheeled robot",
+      "small white objects on shelf",
+      "stored items",
+      "tall equipment rack or cabinet",
+      "wall outlet or switch",
+      "wall-mounted black monitor",
+      "wooden vertical support or shelf side",
+      "yellow horizontal stripe"
+    ],
+    "unexpected": [
+      "dark opening",
+      "light-colored floor",
+      "red ball",
+      "yellow object"
+    ],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 436,
+    "t_start": 1790713961.657993,
+    "obstacle_events": 0,
+    "bends": [
+      "left"
+    ]
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 30.0,
+    "per_step_s": [
+      22.47,
+      0.5,
+      0.0
+    ],
+    "vlm_latency_mean_s": 5.48,
+    "vlm_latency_max_s": 6.91,
+    "checks_completed": 3,
+    "checks_skipped": 3,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "f354fbc3099a",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "drive toward a visible target until close to it",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 2,
+    "capped": true,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 9,
+      "latency_total_s": 43.897,
+      "latency_mean_s": 4.877,
+      "prompt_tokens_total": 14447,
+      "completion_tokens_total": 2984,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 5.046,
+      "latency_mean_s": 5.046,
+      "prompt_tokens_total": 2816,
+      "completion_tokens_total": 399,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: wall"
+    },
+    {
+      "code": "unexpected_objects",
+      "detail": "the rover reported 4 thing(s) the filmed room does not contain: dark opening, light-colored floor, red ball, yellow object \u2014 either the room changed or the model invented them"
+    }
+  ],
+  "spoken_summary": "Task completed: I followed the black floor strip and reached its end. The expected wall was not clearly visible, and the reported red ball was not in the filmed room."
+}

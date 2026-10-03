@@ -1,0 +1,180 @@
+{
+  "session_id": "b843e70af8c4",
+  "outcome": "executing",
+  "rover": "pi",
+  "command": "go to the chaire",
+  "resolved_command": "Go to the gray padded rolling chair beside the desk and window.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "gray padded rolling office chair beside the desk and window"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "gray padded rolling office chair beside the desk and window"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "gray padded rolling office chair beside the desk and window"
+      }
+    ],
+    "notes": "The target is the gray patterned rolling office chair in View 4, beside the desk and window. No floor line is specified, so approach is used."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "gray padded rolling office chair beside the desk and window"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "gray padded rolling office chair beside the desk and window"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "gray padded rolling office chair beside the desk and window"
+      }
+    ],
+    "notes": "The target is the gray patterned rolling office chair in View 4, beside the desk and window. No floor line is specified, so approach is used."
+  },
+  "plan_was_revised": false,
+  "steps": [],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "4f0c9e976543",
+  "room_grounding": {
+    "known": [
+      "large whiteboard",
+      "yellow-green mark or magnet",
+      "black flat-screen monitor or television",
+      "red indicator or mark on monitor",
+      "loose black cables",
+      "gray office chair",
+      "black chair components",
+      "window",
+      "white curtains",
+      "stack of papers or folders",
+      "green sticky note",
+      "wall poster or framed diagram",
+      "wooden vertical furniture panel",
+      "wall shelf or cabinet edge",
+      "blue and white items on shelf",
+      "black flat-screen display",
+      "wall-mount bracket",
+      "hanging cable bundle",
+      "wooden vertical post",
+      "framed graphic poster"
+    ],
+    "seen": [],
+    "never_seen": [
+      "black chair components",
+      "black flat-screen display",
+      "black flat-screen monitor or television",
+      "blue and white items on shelf",
+      "framed graphic poster",
+      "gray office chair",
+      "green sticky note",
+      "hanging cable bundle",
+      "large whiteboard",
+      "loose black cables",
+      "red indicator or mark on monitor",
+      "stack of papers or folders",
+      "wall poster or framed diagram",
+      "wall shelf or cabinet edge",
+      "wall-mount bracket",
+      "white curtains",
+      "window",
+      "wooden vertical furniture panel",
+      "wooden vertical post",
+      "yellow-green mark or magnet"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.01,
+    "per_step_s": [],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": "The gray rolling office chair is visible near the desk/window area, but loose monitor cables and the chair base are floor obstacles; approach with adequate clearance.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 3,
+      "latency_total_s": 11.906,
+      "latency_mean_s": 3.969,
+      "prompt_tokens_total": 7856,
+      "completion_tokens_total": 804,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 3.182,
+      "latency_mean_s": 3.182,
+      "prompt_tokens_total": 2562,
+      "completion_tokens_total": 189,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "I am executing the command to go to the gray padded rolling chair beside the desk and window. The route is a single straight run with no bends taken."
+}

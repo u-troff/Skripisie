@@ -1,0 +1,353 @@
+{
+  "session_id": "3c0436026784",
+  "outcome": "halted",
+  "rover": "pi",
+  "command": "Follow the black strip and scan to find the red ball along your path",
+  "resolved_command": "Follow the black strip while continuously looking around for the red ball, and stop when you detect it.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "black strip end marker while continuously looking for the red ball"
+      },
+      {
+        "id": 2,
+        "action": "stop",
+        "target": "immediately when the red ball is detected"
+      }
+    ],
+    "notes": "The rover must halt as soon as it detects the red ball; otherwise it continues following the black strip to its end marker."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "black strip end marker while continuously looking for the red ball"
+      },
+      {
+        "id": 2,
+        "action": "stop",
+        "target": "immediately when the red ball is detected"
+      }
+    ],
+    "notes": "The rover must halt as soon as it detects the red ball; otherwise it continues following the black strip to its end marker."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "black strip end marker while continuously looking for the red ball",
+      "status": "blocked",
+      "detail": {
+        "arrived": false,
+        "elapsed_s": 23.85,
+        "stopped_s": 0.8,
+        "obstacle_events": 0,
+        "reason": "line_timeout"
+      },
+      "elapsed_s": 24.1
+    }
+  ],
+  "checks": [
+    {
+      "kind": "progress",
+      "target": "black strip end marker while continuously looking for the red ball",
+      "aimed": "centre",
+      "known_count": 0,
+      "t_rel_s": 2.81,
+      "est_distance_cm": 43.0,
+      "latency_s": 4.64,
+      "frame_path": "logs/frames/3c0436026784/kf_01_centre.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "black floor strip"
+        ],
+        "unexpected": [
+          "doorway",
+          "wall",
+          "brown object"
+        ],
+        "description": "A black strip runs ahead on the clear floor, with no red ball or end marker visible."
+      }
+    },
+    {
+      "kind": "look_left",
+      "target": "black strip end marker while continuously looking for the red ball",
+      "aimed": "left",
+      "known_count": 0,
+      "t_rel_s": 5.26,
+      "est_distance_cm": 80.4,
+      "latency_s": 5.81,
+      "frame_path": "logs/frames/3c0436026784/left_01.jpg",
+      "result": {
+        "objects": [
+          "black strip end marker"
+        ],
+        "target_visible": true,
+        "seen": [
+          "black strip end marker"
+        ],
+        "unexpected": [
+          "wall",
+          "floor"
+        ],
+        "description": "A black strip runs along the base of the wall beside the pale floor, and no red ball is visible."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "black strip end marker while continuously looking for the red ball",
+      "aimed": "left",
+      "known_count": 0,
+      "t_rel_s": 8.64,
+      "est_distance_cm": 132.1,
+      "latency_s": 4.07,
+      "frame_path": "logs/frames/3c0436026784/kf_02_left.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "rover",
+          "floor line",
+          "floor"
+        ],
+        "unexpected": [],
+        "description": "The rover and floor line are visible, but no black strip end marker or red ball is seen."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 11.37,
+      "est_distance_cm": 174.0
+    },
+    {
+      "kind": "bend",
+      "side": "left",
+      "t_rel_s": 12.46,
+      "est_distance_cm": 190.6
+    },
+    {
+      "kind": "progress",
+      "target": "black strip end marker while continuously looking for the red ball",
+      "aimed": "right",
+      "known_count": 0,
+      "t_rel_s": 14.19,
+      "est_distance_cm": 217.0,
+      "latency_s": 2.74,
+      "frame_path": "logs/frames/3c0436026784/kf_03_right.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "floor"
+        ],
+        "unexpected": [
+          "dark furniture or object at the far edge"
+        ],
+        "description": "The floor ahead is clear, with no black end marker or red ball visible."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 16.8,
+      "est_distance_cm": 257.1
+    },
+    {
+      "kind": "progress",
+      "target": "black strip end marker while continuously looking for the red ball",
+      "aimed": "centre",
+      "known_count": 0,
+      "t_rel_s": 19.62,
+      "est_distance_cm": 300.1,
+      "latency_s": 3.54,
+      "frame_path": "logs/frames/3c0436026784/kf_04_centre.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": false,
+        "seen": [
+          "rover",
+          "floor"
+        ],
+        "unexpected": [
+          "person's foot and leg"
+        ],
+        "description": "A person's foot blocks part of the floor ahead, with no black end marker or red ball visible."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 22.24,
+      "est_distance_cm": 340.2
+    }
+  ],
+  "look_left": {
+    "kind": "look_left",
+    "target": "black strip end marker while continuously looking for the red ball",
+    "aimed": "left",
+    "known_count": 0,
+    "t_rel_s": 5.26,
+    "est_distance_cm": 80.4,
+    "latency_s": 5.81,
+    "frame_path": "logs/frames/3c0436026784/left_01.jpg",
+    "result": {
+      "objects": [
+        "black strip end marker"
+      ],
+      "target_visible": true,
+      "seen": [
+        "black strip end marker"
+      ],
+      "unexpected": [
+        "wall",
+        "floor"
+      ],
+      "description": "A black strip runs along the base of the wall beside the pale floor, and no red ball is visible."
+    }
+  },
+  "arrival": null,
+  "bends": [
+    {
+      "side": "left",
+      "t_rel_s": 12.46,
+      "est_distance_cm": 190.6
+    }
+  ],
+  "route_summary": "took 1 left bend",
+  "looked": {
+    "centre": 2,
+    "left": 2,
+    "right": 1
+  },
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "black floor strip",
+      "black strip end marker",
+      "brown object",
+      "dark furniture or object at the far edge",
+      "doorway",
+      "floor",
+      "floor line",
+      "person's foot and leg",
+      "rover",
+      "wall"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 646,
+    "t_start": 1790716190.4665868,
+    "obstacle_events": 0,
+    "bends": [
+      "left"
+    ]
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 24.18,
+    "per_step_s": [
+      24.1
+    ],
+    "vlm_latency_mean_s": 4.16,
+    "vlm_latency_max_s": 5.81,
+    "checks_completed": 4,
+    "checks_skipped": 3,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "f354fbc3099a",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "drive toward a visible target until close to it",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 8,
+      "latency_total_s": 29.281,
+      "latency_mean_s": 3.66,
+      "prompt_tokens_total": 2702,
+      "completion_tokens_total": 1951,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 6.972,
+      "latency_mean_s": 6.972,
+      "prompt_tokens_total": 258,
+      "completion_tokens_total": 599,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "no_arrival_check",
+      "detail": "the mission never reached an arrival check, so nothing confirms what the rover was looking at when it stopped"
+    },
+    {
+      "code": "path_not_clear",
+      "detail": "1 check(s) reported the path ahead was not clear"
+    },
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (line_timeout)"
+    },
+    {
+      "code": "line_timeout_after_bend",
+      "detail": "the drive timed out on a route with 1 bend(s) \u2014 a stop landing during a pivot turn cancels it and the rover resumes off the tape (known limitation, not a planning failure)"
+    },
+    {
+      "code": "ungrounded_checks",
+      "detail": "no room video was loaded, so the camera checks had nothing to be scored against \u2014 an empty 'unexpected' here is not evidence that nothing was hallucinated"
+    }
+  ],
+  "spoken_summary": "The rover halted after taking one left bend; the red ball was not visible when it saw the black strip end marker. The mission stopped before finishing due to a line timeout, and no arrival check confirms what it was looking at when it stopped."
+}

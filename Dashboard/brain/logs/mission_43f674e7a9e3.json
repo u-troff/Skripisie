@@ -1,0 +1,127 @@
+{
+  "session_id": "43f674e7a9e3",
+  "outcome": "executing",
+  "rover": "pi",
+  "command": "can you please drive this to us as possible to the red ball",
+  "resolved_command": "Drive as close as possible to the visible red ball without touching it.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "visible red ball, stopping as close as possible without touching it"
+      },
+      {
+        "id": 2,
+        "action": "stop",
+        "target": "current position"
+      }
+    ],
+    "notes": "Approach the red ball cautiously and halt just short of contact."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "visible red ball, stopping as close as possible without touching it"
+      },
+      {
+        "id": 2,
+        "action": "stop",
+        "target": "current position"
+      }
+    ],
+    "notes": "Approach the red ball cautiously and halt just short of contact."
+  },
+  "plan_was_revised": false,
+  "steps": [],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "looked": {},
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.0,
+    "per_step_s": [],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "f354fbc3099a",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "drive toward a visible target until close to it",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 3,
+      "latency_total_s": 8.793,
+      "latency_mean_s": 2.931,
+      "prompt_tokens_total": 1495,
+      "completion_tokens_total": 559,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 2.385,
+      "latency_mean_s": 2.385,
+      "prompt_tokens_total": 252,
+      "completion_tokens_total": 142,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "Executing the drive toward the visible red ball, staying as close as possible without touching it. The route is a single straight run with no bends taken."
+}

@@ -1,0 +1,433 @@
+{
+  "session_id": "d3ea8b7b3811",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "can you please go and find the red ball",
+  "resolved_command": "can you please go and find the red ball",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "the small red round object in the room corner beside the equipment wall"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "the small red round object"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "the small red round object"
+      }
+    ],
+    "notes": "The listed object matching a red ball is the small red round object on the white floor in View 2."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "the small red round object in the room corner beside the equipment wall"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "the small red round object"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "the small red round object"
+      }
+    ],
+    "notes": "The listed object matching a red ball is the small red round object on the white floor in View 2."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "the small red round object in the room corner beside the equipment wall",
+      "status": "ok",
+      "detail": {
+        "arrived": true,
+        "elapsed_s": 7.9,
+        "stopped_s": 0.82,
+        "obstacle_events": 0,
+        "target_confirmed": "the small red round object in the room corner beside the equipment wall"
+      },
+      "elapsed_s": 10.78
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "the small red round object",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.5
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "the small red round object",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "progress",
+      "target": "the small red round object in the room corner beside the equipment wall",
+      "aimed": "centre",
+      "known_count": 20,
+      "t_rel_s": 3.42,
+      "est_distance_cm": 52.4,
+      "latency_s": 5.46,
+      "frame_path": "logs/frames/d3ea8b7b3811/kf_01_centre.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": false,
+        "seen": [
+          "light beige tiled floor",
+          "black floor boundary strip",
+          "black equipment cabinet",
+          "white wall"
+        ],
+        "unexpected": [],
+        "description": "The black floor strip leads toward a cabinet blocking the way, and the red target is not visible."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "the small red round object in the room corner beside the equipment wall",
+      "aimed": "left",
+      "known_count": 20,
+      "t_rel_s": 4.14,
+      "est_distance_cm": 63.4,
+      "latency_s": 4.0,
+      "frame_path": "logs/frames/d3ea8b7b3811/kf_02_left.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "light beige tiled floor",
+          "yellow floor marking",
+          "small red round object",
+          "brown wooden vertical post",
+          "black metal shelving rack"
+        ],
+        "unexpected": [],
+        "description": "The small red round object is visible ahead on the tiled floor beside the yellow marking."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "the small red round object in the room corner beside the equipment wall",
+      "aimed": "right",
+      "known_count": 20,
+      "t_rel_s": 4.84,
+      "est_distance_cm": 74.1,
+      "latency_s": 3.93,
+      "frame_path": "logs/frames/d3ea8b7b3811/kf_03_right.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "light beige tiled floor",
+          "light-colored floor",
+          "white wall",
+          "black floor boundary strip",
+          "black wall or floor stripe"
+        ],
+        "unexpected": [],
+        "description": "The camera shows an open light-colored floor beside a pale wall with a dark boundary strip, but not the red object."
+      }
+    },
+    {
+      "kind": "look_left",
+      "target": "the small red round object in the room corner beside the equipment wall",
+      "aimed": "left",
+      "known_count": 20,
+      "t_rel_s": 5.24,
+      "est_distance_cm": 80.2,
+      "latency_s": 4.76,
+      "frame_path": "logs/frames/d3ea8b7b3811/left_01.jpg",
+      "result": {
+        "objects": [
+          "light beige tiled floor",
+          "black floor boundary strip",
+          "white wall",
+          "black equipment cabinet"
+        ],
+        "target_visible": false,
+        "seen": [
+          "light beige tiled floor",
+          "black floor boundary strip",
+          "white wall",
+          "black equipment cabinet"
+        ],
+        "unexpected": [],
+        "description": "The view shows a light tiled floor meeting a white wall with a black boundary strip and the edge of a black cabinet at left."
+      }
+    }
+  ],
+  "look_left": {
+    "kind": "look_left",
+    "target": "the small red round object in the room corner beside the equipment wall",
+    "aimed": "left",
+    "known_count": 20,
+    "t_rel_s": 5.24,
+    "est_distance_cm": 80.2,
+    "latency_s": 4.76,
+    "frame_path": "logs/frames/d3ea8b7b3811/left_01.jpg",
+    "result": {
+      "objects": [
+        "light beige tiled floor",
+        "black floor boundary strip",
+        "white wall",
+        "black equipment cabinet"
+      ],
+      "target_visible": false,
+      "seen": [
+        "light beige tiled floor",
+        "black floor boundary strip",
+        "white wall",
+        "black equipment cabinet"
+      ],
+      "unexpected": [],
+      "description": "The view shows a light tiled floor meeting a white wall with a black boundary strip and the edge of a black cabinet at left."
+    }
+  },
+  "arrival": {
+    "kind": "arrival",
+    "target": "the small red round object",
+    "expected": [
+      "the small red round object"
+    ],
+    "known": [
+      "light beige tiled floor",
+      "black floor boundary strip",
+      "yellow floor marking",
+      "black equipment cabinet",
+      "black electronic device",
+      "hanging black cables",
+      "wooden vertical support",
+      "left-side shelving or rack",
+      "stacked light-colored items",
+      "blue-and-white rectangular item",
+      "black overhead device",
+      "small yellow-and-black object",
+      "white wall",
+      "light-colored floor",
+      "black wall or floor stripe",
+      "small red round object",
+      "black metal shelving rack",
+      "brown wooden vertical post",
+      "black flat-screen monitor or television",
+      "black electronic equipment behind the monitor"
+    ],
+    "t_rel_s": 11.28,
+    "latency_s": 3.23,
+    "frame_path": "logs/frames/d3ea8b7b3811/arrival.jpg",
+    "result": {
+      "target_visible": false,
+      "confidence": "high",
+      "seen": [
+        "light beige tiled floor",
+        "black floor boundary strip",
+        "black equipment cabinet",
+        "white wall"
+      ],
+      "missing": [
+        "the small red round object"
+      ],
+      "unexpected": [],
+      "description": "The image shows a light tiled floor with a black boundary strip, a dark cabinet-like structure, and a white wall. The small red round object is not visible."
+    }
+  },
+  "target_confirmed": {
+    "kind": "progress",
+    "target": "the small red round object in the room corner beside the equipment wall",
+    "aimed": "left",
+    "known_count": 20,
+    "t_rel_s": 4.14,
+    "est_distance_cm": 63.4,
+    "latency_s": 4.0,
+    "frame_path": "logs/frames/d3ea8b7b3811/kf_02_left.jpg",
+    "result": {
+      "target_visible": true,
+      "path_clear": true,
+      "seen": [
+        "light beige tiled floor",
+        "yellow floor marking",
+        "small red round object",
+        "brown wooden vertical post",
+        "black metal shelving rack"
+      ],
+      "unexpected": [],
+      "description": "The small red round object is visible ahead on the tiled floor beside the yellow marking."
+    }
+  },
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "looked": {
+    "centre": 2,
+    "left": 2,
+    "right": 1
+  },
+  "scene_id": "a0e063e69665",
+  "room_grounding": {
+    "known": [
+      "light beige tiled floor",
+      "black floor boundary strip",
+      "yellow floor marking",
+      "black equipment cabinet",
+      "black electronic device",
+      "hanging black cables",
+      "wooden vertical support",
+      "left-side shelving or rack",
+      "stacked light-colored items",
+      "blue-and-white rectangular item",
+      "black overhead device",
+      "small yellow-and-black object",
+      "white wall",
+      "light-colored floor",
+      "black wall or floor stripe",
+      "small red round object",
+      "black metal shelving rack",
+      "brown wooden vertical post",
+      "black flat-screen monitor or television",
+      "black electronic equipment behind the monitor"
+    ],
+    "seen": [
+      "black equipment cabinet",
+      "black floor boundary strip",
+      "black metal shelving rack",
+      "black wall or floor stripe",
+      "brown wooden vertical post",
+      "light beige tiled floor",
+      "light-colored floor",
+      "small red round object",
+      "white wall",
+      "yellow floor marking"
+    ],
+    "never_seen": [
+      "black electronic device",
+      "black electronic equipment behind the monitor",
+      "black flat-screen monitor or television",
+      "black overhead device",
+      "blue-and-white rectangular item",
+      "hanging black cables",
+      "left-side shelving or rack",
+      "small yellow-and-black object",
+      "stacked light-colored items",
+      "wooden vertical support"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 1061,
+    "t_start": 1790807998.7037692,
+    "obstacle_events": 0,
+    "bends": []
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 15.1,
+    "per_step_s": [
+      10.78,
+      0.5,
+      0.0
+    ],
+    "vlm_latency_mean_s": 4.28,
+    "vlm_latency_max_s": 5.46,
+    "checks_completed": 3,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "f354fbc3099a",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "drive toward a visible target until close to it",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 7,
+      "latency_total_s": 30.101,
+      "latency_mean_s": 4.3,
+      "prompt_tokens_total": 9277,
+      "completion_tokens_total": 2082,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 2.758,
+      "latency_mean_s": 2.758,
+      "prompt_tokens_total": 2985,
+      "completion_tokens_total": 220,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "target_not_seen",
+      "detail": "the target was not visible at arrival"
+    },
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: the small red round object"
+    },
+    {
+      "code": "visibility_inconsistent",
+      "detail": "the target was visible on the way but not at arrival"
+    },
+    {
+      "code": "path_not_clear",
+      "detail": "1 check(s) reported the path ahead was not clear"
+    }
+  ],
+  "spoken_summary": "I completed the search for the small red round object. It was not visible at arrival, although it was visible on the way."
+}

@@ -1,0 +1,449 @@
+{
+  "session_id": "63c293d1881b",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "go to the chair",
+  "resolved_command": "Go to the dark gray metal-framed chair.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "dark gray medium metal-framed chair or exercise-equipment frame in View 1"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "dark gray medium metal-framed chair or exercise-equipment frame"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "dark gray medium metal-framed chair or exercise-equipment frame"
+      }
+    ],
+    "notes": "No floor line or end marker is identified or visible in View 1, so approach is used. Approach cautiously to avoid the nearby hanging cables and equipment frame."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "dark gray medium metal-framed chair or exercise-equipment frame in View 1"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "dark gray medium metal-framed chair or exercise-equipment frame"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "dark gray medium metal-framed chair or exercise-equipment frame"
+      }
+    ],
+    "notes": "No floor line or end marker is identified or visible in View 1, so approach is used. Approach cautiously to avoid the nearby hanging cables and equipment frame."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "dark gray medium metal-framed chair or exercise-equipment frame in View 1",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 5,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 32.84
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "dark gray medium metal-framed chair or exercise-equipment frame",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "dark gray medium metal-framed chair or exercise-equipment frame",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 7.89,
+      "bbox": [
+        191,
+        276,
+        468,
+        347
+      ],
+      "x_center": 0.515,
+      "fill": 0.064,
+      "bottom": 0.723,
+      "confidence": "medium",
+      "sharpness": 688.30908203125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 5.8,
+      "frame_path": "logs/frames/63c293d1881b/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 16.68,
+      "bbox": [
+        184,
+        151,
+        407,
+        345
+      ],
+      "x_center": 0.462,
+      "fill": 0.141,
+      "bottom": 0.719,
+      "confidence": "medium",
+      "sharpness": 724.0809326171875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=0 pivot_s=0.00 gate=confirmed",
+      "vlm_latency_s": 6.47,
+      "frame_path": "logs/frames/63c293d1881b/ap_lock_verify.jpg",
+      "bearing_deg": 0.84,
+      "pivot_requested_deg": 0.84,
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "residual_e": -0.038,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 21.48,
+      "bbox": [
+        111,
+        143,
+        394,
+        359
+      ],
+      "x_center": 0.395,
+      "fill": 0.199,
+      "bottom": 0.748,
+      "confidence": "medium",
+      "sharpness": 705.6558837890625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 15 gate=confirmed",
+      "vlm_latency_s": 2.97,
+      "frame_path": "logs/frames/63c293d1881b/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.77,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.141,
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 26.76,
+      "bbox": [
+        103,
+        0,
+        373,
+        361
+      ],
+      "x_center": 0.372,
+      "fill": 0.317,
+      "bottom": 0.752,
+      "confidence": "medium",
+      "sharpness": 620.8038330078125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 15 gate=confirmed",
+      "vlm_latency_s": 3.64,
+      "frame_path": "logs/frames/63c293d1881b/ap_04_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.76,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.199,
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 32.84,
+      "bbox": [
+        103,
+        0,
+        373,
+        361
+      ],
+      "x_center": 0.372,
+      "fill": 0.317,
+      "bottom": 0.752,
+      "confidence": "medium",
+      "sharpness": 620.8038330078125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1704,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 3.64,
+      "frame_path": "logs/frames/63c293d1881b/ap_04_check.jpg",
+      "hops_done": 2,
+      "fill_prev": 0.199,
+      "arrival_block": null
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "dark gray medium metal-framed chair or exercise-equipment frame in View 1",
+    "expected": [
+      "dark gray medium metal-framed chair or exercise-equipment frame in View 1"
+    ],
+    "known": [
+      "black flat-screen monitor or television",
+      "dark equipment cabinet or stand",
+      "hanging power and signal cables",
+      "metal-framed chair or exercise-equipment frame",
+      "two round black knobs or handles",
+      "wooden desk or table edge",
+      "window",
+      "white curtains",
+      "stack of white papers or folders",
+      "green small object",
+      "framed green-and-black poster or circuit-board print",
+      "blue-and-white book or binder",
+      "partial white wall picture or switch plate",
+      "wall-mounted black television or monitor",
+      "computer monitor displaying green graphics",
+      "wooden vertical post or shelf support",
+      "black tabletop or equipment shelf",
+      "hanging black cable",
+      "additional black cable",
+      "left wall-mounted round fixture"
+    ],
+    "t_rel_s": 26.76,
+    "latency_s": 5.4,
+    "frame_path": "logs/frames/63c293d1881b/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "dark equipment cabinet or stand",
+        "metal-framed chair or exercise-equipment frame",
+        "wooden desk or table edge",
+        "window",
+        "white curtains",
+        "computer monitor displaying green graphics",
+        "hanging black cable"
+      ],
+      "missing": [],
+      "unexpected": [
+        "yellow floor marking or tape",
+        "tiled floor"
+      ],
+      "description": "A dark wheeled metal-framed chair is clearly visible in the foreground beneath the desk. A monitor showing green graphics, a window with white curtains, and a black cable on the floor are also visible."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 5,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 0,
+    "chassis_spin_deg_total": 0.8,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": 0.84,
+    "residual_e_at_lock": -0.038,
+    "hops_done": 2,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 620.8,
+    "sharpness_median": 688.3,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 22.52,
+    "motion_time_s": 1.53,
+    "wall_time_s": 2.43,
+    "sonar_stops": 0,
+    "arrival_reason": "fill"
+  },
+  "looked": {
+    "centre": 6
+  },
+  "scene_id": "4c4f78912caf",
+  "room_grounding": {
+    "known": [
+      "black flat-screen monitor or television",
+      "dark equipment cabinet or stand",
+      "hanging power and signal cables",
+      "metal-framed chair or exercise-equipment frame",
+      "two round black knobs or handles",
+      "wooden desk or table edge",
+      "window",
+      "white curtains",
+      "stack of white papers or folders",
+      "green small object",
+      "framed green-and-black poster or circuit-board print",
+      "blue-and-white book or binder",
+      "partial white wall picture or switch plate",
+      "wall-mounted black television or monitor",
+      "computer monitor displaying green graphics",
+      "wooden vertical post or shelf support",
+      "black tabletop or equipment shelf",
+      "hanging black cable",
+      "additional black cable",
+      "left wall-mounted round fixture"
+    ],
+    "seen": [
+      "computer monitor displaying green graphics",
+      "dark equipment cabinet or stand",
+      "hanging black cable",
+      "metal-framed chair or exercise-equipment frame",
+      "white curtains",
+      "window",
+      "wooden desk or table edge"
+    ],
+    "never_seen": [
+      "additional black cable",
+      "black flat-screen monitor or television",
+      "black tabletop or equipment shelf",
+      "blue-and-white book or binder",
+      "framed green-and-black poster or circuit-board print",
+      "green small object",
+      "hanging power and signal cables",
+      "left wall-mounted round fixture",
+      "partial white wall picture or switch plate",
+      "stack of white papers or folders",
+      "two round black knobs or handles",
+      "wall-mounted black television or monitor",
+      "wooden vertical post or shelf support"
+    ],
+    "unexpected": [
+      "tiled floor",
+      "yellow floor marking or tape"
+    ],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 33.34,
+    "per_step_s": [
+      32.84,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 5.4,
+    "vlm_latency_max_s": 5.4,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": false,
+    "concerns": "The plan targets a floor line end marker, but no floor line or end marker is identified or visible in View 1. The approach to the dark gray metal-framed chair also requires avoiding nearby hanging cables and the equipment frame.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 8,
+      "latency_total_s": 32.758,
+      "latency_mean_s": 4.095,
+      "prompt_tokens_total": 10719,
+      "completion_tokens_total": 2714,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 5.358,
+      "latency_mean_s": 2.679,
+      "prompt_tokens_total": 5358,
+      "completion_tokens_total": 478,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "unexpected_objects",
+      "detail": "the rover reported 2 thing(s) the filmed room does not contain: tiled floor, yellow floor marking or tape \u2014 either the room changed or the model invented them"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    }
+  ],
+  "spoken_summary": "Command completed: I reached the dark gray metal-framed chair. Arrival was decided by vision only; sonar did not confirm it."
+}

@@ -1,0 +1,464 @@
+{
+  "session_id": "69ebe46cc023",
+  "outcome": "halted",
+  "rover": "pi",
+  "command": "can you go to the card board box",
+  "resolved_command": "Drive to the brown-and-white cardboard box with the black-and-yellow gear symbol on its front, located on the surface to the right of the central black electronic unit.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "brown-and-white cardboard box with the black-and-yellow gear symbol on its front"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "brown-and-white cardboard box with the black-and-yellow gear symbol on its front"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "brown-and-white cardboard box with the black-and-yellow gear symbol on its front"
+      }
+    ],
+    "notes": "The box is on the surface to the right of the central black electronic unit in View 2. No interaction with the box is possible."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "brown-and-white cardboard box with the black-and-yellow gear symbol on its front"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "brown-and-white cardboard box with the black-and-yellow gear symbol on its front"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "brown-and-white cardboard box with the black-and-yellow gear symbol on its front"
+      }
+    ],
+    "notes": "The box is on the surface to the right of the central black electronic unit in View 2. No interaction with the box is possible."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "brown-and-white cardboard box with the black-and-yellow gear symbol on its front",
+      "status": "blocked",
+      "detail": {
+        "reason": "target_not_found",
+        "cycles": 8
+      },
+      "elapsed_s": 36.54
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 5.51,
+      "bbox": [
+        255,
+        327,
+        351,
+        411
+      ],
+      "x_center": 0.473,
+      "fill": 0.026,
+      "bottom": 0.856,
+      "confidence": "high",
+      "sharpness": 415.3619689941406,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 3.55,
+      "frame_path": "logs/frames/69ebe46cc023/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 10.75,
+      "bbox": [
+        255,
+        327,
+        351,
+        413
+      ],
+      "x_center": 0.473,
+      "fill": 0.027,
+      "bottom": 0.86,
+      "confidence": "high",
+      "sharpness": 447.9828186035156,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=0 pivot_s=0.00 gate=confirmed",
+      "vlm_latency_s": 2.96,
+      "frame_path": "logs/frames/69ebe46cc023/ap_lock_verify.jpg",
+      "bearing_deg": -1.51,
+      "pivot_requested_deg": -1.51,
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "residual_e": -0.027,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 15.94,
+      "bbox": [
+        221,
+        330,
+        336,
+        435
+      ],
+      "x_center": 0.435,
+      "fill": 0.039,
+      "bottom": 0.906,
+      "confidence": "high",
+      "sharpness": 369.2330627441406,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 30 gate=confirmed",
+      "vlm_latency_s": 2.78,
+      "frame_path": "logs/frames/69ebe46cc023/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 1.47,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.027,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 20.89,
+      "bbox": [
+        160,
+        307,
+        304,
+        439
+      ],
+      "x_center": 0.362,
+      "fill": 0.062,
+      "bottom": 0.915,
+      "confidence": "high",
+      "sharpness": 284.60162353515625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 30 gate=confirmed",
+      "vlm_latency_s": 2.58,
+      "frame_path": "logs/frames/69ebe46cc023/ap_04_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 1.46,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.039,
+      "reject_reason": null,
+      "arrival_block": "vision_arrival_sonar_contradicted"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 25.86,
+      "bbox": [
+        0,
+        274,
+        148,
+        457
+      ],
+      "x_center": 0.116,
+      "fill": 0.088,
+      "bottom": 0.952,
+      "confidence": "high",
+      "sharpness": 170.14097595214844,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot L 0.07s hop 30 gate=confirmed",
+      "vlm_latency_s": 2.47,
+      "frame_path": "logs/frames/69ebe46cc023/ap_05_check.jpg",
+      "pivot_cmd_s": 0.06549152542372882,
+      "pivot_dir": -1,
+      "hop_moved_s": 1.47,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.062,
+      "reject_reason": null,
+      "arrival_block": "vision_arrival_sonar_contradicted"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 29.83,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": 34.22957229614258,
+      "frame_attempts": 3,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "pivot L 0.18s hop 15 gate=skipped_blurry",
+      "vlm_latency_s": null,
+      "frame_path": "logs/frames/69ebe46cc023/ap_06_check.jpg",
+      "pivot_cmd_s": 0.18223728813559323,
+      "pivot_dir": -1,
+      "hop_moved_s": 0.76,
+      "gate": "skipped_blurry",
+      "hops_done": 4,
+      "fill_prev": 0.088,
+      "reject_reason": "skipped_blurry",
+      "arrival_block": "vision_arrival_sonar_contradicted"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 33.47,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": 50.047630310058594,
+      "frame_attempts": 3,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "hop_back 0.6s gate=skipped_blurry",
+      "vlm_latency_s": null,
+      "frame_path": "logs/frames/69ebe46cc023/ap_07_lostlook.jpg",
+      "gate": "skipped_blurry",
+      "hop_moved_s": 0.65
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 8,
+      "phase": "approach",
+      "t_rel_s": 36.54,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": 50.71025848388672,
+      "frame_attempts": 3,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "relocate_look gate=skipped_blurry",
+      "vlm_latency_s": null,
+      "frame_path": "logs/frames/69ebe46cc023/ap_08_relocate.jpg",
+      "gate": "skipped_blurry"
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 8,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 2,
+    "chassis_spin_deg_total": -1.5,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -1.51,
+    "residual_e_at_lock": -0.027,
+    "hops_done": 5,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 34.2,
+    "sharpness_median": 284.6,
+    "detections_rejected": {
+      "skipped_blurry": 1
+    },
+    "arrival_cross_check": null,
+    "gimbal_only_lock": null,
+    "vlm_time_s": 14.34,
+    "motion_time_s": 6.06,
+    "wall_time_s": 16.69,
+    "sonar_stops": 0,
+    "arrival_reason": "target_not_found"
+  },
+  "looked": {
+    "centre": 8
+  },
+  "scene_id": "250c4f913de6",
+  "room_grounding": {
+    "known": [
+      "window",
+      "horizontal window blinds or slats",
+      "dark wall poster or sign",
+      "white control panel or appliance",
+      "green object",
+      "vertical wooden beam",
+      "black wall-mounted equipment cabinet",
+      "black upper shelf or housing",
+      "black horizontal cable or conduit",
+      "hanging electrical cables",
+      "cardboard box",
+      "red circular wall device",
+      "small black cable loop or connector",
+      "curtain",
+      "computer monitor",
+      "screen contents",
+      "green potted plant",
+      "plant pot",
+      "black rectangular electronic unit",
+      "black horizontal shelf or bracket"
+    ],
+    "seen": [],
+    "never_seen": [
+      "black horizontal cable or conduit",
+      "black horizontal shelf or bracket",
+      "black rectangular electronic unit",
+      "black upper shelf or housing",
+      "black wall-mounted equipment cabinet",
+      "cardboard box",
+      "computer monitor",
+      "curtain",
+      "dark wall poster or sign",
+      "green object",
+      "green potted plant",
+      "hanging electrical cables",
+      "horizontal window blinds or slats",
+      "plant pot",
+      "red circular wall device",
+      "screen contents",
+      "small black cable loop or connector",
+      "vertical wooden beam",
+      "white control panel or appliance",
+      "window"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 36.63,
+    "per_step_s": [
+      36.54
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 8,
+      "latency_total_s": 22.798,
+      "latency_mean_s": 2.85,
+      "prompt_tokens_total": 8517,
+      "completion_tokens_total": 1259,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 3.293,
+      "latency_mean_s": 3.293,
+      "prompt_tokens_total": 2027,
+      "completion_tokens_total": 234,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (target_not_found)"
+    },
+    {
+      "code": "target_lost_repeatedly",
+      "detail": "the target was lost and re-acquired 2 time(s) during the approach"
+    },
+    {
+      "code": "hallucinated_box_rejected",
+      "detail": "1 detection(s) were rejected as implausible (skipped_blurry) \u2014 counted, not believed"
+    },
+    {
+      "code": "vision_arrival_sonar_contradicted",
+      "detail": "3 time(s) vision reported the target close enough to arrive while sonar still read it as far away \u2014 vision was not trusted, the rover kept approaching"
+    },
+    {
+      "code": "arrival_unconfirmed",
+      "detail": "the approach ended without a confirmed arrival"
+    }
+  ],
+  "spoken_summary": "The rover halted before reaching the brown-and-white cardboard box with the black-and-yellow gear symbol. The target was lost and reacquired twice, and arrival was not confirmed."
+}

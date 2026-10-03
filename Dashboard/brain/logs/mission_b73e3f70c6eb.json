@@ -1,0 +1,180 @@
+{
+  "session_id": "b73e3f70c6eb",
+  "outcome": "executing",
+  "rover": "pi",
+  "command": "go to the chair",
+  "resolved_command": "Go to the dark gray and black office chair in front of the desk.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "dark gray and black office chair in front of the desk"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "dark gray and black office chair in front of the desk"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "dark gray and black office chair in front of the desk"
+      }
+    ],
+    "notes": ""
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "dark gray and black office chair in front of the desk"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "dark gray and black office chair in front of the desk"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "dark gray and black office chair in front of the desk"
+      }
+    ],
+    "notes": ""
+  },
+  "plan_was_revised": false,
+  "steps": [],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "83941849bdbe",
+  "room_grounding": {
+    "known": [
+      "large whiteboard",
+      "wooden desk",
+      "computer monitor",
+      "monitor indicator light",
+      "computer cables",
+      "office chair",
+      "chair backrest",
+      "chair armrests",
+      "window",
+      "curtains",
+      "framed circuit-board poster",
+      "blue-and-white wall sign",
+      "stack of papers or folders",
+      "blue-and-white rectangular panel",
+      "small green wall object",
+      "small ceiling light or ceiling mark",
+      "large white tiled wall",
+      "black horizontal wall stripe",
+      "computer monitor screen",
+      "large black computer tower"
+    ],
+    "seen": [],
+    "never_seen": [
+      "black horizontal wall stripe",
+      "blue-and-white rectangular panel",
+      "blue-and-white wall sign",
+      "chair armrests",
+      "chair backrest",
+      "computer cables",
+      "computer monitor",
+      "computer monitor screen",
+      "curtains",
+      "framed circuit-board poster",
+      "large black computer tower",
+      "large white tiled wall",
+      "large whiteboard",
+      "monitor indicator light",
+      "office chair",
+      "small ceiling light or ceiling mark",
+      "small green wall object",
+      "stack of papers or folders",
+      "window",
+      "wooden desk"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.01,
+    "per_step_s": [],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": "The office chair is present and can be observed. Approach carefully around the chair base and nearby hanging/trailing computer cables.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 3,
+      "latency_total_s": 8.02,
+      "latency_mean_s": 2.673,
+      "prompt_tokens_total": 7991,
+      "completion_tokens_total": 539,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 2.852,
+      "latency_mean_s": 2.852,
+      "prompt_tokens_total": 2614,
+      "completion_tokens_total": 195,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "Executing: going to the dark gray and black office chair in front of the desk. The route was a single straight run with no sonar obstacle events."
+}

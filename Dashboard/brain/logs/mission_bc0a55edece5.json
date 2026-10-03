@@ -1,0 +1,317 @@
+{
+  "session_id": "bc0a55edece5",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "can you go to the red bal",
+  "resolved_command": "Go to the red circular wall marker.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "red circular wall marker"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "red circular wall marker"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "red circular wall marker"
+      }
+    ],
+    "notes": "Red circular wall markers are present in multiple views; approach the visible one."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "red circular wall marker"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "red circular wall marker"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "red circular wall marker"
+      }
+    ],
+    "notes": "Red circular wall markers are present in multiple views; approach the visible one."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "red circular wall marker",
+      "status": "ok",
+      "detail": {
+        "reason": "bottom",
+        "cycles": 1
+      },
+      "elapsed_s": 9.72
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "red circular wall marker",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "red circular wall marker",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 0,
+      "phase": "search",
+      "t_rel_s": 2.66,
+      "bbox": [
+        325,
+        427,
+        345,
+        446
+      ],
+      "x_center": 0.523,
+      "fill": 0.001,
+      "bottom": 0.929,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "initial_look",
+      "vlm_latency_s": 2.38,
+      "frame_path": "logs/frames/bc0a55edece5/ap_00_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "approach",
+      "t_rel_s": 2.66,
+      "bbox": [
+        325,
+        427,
+        345,
+        446
+      ],
+      "x_center": 0.523,
+      "fill": 0.001,
+      "bottom": 0.929,
+      "confidence": "high",
+      "sonar_mm": 2248,
+      "action": "arrived",
+      "vlm_latency_s": 2.38,
+      "frame_path": "logs/frames/bc0a55edece5/ap_01_arrived.jpg"
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "red circular wall marker",
+    "expected": [
+      "red circular wall marker"
+    ],
+    "known": [
+      "light-colored tiled floor",
+      "black floor marking strip",
+      "yellow floor marking strip",
+      "dark storage shelving unit",
+      "items on storage shelves",
+      "large black equipment cabinet or computer tower",
+      "blue indicator lights",
+      "red indicator light",
+      "cable",
+      "dark patterned chair or seat",
+      "chair or equipment support legs",
+      "vertical metal stand",
+      "angled support rods",
+      "small black circular fixture",
+      "small red circular object",
+      "mobile robot or robotic vehicle",
+      "yellow-and-black striped bumper or component",
+      "robot camera or sensor assembly",
+      "purple-blue robot lights",
+      "dark horizontal wall or floor trim"
+    ],
+    "t_rel_s": 2.66,
+    "latency_s": 6.26,
+    "frame_path": "logs/frames/bc0a55edece5/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "medium",
+      "seen": [
+        "light-colored tiled floor",
+        "yellow floor marking strip",
+        "large black equipment cabinet or computer tower",
+        "blue indicator lights",
+        "small red circular object",
+        "chair or equipment support legs",
+        "vertical metal stand",
+        "angled support rods",
+        "dark horizontal wall or floor trim"
+      ],
+      "missing": [],
+      "unexpected": [],
+      "description": "A small red circular marker is clearly visible near the center of the tiled floor. It appears on the floor rather than mounted on the wall."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 1,
+    "search_steps_used": 1,
+    "vlm_time_s": 4.76,
+    "motion_time_s": 0,
+    "sonar_stops": 0,
+    "arrival_reason": "bottom"
+  },
+  "looked": {
+    "centre": 3
+  },
+  "scene_id": "917f37f65dbe",
+  "room_grounding": {
+    "known": [
+      "light-colored tiled floor",
+      "black floor marking strip",
+      "yellow floor marking strip",
+      "dark storage shelving unit",
+      "items on storage shelves",
+      "large black equipment cabinet or computer tower",
+      "blue indicator lights",
+      "red indicator light",
+      "cable",
+      "dark patterned chair or seat",
+      "chair or equipment support legs",
+      "vertical metal stand",
+      "angled support rods",
+      "small black circular fixture",
+      "small red circular object",
+      "mobile robot or robotic vehicle",
+      "yellow-and-black striped bumper or component",
+      "robot camera or sensor assembly",
+      "purple-blue robot lights",
+      "dark horizontal wall or floor trim"
+    ],
+    "seen": [
+      "angled support rods",
+      "blue indicator lights",
+      "chair or equipment support legs",
+      "dark horizontal wall or floor trim",
+      "large black equipment cabinet or computer tower",
+      "light-colored tiled floor",
+      "small red circular object",
+      "vertical metal stand",
+      "yellow floor marking strip"
+    ],
+    "never_seen": [
+      "black floor marking strip",
+      "cable",
+      "dark patterned chair or seat",
+      "dark storage shelving unit",
+      "items on storage shelves",
+      "mobile robot or robotic vehicle",
+      "purple-blue robot lights",
+      "red indicator light",
+      "robot camera or sensor assembly",
+      "small black circular fixture",
+      "yellow-and-black striped bumper or component"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 10.23,
+    "per_step_s": [
+      9.72,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 6.26,
+    "vlm_latency_max_s": 6.26,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 5,
+      "latency_total_s": 19.504,
+      "latency_mean_s": 3.901,
+      "prompt_tokens_total": 9379,
+      "completion_tokens_total": 1542,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 2.447,
+      "latency_mean_s": 2.447,
+      "prompt_tokens_total": 2704,
+      "completion_tokens_total": 167,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (bottom) \u2014 sonar did not confirm"
+    }
+  ],
+  "spoken_summary": "Completed a single straight run to the red circular marker. It was visible near the center of the tiled floor and appeared to be on the floor rather than mounted on the wall. Arrival was decided by vision only; sonar did not confirm it."
+}

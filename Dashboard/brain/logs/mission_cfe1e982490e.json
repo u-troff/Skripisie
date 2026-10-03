@@ -1,0 +1,538 @@
+{
+  "session_id": "cfe1e982490e",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "go to chair",
+  "resolved_command": "Go to the gray upholstered office chair in View 1, in front of the workstation.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "gray upholstered office chair in View 1, in front of the workstation"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "gray upholstered office chair in View 1"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "gray upholstered office chair in View 1"
+      }
+    ],
+    "notes": "Approach the chair while avoiding the chair base, casters, workstation supports, and nearby cables."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "gray upholstered office chair in View 1, in front of the workstation"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "gray upholstered office chair in View 1"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "gray upholstered office chair in View 1"
+      }
+    ],
+    "notes": "Approach the chair while avoiding the chair base, casters, workstation supports, and nearby cables."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "gray upholstered office chair in View 1, in front of the workstation",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 8,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 51.15
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "gray upholstered office chair in View 1",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "gray upholstered office chair in View 1",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 5.71,
+      "bbox": [
+        174,
+        0,
+        438,
+        369
+      ],
+      "x_center": 0.478,
+      "fill": 0.317,
+      "bottom": 0.769,
+      "confidence": "medium",
+      "sharpness": 614.662109375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 3.79,
+      "frame_path": "logs/frames/cfe1e982490e/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 12.09,
+      "bbox": [
+        145,
+        0,
+        395,
+        367
+      ],
+      "x_center": 0.422,
+      "fill": 0.299,
+      "bottom": 0.765,
+      "confidence": "medium",
+      "sharpness": 621.4248046875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=0 pivot_s=0.00 gate=confirmed",
+      "vlm_latency_s": 4.09,
+      "frame_path": "logs/frames/cfe1e982490e/ap_lock_verify.jpg",
+      "bearing_deg": -1.23,
+      "pivot_requested_deg": -1.23,
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "residual_e": -0.078,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 17.38,
+      "bbox": [
+        173,
+        0,
+        431,
+        370
+      ],
+      "x_center": 0.472,
+      "fill": 0.311,
+      "bottom": 0.771,
+      "confidence": "high",
+      "sharpness": 859.4076538085938,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 15 gate=confirmed",
+      "vlm_latency_s": 3.52,
+      "frame_path": "logs/frames/cfe1e982490e/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.76,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.299,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 22.56,
+      "bbox": [
+        139,
+        0,
+        470,
+        370
+      ],
+      "x_center": 0.476,
+      "fill": 0.399,
+      "bottom": 0.771,
+      "confidence": "high",
+      "sharpness": 787.9385375976562,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 15 gate=confirmed",
+      "vlm_latency_s": 3.41,
+      "frame_path": "logs/frames/cfe1e982490e/ap_04_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.76,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.311,
+      "reject_reason": null,
+      "arrival_block": "vision_arrival_sonar_contradicted"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 28.13,
+      "bbox": [
+        78,
+        0,
+        480,
+        386
+      ],
+      "x_center": 0.436,
+      "fill": 0.505,
+      "bottom": 0.804,
+      "confidence": "high",
+      "sharpness": 712.6721801757812,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 15 gate=confirmed",
+      "vlm_latency_s": 3.9,
+      "frame_path": "logs/frames/cfe1e982490e/ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.76,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.399,
+      "reject_reason": null,
+      "arrival_block": "vision_arrival_sonar_contradicted"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 35.24,
+      "bbox": [
+        78,
+        0,
+        438,
+        388
+      ],
+      "x_center": 0.403,
+      "fill": 0.455,
+      "bottom": 0.808,
+      "confidence": "medium",
+      "sharpness": 541.0469360351562,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 15 gate=confirmed",
+      "vlm_latency_s": 5.4,
+      "frame_path": "logs/frames/cfe1e982490e/ap_06_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.76,
+      "gate": "confirmed",
+      "hops_done": 4,
+      "fill_prev": 0.505,
+      "reject_reason": null,
+      "arrival_block": "vision_arrival_sonar_contradicted"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 43.68,
+      "bbox": [
+        74,
+        0,
+        557,
+        324
+      ],
+      "x_center": 0.493,
+      "fill": 0.509,
+      "bottom": 0.675,
+      "confidence": "medium",
+      "sharpness": 522.20703125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 15 gate=confirmed",
+      "vlm_latency_s": 6.68,
+      "frame_path": "logs/frames/cfe1e982490e/ap_07_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.76,
+      "gate": "confirmed",
+      "hops_done": 5,
+      "fill_prev": 0.455,
+      "reject_reason": null,
+      "arrival_block": "vision_arrival_sonar_contradicted"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 8,
+      "phase": "approach",
+      "t_rel_s": 51.15,
+      "bbox": [
+        74,
+        0,
+        557,
+        324
+      ],
+      "x_center": 0.493,
+      "fill": 0.509,
+      "bottom": 0.675,
+      "confidence": "medium",
+      "sharpness": 522.20703125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 663,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 6.68,
+      "frame_path": "logs/frames/cfe1e982490e/ap_07_check.jpg",
+      "hops_done": 5,
+      "fill_prev": 0.455,
+      "arrival_block": null
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "gray upholstered office chair in View 1, in front of the workstation",
+    "expected": [
+      "gray upholstered office chair in View 1, in front of the workstation",
+      "office chair"
+    ],
+    "known": [
+      "window",
+      "curtains",
+      "wall-mounted picture or poster",
+      "small green item",
+      "wooden desk or cabinet",
+      "computer monitor or television",
+      "computer equipment",
+      "hanging cables",
+      "office chair",
+      "chair armrests",
+      "chair base and casters",
+      "two round wall fixtures",
+      "large white rectangular wall panel or whiteboard",
+      "yellow-green mark or item",
+      "partial wall-mounted frame",
+      "blue and white items",
+      "large black speaker",
+      "black speaker mounting frame",
+      "audio cables",
+      "wooden board or post"
+    ],
+    "t_rel_s": 43.69,
+    "latency_s": 6.83,
+    "frame_path": "logs/frames/cfe1e982490e/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "medium",
+      "seen": [
+        "office chair",
+        "chair base and casters",
+        "hanging cables"
+      ],
+      "missing": [],
+      "unexpected": [],
+      "description": "The underside of an office chair is visible, including its central support, base, and casters. Cables are also visible in the background."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 8,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 0,
+    "chassis_spin_deg_total": -1.2,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -1.23,
+    "residual_e_at_lock": -0.078,
+    "hops_done": 5,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 522.2,
+    "sharpness_median": 621.4,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 37.47,
+    "motion_time_s": 3.8,
+    "wall_time_s": 7.97,
+    "sonar_stops": 0,
+    "arrival_reason": "fill"
+  },
+  "looked": {
+    "centre": 9
+  },
+  "scene_id": "675cb797eb48",
+  "room_grounding": {
+    "known": [
+      "window",
+      "curtains",
+      "wall-mounted picture or poster",
+      "small green item",
+      "wooden desk or cabinet",
+      "computer monitor or television",
+      "computer equipment",
+      "hanging cables",
+      "office chair",
+      "chair armrests",
+      "chair base and casters",
+      "two round wall fixtures",
+      "large white rectangular wall panel or whiteboard",
+      "yellow-green mark or item",
+      "partial wall-mounted frame",
+      "blue and white items",
+      "large black speaker",
+      "black speaker mounting frame",
+      "audio cables",
+      "wooden board or post"
+    ],
+    "seen": [
+      "chair base and casters",
+      "hanging cables",
+      "office chair"
+    ],
+    "never_seen": [
+      "audio cables",
+      "black speaker mounting frame",
+      "blue and white items",
+      "chair armrests",
+      "computer equipment",
+      "computer monitor or television",
+      "curtains",
+      "large black speaker",
+      "large white rectangular wall panel or whiteboard",
+      "partial wall-mounted frame",
+      "small green item",
+      "two round wall fixtures",
+      "wall-mounted picture or poster",
+      "window",
+      "wooden board or post",
+      "wooden desk or cabinet",
+      "yellow-green mark or item"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 51.66,
+    "per_step_s": [
+      51.15,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 6.83,
+    "vlm_latency_max_s": 6.83,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 11,
+      "latency_total_s": 45.733,
+      "latency_mean_s": 4.158,
+      "prompt_tokens_total": 11826,
+      "completion_tokens_total": 3100,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 3.194,
+      "latency_mean_s": 3.194,
+      "prompt_tokens_total": 2593,
+      "completion_tokens_total": 214,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    },
+    {
+      "code": "vision_arrival_sonar_contradicted",
+      "detail": "4 time(s) vision reported the target close enough to arrive while sonar still read it as far away \u2014 vision was not trusted, the rover kept approaching"
+    }
+  ],
+  "spoken_summary": "Command completed: the rover went to the gray upholstered office chair in View 1, in front of the workstation. Arrival was decided by vision only; sonar did not confirm."
+}

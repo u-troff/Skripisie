@@ -1,0 +1,354 @@
+{
+  "session_id": "8ea14fa12a60",
+  "outcome": "halted",
+  "rover": "pi",
+  "command": "drive towards the chair in view",
+  "resolved_command": "Drive towards the purple-and-gray geometric patterned chair in View 5.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "purple-and-gray geometric patterned fabric upholstered chair in View 5"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "purple-and-gray geometric patterned fabric upholstered chair in View 5"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "purple-and-gray geometric patterned fabric upholstered chair in View 5"
+      }
+    ],
+    "notes": "No floor line is identified in View 5, so approach is used to travel toward the chair. The rover cannot touch, move, or pick up the chair."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "purple-and-gray geometric patterned fabric upholstered chair in View 5"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "purple-and-gray geometric patterned fabric upholstered chair in View 5"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "purple-and-gray geometric patterned fabric upholstered chair in View 5"
+      }
+    ],
+    "notes": "No floor line is identified in View 5, so approach is used to travel toward the chair. The rover cannot touch, move, or pick up the chair."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "purple-and-gray geometric patterned fabric upholstered chair in View 5",
+      "status": "blocked",
+      "detail": {
+        "reason": "target_not_found",
+        "cycles": 8
+      },
+      "elapsed_s": 23.96
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 0,
+      "phase": "search",
+      "t_rel_s": 1.89,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "initial_look",
+      "vlm_latency_s": 1.78,
+      "frame_path": "logs/frames/8ea14fa12a60/ap_00_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 4.19,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 1.64,
+      "frame_path": "logs/frames/8ea14fa12a60/ap_01_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "search",
+      "t_rel_s": 7.56,
+      "bbox": [
+        0,
+        0,
+        639,
+        421
+      ],
+      "x_center": 0.499,
+      "fill": 0.876,
+      "bottom": 0.877,
+      "confidence": "low",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 2.69,
+      "frame_path": "logs/frames/8ea14fa12a60/ap_02_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "search",
+      "t_rel_s": 9.8,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 1.56,
+      "frame_path": "logs/frames/8ea14fa12a60/ap_03_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "search",
+      "t_rel_s": 13.78,
+      "bbox": [
+        0,
+        0,
+        639,
+        223
+      ],
+      "x_center": 0.499,
+      "fill": 0.464,
+      "bottom": 0.465,
+      "confidence": "low",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 3.33,
+      "frame_path": "logs/frames/8ea14fa12a60/ap_04_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "search",
+      "t_rel_s": 15.97,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 1.52,
+      "frame_path": "logs/frames/8ea14fa12a60/ap_05_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "search",
+      "t_rel_s": 18.45,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 1.74,
+      "frame_path": "logs/frames/8ea14fa12a60/ap_06_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "search",
+      "t_rel_s": 21.49,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 2.23,
+      "frame_path": "logs/frames/8ea14fa12a60/ap_07_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 8,
+      "phase": "search",
+      "t_rel_s": 23.96,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 1.69,
+      "frame_path": "logs/frames/8ea14fa12a60/ap_08_search.jpg"
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 8,
+    "search_steps_used": 9,
+    "vlm_time_s": 18.18,
+    "motion_time_s": 3.89,
+    "sonar_stops": 0,
+    "arrival_reason": "target_not_found"
+  },
+  "looked": {
+    "centre": 9
+  },
+  "scene_id": "917f37f65dbe",
+  "room_grounding": {
+    "known": [
+      "light-colored tiled floor",
+      "black floor marking strip",
+      "yellow floor marking strip",
+      "dark storage shelving unit",
+      "items on storage shelves",
+      "large black equipment cabinet or computer tower",
+      "blue indicator lights",
+      "red indicator light",
+      "cable",
+      "dark patterned chair or seat",
+      "chair or equipment support legs",
+      "vertical metal stand",
+      "angled support rods",
+      "small black circular fixture",
+      "small red circular object",
+      "mobile robot or robotic vehicle",
+      "yellow-and-black striped bumper or component",
+      "robot camera or sensor assembly",
+      "purple-blue robot lights",
+      "dark horizontal wall or floor trim"
+    ],
+    "seen": [],
+    "never_seen": [
+      "angled support rods",
+      "black floor marking strip",
+      "blue indicator lights",
+      "cable",
+      "chair or equipment support legs",
+      "dark horizontal wall or floor trim",
+      "dark patterned chair or seat",
+      "dark storage shelving unit",
+      "items on storage shelves",
+      "large black equipment cabinet or computer tower",
+      "light-colored tiled floor",
+      "mobile robot or robotic vehicle",
+      "purple-blue robot lights",
+      "red indicator light",
+      "robot camera or sensor assembly",
+      "small black circular fixture",
+      "small red circular object",
+      "vertical metal stand",
+      "yellow floor marking strip",
+      "yellow-and-black striped bumper or component"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 24.03,
+    "per_step_s": [
+      23.96
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 12,
+      "latency_total_s": 29.987,
+      "latency_mean_s": 2.499,
+      "prompt_tokens_total": 12457,
+      "completion_tokens_total": 1668,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 2.384,
+      "latency_mean_s": 2.384,
+      "prompt_tokens_total": 2710,
+      "completion_tokens_total": 207,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (target_not_found)"
+    }
+  ],
+  "spoken_summary": "The rover halted after a straight run toward the purple-and-gray geometric patterned chair in View 5. The mission stopped before finishing because the target was not found."
+}

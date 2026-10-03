@@ -1,0 +1,171 @@
+{
+  "session_id": "smoketest",
+  "outcome": "halted",
+  "rover": "pi",
+  "command": "Go to the red box",
+  "resolved_command": "Follow the line to the red box and tell me if it is there",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "a red box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "a red box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "what you saw"
+      }
+    ]
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "a red box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "a red box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "what you saw"
+      }
+    ]
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "a red box",
+      "status": "blocked",
+      "detail": {
+        "reason": "obstacle",
+        "sonar_mm": 150,
+        "arrived": false,
+        "elapsed_s": 10.0
+      },
+      "elapsed_s": 10.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "progress",
+      "target": "a red box",
+      "t_rel_s": 2.42,
+      "est_distance_cm": 41.1,
+      "latency_s": 5.0,
+      "frame_path": "logs/frames/smoketest/kf_01.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": false,
+        "description": "a box on the line"
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 4.83,
+      "est_distance_cm": 82.2
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 7.25,
+      "est_distance_cm": 123.2
+    },
+    {
+      "kind": "look_left",
+      "target": "a red box",
+      "t_rel_s": 8.86,
+      "est_distance_cm": 150.6,
+      "latency_s": 0.0,
+      "frame_path": "logs/frames/smoketest/left_01.jpg",
+      "result": {
+        "objects": [
+          "a plant"
+        ],
+        "target_visible": false,
+        "description": "a plant to the left"
+      }
+    }
+  ],
+  "look_left": {
+    "kind": "look_left",
+    "target": "a red box",
+    "t_rel_s": 8.86,
+    "est_distance_cm": 150.6,
+    "latency_s": 0.0,
+    "frame_path": "logs/frames/smoketest/left_01.jpg",
+    "result": {
+      "objects": [
+        "a plant"
+      ],
+      "target_visible": false,
+      "description": "a plant to the left"
+    }
+  },
+  "arrival": null,
+  "sonar_obstacle_events": 1,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 800,
+    "t_start": null,
+    "obstacle_events": 1
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 10.0,
+    "per_step_s": [
+      10.0
+    ],
+    "vlm_latency_mean_s": 2.5,
+    "vlm_latency_max_s": 5.0,
+    "checks_completed": 1,
+    "checks_skipped": 2,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "no_arrival_check",
+      "detail": "the mission never reached an arrival check, so nothing confirms what the rover was looking at when it stopped"
+    },
+    {
+      "code": "path_not_clear",
+      "detail": "1 check(s) reported the path ahead was not clear"
+    },
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (obstacle)"
+    },
+    {
+      "code": "thin_evidence",
+      "detail": "only 1 progress check(s) completed during the drive \u2014 too few to say much about what was passed on the way"
+    }
+  ],
+  "spoken_summary": "Mission halted. Target unconfirmed. 4 uncertainties flagged."
+}

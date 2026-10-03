@@ -1,0 +1,705 @@
+{
+  "session_id": "2d7150f930e2",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "go to the cardboard box",
+  "resolved_command": "Go to the brown-and-white cardboard box beside the computer tower.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "floor line end marker"
+      },
+      {
+        "id": 2,
+        "action": "scan",
+        "target": "desk and computer corner"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "brown-and-white cardboard box beside the black computer tower"
+      },
+      {
+        "id": 4,
+        "action": "observe",
+        "target": "brown-and-white cardboard box beside the black computer tower"
+      },
+      {
+        "id": 5,
+        "action": "report",
+        "target": "brown-and-white cardboard box beside the black computer tower"
+      }
+    ],
+    "notes": "The box is in the desk and computer corner. Loose black cables and other floor obstacles are near the computer equipment and box; the available actions do not provide explicit obstacle avoidance, so following the line and approaching may risk collision."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "floor line end marker"
+      },
+      {
+        "id": 2,
+        "action": "scan",
+        "target": "desk and computer corner"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "brown-and-white cardboard box beside the black computer tower"
+      },
+      {
+        "id": 4,
+        "action": "observe",
+        "target": "brown-and-white cardboard box beside the black computer tower"
+      },
+      {
+        "id": 5,
+        "action": "report",
+        "target": "brown-and-white cardboard box beside the black computer tower"
+      }
+    ],
+    "notes": "The box is in the desk and computer corner. Loose black cables and other floor obstacles are near the computer equipment and box; the available actions do not provide explicit obstacle avoidance, so following the line and approaching may risk collision."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "floor line end marker",
+      "status": "ok",
+      "detail": {
+        "arrived": true,
+        "elapsed_s": 20.87,
+        "stopped_s": 0.76,
+        "obstacle_events": 0,
+        "target_confirmed": "floor line end marker"
+      },
+      "elapsed_s": 21.12
+    },
+    {
+      "index": 1,
+      "action": "scan",
+      "target": "desk and computer corner",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.22
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "brown-and-white cardboard box beside the black computer tower",
+      "status": "ok",
+      "detail": {
+        "reason": "bottom",
+        "cycles": 7,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 40.42
+    },
+    {
+      "index": 3,
+      "action": "observe",
+      "target": "brown-and-white cardboard box beside the black computer tower",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.5
+    },
+    {
+      "index": 4,
+      "action": "report",
+      "target": "brown-and-white cardboard box beside the black computer tower",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 4.22,
+      "bbox": [
+        181,
+        327,
+        271,
+        404
+      ],
+      "x_center": 0.353,
+      "fill": 0.023,
+      "bottom": 0.842,
+      "confidence": "high",
+      "sharpness": 437.4621887207031,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 2.25,
+      "frame_path": "logs/frames/2d7150f930e2/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "look_left",
+      "target": "floor line end marker",
+      "aimed": "left",
+      "known_count": 20,
+      "t_rel_s": 5.23,
+      "est_distance_cm": 79.9,
+      "latency_s": 6.51,
+      "frame_path": "logs/frames/2d7150f930e2/left_01.jpg",
+      "result": {
+        "objects": [],
+        "target_visible": false,
+        "seen": [
+          "display monitor"
+        ],
+        "unexpected": [
+          "white wall"
+        ],
+        "description": "The camera faces a mostly blank white wall, with only part of a lit display monitor visible at the far left."
+      }
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 9.28,
+      "bbox": [
+        434,
+        329,
+        523,
+        444
+      ],
+      "x_center": 0.748,
+      "fill": 0.033,
+      "bottom": 0.925,
+      "confidence": "high",
+      "sharpness": 382.3492431640625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 2.69,
+      "frame_path": "logs/frames/2d7150f930e2/ap_lock_verify.jpg",
+      "bearing_deg": -8.23,
+      "pivot_requested_deg": -8.23,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": -1,
+      "residual_e": 0.248,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "progress",
+      "target": "floor line end marker",
+      "aimed": "centre",
+      "known_count": 20,
+      "t_rel_s": 13.3,
+      "est_distance_cm": 203.5,
+      "latency_s": 7.79,
+      "frame_path": "logs/frames/2d7150f930e2/kf_01_centre.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "cardboard box",
+          "black cable",
+          "red circular alarm or sensor",
+          "yellow line",
+          "white ceiling panel",
+          "black metal frame or stand"
+        ],
+        "unexpected": [],
+        "description": "The yellow floor line is clear and leads toward the visible end marker near the back wall."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "floor line end marker",
+      "aimed": "left",
+      "known_count": 20,
+      "t_rel_s": 13.93,
+      "est_distance_cm": 213.1,
+      "latency_s": 5.88,
+      "frame_path": "logs/frames/2d7150f930e2/kf_02_left.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "white equipment cabinet",
+          "yellow line"
+        ],
+        "unexpected": [],
+        "description": "The yellow floor line is visible and unobstructed, but its end marker is not clearly visible."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "floor line end marker",
+      "aimed": "right",
+      "known_count": 20,
+      "t_rel_s": 14.73,
+      "est_distance_cm": 225.3,
+      "latency_s": 5.02,
+      "frame_path": "logs/frames/2d7150f930e2/kf_03_right.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "black tape strip",
+          "red circular alarm or sensor"
+        ],
+        "unexpected": [],
+        "description": "The black floor line continues across an unobstructed floor, but its end marker is not visible."
+      }
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 14.87,
+      "bbox": [
+        48,
+        325,
+        154,
+        416
+      ],
+      "x_center": 0.158,
+      "fill": 0.031,
+      "bottom": 0.867,
+      "confidence": "high",
+      "sharpness": 405.06219482421875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot R 0.12s hop 30 gate=confirmed",
+      "vlm_latency_s": 2.94,
+      "frame_path": "logs/frames/2d7150f930e2/ap_03_check.jpg",
+      "pivot_cmd_s": 0.1176949152542373,
+      "pivot_dir": 1,
+      "hop_moved_s": 1.47,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.033,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 19.15,
+      "est_distance_cm": 293.0
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 20.27,
+      "bbox": [
+        244,
+        324,
+        372,
+        439
+      ],
+      "x_center": 0.481,
+      "fill": 0.048,
+      "bottom": 0.915,
+      "confidence": "high",
+      "sharpness": 443.8124084472656,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot L 0.16s hop 30 gate=confirmed",
+      "vlm_latency_s": 2.59,
+      "frame_path": "logs/frames/2d7150f930e2/ap_04_check.jpg",
+      "pivot_cmd_s": 0.1623050847457627,
+      "pivot_dir": -1,
+      "hop_moved_s": 1.47,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.031,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 26.49,
+      "bbox": [
+        193,
+        305,
+        365,
+        458
+      ],
+      "x_center": 0.436,
+      "fill": 0.086,
+      "bottom": 0.954,
+      "confidence": "high",
+      "sharpness": 485.3279113769531,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 30 gate=confirmed",
+      "vlm_latency_s": 3.73,
+      "frame_path": "logs/frames/2d7150f930e2/ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 1.47,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.048,
+      "reject_reason": null,
+      "arrival_block": "vision_arrival_sonar_contradicted"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 31.65,
+      "bbox": [
+        161,
+        281,
+        367,
+        466
+      ],
+      "x_center": 0.412,
+      "fill": 0.124,
+      "bottom": 0.971,
+      "confidence": "high",
+      "sharpness": 468.38580322265625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 15 gate=confirmed",
+      "vlm_latency_s": 3.5,
+      "frame_path": "logs/frames/2d7150f930e2/ap_06_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.75,
+      "gate": "confirmed",
+      "hops_done": 4,
+      "fill_prev": 0.086,
+      "reject_reason": null,
+      "arrival_block": "vision_arrival_sonar_contradicted"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 40.42,
+      "bbox": [
+        161,
+        281,
+        367,
+        466
+      ],
+      "x_center": 0.412,
+      "fill": 0.124,
+      "bottom": 0.971,
+      "confidence": "high",
+      "sharpness": 468.38580322265625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 799,
+      "action": "arrived (bottom)",
+      "vlm_latency_s": 3.5,
+      "frame_path": "logs/frames/2d7150f930e2/ap_06_check.jpg",
+      "hops_done": 4,
+      "fill_prev": 0.086,
+      "arrival_block": null
+    }
+  ],
+  "look_left": {
+    "kind": "look_left",
+    "target": "floor line end marker",
+    "aimed": "left",
+    "known_count": 20,
+    "t_rel_s": 5.23,
+    "est_distance_cm": 79.9,
+    "latency_s": 6.51,
+    "frame_path": "logs/frames/2d7150f930e2/left_01.jpg",
+    "result": {
+      "objects": [],
+      "target_visible": false,
+      "seen": [
+        "display monitor"
+      ],
+      "unexpected": [
+        "white wall"
+      ],
+      "description": "The camera faces a mostly blank white wall, with only part of a lit display monitor visible at the far left."
+    }
+  },
+  "arrival": {
+    "kind": "arrival",
+    "target": "brown-and-white cardboard box beside the black computer tower",
+    "expected": [
+      "brown-and-white cardboard box beside the black computer tower",
+      "cardboard box"
+    ],
+    "known": [
+      "window",
+      "window blinds",
+      "dark wall poster or chart",
+      "white equipment cabinet",
+      "display monitor",
+      "green item",
+      "black electronic unit",
+      "black wall shelf or rack",
+      "wooden support beam",
+      "cardboard box",
+      "black cable",
+      "additional black cables",
+      "black metal frame or stand",
+      "red circular alarm or sensor",
+      "black tape strip",
+      "yellow line",
+      "white ceiling panel",
+      "small white hanging fixtures",
+      "white curtains",
+      "computer monitor"
+    ],
+    "t_rel_s": 54.0,
+    "latency_s": 8.14,
+    "frame_path": "logs/frames/2d7150f930e2/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "medium",
+      "seen": [
+        "window",
+        "window blinds",
+        "display monitor",
+        "cardboard box",
+        "black cable",
+        "additional black cables",
+        "black electronic unit",
+        "wooden support beam",
+        "computer monitor"
+      ],
+      "missing": [],
+      "unexpected": [],
+      "description": "A cardboard box is clearly visible beside a large dark computer tower or electronic unit. A monitor, window, support beam, and several cables are also visible."
+    }
+  },
+  "target_confirmed": {
+    "kind": "progress",
+    "target": "floor line end marker",
+    "aimed": "centre",
+    "known_count": 20,
+    "t_rel_s": 13.3,
+    "est_distance_cm": 203.5,
+    "latency_s": 7.79,
+    "frame_path": "logs/frames/2d7150f930e2/kf_01_centre.jpg",
+    "result": {
+      "target_visible": true,
+      "path_clear": true,
+      "seen": [
+        "cardboard box",
+        "black cable",
+        "red circular alarm or sensor",
+        "yellow line",
+        "white ceiling panel",
+        "black metal frame or stand"
+      ],
+      "unexpected": [],
+      "description": "The yellow floor line is clear and leads toward the visible end marker near the back wall."
+    }
+  },
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 7,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 3,
+    "chassis_spin_deg_total": -8.2,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -8.23,
+    "residual_e_at_lock": 0.248,
+    "hops_done": 4,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 382.3,
+    "sharpness_median": 443.8,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 21.2,
+    "motion_time_s": 5.56,
+    "wall_time_s": 15.0,
+    "sonar_stops": 0,
+    "arrival_reason": "bottom"
+  },
+  "looked": {
+    "centre": 9,
+    "left": 2,
+    "right": 1
+  },
+  "scene_id": "7906ec1ecc3b",
+  "room_grounding": {
+    "known": [
+      "window",
+      "window blinds",
+      "dark wall poster or chart",
+      "white equipment cabinet",
+      "display monitor",
+      "green item",
+      "black electronic unit",
+      "black wall shelf or rack",
+      "wooden support beam",
+      "cardboard box",
+      "black cable",
+      "additional black cables",
+      "black metal frame or stand",
+      "red circular alarm or sensor",
+      "black tape strip",
+      "yellow line",
+      "white ceiling panel",
+      "small white hanging fixtures",
+      "white curtains",
+      "computer monitor"
+    ],
+    "seen": [
+      "additional black cables",
+      "black cable",
+      "black electronic unit",
+      "black metal frame or stand",
+      "black tape strip",
+      "cardboard box",
+      "computer monitor",
+      "display monitor",
+      "red circular alarm or sensor",
+      "white ceiling panel",
+      "white equipment cabinet",
+      "window",
+      "window blinds",
+      "wooden support beam",
+      "yellow line"
+    ],
+    "never_seen": [
+      "black wall shelf or rack",
+      "dark wall poster or chart",
+      "green item",
+      "small white hanging fixtures",
+      "white curtains"
+    ],
+    "unexpected": [
+      "white wall"
+    ],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 2997,
+    "t_start": 1791046307.8377001,
+    "obstacle_events": 0,
+    "bends": []
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 63.26,
+    "per_step_s": [
+      21.12,
+      1.22,
+      40.42,
+      0.5,
+      0.0
+    ],
+    "vlm_latency_mean_s": 6.67,
+    "vlm_latency_max_s": 8.14,
+    "checks_completed": 3,
+    "checks_skipped": 1,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": false,
+    "concerns": "The destination box is identifiable in the desk and computer corner, and observing/reporting it are feasible. However, the route and approach do not account for loose cables and other floor obstacles around the computer equipment and box; blindly following the line could cause a collision.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 14,
+      "latency_total_s": 60.733,
+      "latency_mean_s": 4.338,
+      "prompt_tokens_total": 12297,
+      "completion_tokens_total": 4073,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 8.292,
+      "latency_mean_s": 4.146,
+      "prompt_tokens_total": 4240,
+      "completion_tokens_total": 666,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "unexpected_objects",
+      "detail": "the rover reported 1 thing(s) the filmed room does not contain: white wall \u2014 either the room changed or the model invented them"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (bottom) \u2014 sonar did not confirm"
+    },
+    {
+      "code": "vision_arrival_sonar_contradicted",
+      "detail": "2 time(s) vision reported the target close enough to arrive while sonar still read it as far away \u2014 vision was not trusted, the rover kept approaching"
+    }
+  ],
+  "spoken_summary": "Completed: I went to the brown-and-white cardboard box beside the black computer tower. The box was visible, but arrival was decided by vision only; sonar did not confirm it."
+}

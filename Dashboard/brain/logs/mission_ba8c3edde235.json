@@ -1,0 +1,326 @@
+{
+  "session_id": "ba8c3edde235",
+  "outcome": "halted",
+  "rover": "pi",
+  "command": "please go to the cot or bed",
+  "resolved_command": "Please go to the large blue bed or cot in View 6.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "large blue bed or cot in View 6"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "large blue bed or cot in View 6"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "large blue bed or cot in View 6"
+      }
+    ],
+    "notes": "No floor-line route to View 6 is specified, so approach is used to locate and reach the target. The rover cannot pick up or move the bed or cot."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "large blue bed or cot in View 6"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "large blue bed or cot in View 6"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "large blue bed or cot in View 6"
+      }
+    ],
+    "notes": "No floor-line route to View 6 is specified, so approach is used to locate and reach the target. The rover cannot pick up or move the bed or cot."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "large blue bed or cot in View 6",
+      "status": "blocked",
+      "detail": {
+        "reason": "target_not_found",
+        "cycles": 4
+      },
+      "elapsed_s": 21.93
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 5.85,
+      "bbox": [
+        0,
+        157,
+        207,
+        329
+      ],
+      "x_center": 0.162,
+      "fill": 0.116,
+      "bottom": 0.685,
+      "confidence": "medium",
+      "sharpness": 763.4720458984375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 3.87,
+      "frame_path": "logs/frames/ba8c3edde235/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 10.19,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 436.935791015625,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.16 gate=not_visible",
+      "vlm_latency_s": 1.99,
+      "frame_path": "logs/frames/ba8c3edde235/ap_lock_verify.jpg",
+      "bearing_deg": -18.93,
+      "pivot_requested_deg": -18.93,
+      "pivot_cmd_s": 0.16,
+      "pivot_dir": -1,
+      "residual_e": null,
+      "gate": "not_visible"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 16.73,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 558.2017822265625,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "hop_back 0.6s gate=not_visible",
+      "vlm_latency_s": 4.87,
+      "frame_path": "logs/frames/ba8c3edde235/ap_03_lostlook.jpg",
+      "gate": "not_visible",
+      "hop_moved_s": 0.65
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 21.93,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 551.767578125,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "relocate_look gate=not_visible",
+      "vlm_latency_s": 4.32,
+      "frame_path": "logs/frames/ba8c3edde235/ap_04_relocate.jpg",
+      "gate": "not_visible"
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 4,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 1,
+    "chassis_spin_deg_total": -18.9,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -18.93,
+    "residual_e_at_lock": null,
+    "hops_done": 1,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 436.9,
+    "sharpness_median": 558.2,
+    "detections_rejected": {},
+    "arrival_cross_check": null,
+    "gimbal_only_lock": null,
+    "vlm_time_s": 15.05,
+    "motion_time_s": 0.81,
+    "wall_time_s": 1.03,
+    "sonar_stops": 0,
+    "arrival_reason": "target_not_found"
+  },
+  "looked": {
+    "centre": 4
+  },
+  "scene_id": "675cb797eb48",
+  "room_grounding": {
+    "known": [
+      "window",
+      "curtains",
+      "wall-mounted picture or poster",
+      "small green item",
+      "wooden desk or cabinet",
+      "computer monitor or television",
+      "computer equipment",
+      "hanging cables",
+      "office chair",
+      "chair armrests",
+      "chair base and casters",
+      "two round wall fixtures",
+      "large white rectangular wall panel or whiteboard",
+      "yellow-green mark or item",
+      "partial wall-mounted frame",
+      "blue and white items",
+      "large black speaker",
+      "black speaker mounting frame",
+      "audio cables",
+      "wooden board or post"
+    ],
+    "seen": [],
+    "never_seen": [
+      "audio cables",
+      "black speaker mounting frame",
+      "blue and white items",
+      "chair armrests",
+      "chair base and casters",
+      "computer equipment",
+      "computer monitor or television",
+      "curtains",
+      "hanging cables",
+      "large black speaker",
+      "large white rectangular wall panel or whiteboard",
+      "office chair",
+      "partial wall-mounted frame",
+      "small green item",
+      "two round wall fixtures",
+      "wall-mounted picture or poster",
+      "window",
+      "wooden board or post",
+      "wooden desk or cabinet",
+      "yellow-green mark or item"
+    ],
+    "unexpected": [],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 22.0,
+    "per_step_s": [
+      21.93
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 6,
+      "latency_total_s": 20.704,
+      "latency_mean_s": 3.451,
+      "prompt_tokens_total": 7080,
+      "completion_tokens_total": 1374,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 3.433,
+      "latency_mean_s": 3.433,
+      "prompt_tokens_total": 2589,
+      "completion_tokens_total": 253,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (target_not_found)"
+    },
+    {
+      "code": "target_lost_repeatedly",
+      "detail": "the target was lost and re-acquired 2 time(s) during the approach"
+    },
+    {
+      "code": "arrival_unconfirmed",
+      "detail": "the approach ended without a confirmed arrival"
+    }
+  ],
+  "spoken_summary": "The mission halted before finishing because the target was not found. The target was lost and reacquired 2 times, and arrival was not confirmed."
+}

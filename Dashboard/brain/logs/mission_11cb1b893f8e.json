@@ -1,0 +1,616 @@
+{
+  "session_id": "11cb1b893f8e",
+  "outcome": "halted",
+  "rover": "pi",
+  "command": "please go find the black ball at the end of the black strip",
+  "resolved_command": "Go to View 2, follow the long black floor strip/cable, and look for the red ball at its endpoint.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "View 2 room corner, with the small wheeled robot visible at the end"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "small wheeled robot"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "arrival at View 2"
+      },
+      {
+        "id": 4,
+        "action": "follow_line",
+        "target": "left endpoint of the long black floor strip or cable"
+      },
+      {
+        "id": 5,
+        "action": "observe",
+        "target": "left endpoint of the long black floor strip or cable"
+      },
+      {
+        "id": 6,
+        "action": "report",
+        "target": "whether a red ball is present at the endpoint"
+      }
+    ],
+    "notes": "No red ball is listed in the filmed contents, so the rover cannot be expected to find one. The long black strip is described as a floor strip or cable; following it is represented with follow_line because that is the only available long-distance travel action."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "View 2 room corner, with the small wheeled robot visible at the end"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "small wheeled robot"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "arrival at View 2"
+      },
+      {
+        "id": 4,
+        "action": "follow_line",
+        "target": "left endpoint of the long black floor strip or cable"
+      },
+      {
+        "id": 5,
+        "action": "observe",
+        "target": "left endpoint of the long black floor strip or cable"
+      },
+      {
+        "id": 6,
+        "action": "report",
+        "target": "whether a red ball is present at the endpoint"
+      }
+    ],
+    "notes": "No red ball is listed in the filmed contents, so the rover cannot be expected to find one. The long black strip is described as a floor strip or cable; following it is represented with follow_line because that is the only available long-distance travel action."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "View 2 room corner, with the small wheeled robot visible at the end",
+      "status": "ok",
+      "detail": {
+        "arrived": true,
+        "elapsed_s": 22.12,
+        "stopped_s": 0.75,
+        "obstacle_events": 0
+      },
+      "elapsed_s": 25.66
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "small wheeled robot",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.5
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "arrival at View 2",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    },
+    {
+      "index": 3,
+      "action": "follow_line",
+      "target": "left endpoint of the long black floor strip or cable",
+      "status": "blocked",
+      "detail": {
+        "arrived": false,
+        "elapsed_s": 23.83,
+        "stopped_s": 0.8,
+        "obstacle_events": 0,
+        "reason": "line_timeout"
+      },
+      "elapsed_s": 26.95
+    }
+  ],
+  "checks": [
+    {
+      "kind": "progress",
+      "target": "View 2 room corner, with the small wheeled robot visible at the end",
+      "known_count": 20,
+      "t_rel_s": 2.81,
+      "est_distance_cm": 43.0,
+      "latency_s": 4.5,
+      "frame_path": "logs/frames/11cb1b893f8e/kf_01.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "yellow horizontal stripe"
+        ],
+        "unexpected": [
+          "person's legs and feet"
+        ],
+        "description": "The yellow floor line is visible, but the small wheeled robot is not."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "left endpoint of the long black floor strip or cable",
+      "known_count": 20,
+      "t_rel_s": 2.81,
+      "est_distance_cm": 43.0,
+      "latency_s": 8.32,
+      "frame_path": "logs/frames/11cb1b893f8e/kf_01.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable",
+          "wall"
+        ],
+        "unexpected": [
+          "floor"
+        ],
+        "description": "A black floor cable runs diagonally across the visible floor and its endpoint is visible near the dark wall."
+      }
+    },
+    {
+      "kind": "look_left",
+      "target": "View 2 room corner, with the small wheeled robot visible at the end",
+      "known_count": 20,
+      "t_rel_s": 5.31,
+      "est_distance_cm": 81.2,
+      "latency_s": 6.55,
+      "frame_path": "logs/frames/11cb1b893f8e/left_01.jpg",
+      "result": {
+        "objects": [
+          "wall",
+          "white wall",
+          "black floor strip or cable",
+          "floor"
+        ],
+        "target_visible": false,
+        "seen": [
+          "wall",
+          "white wall",
+          "black floor strip or cable"
+        ],
+        "unexpected": [
+          "floor"
+        ],
+        "description": "The image shows a bare floor meeting a white wall, with a narrow dark strip along the base and no visible robot."
+      }
+    },
+    {
+      "kind": "look_left",
+      "target": "left endpoint of the long black floor strip or cable",
+      "known_count": 20,
+      "t_rel_s": 5.36,
+      "est_distance_cm": 81.9,
+      "latency_s": 7.08,
+      "frame_path": "logs/frames/11cb1b893f8e/left_01.jpg",
+      "result": {
+        "objects": [
+          "black floor strip or cable"
+        ],
+        "target_visible": false,
+        "seen": [
+          "black floor strip or cable"
+        ],
+        "unexpected": [
+          "yellow cable"
+        ],
+        "description": "A black cable curves across the light-colored floor, with a yellow cable alongside it, while the surrounding area is mostly dark."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 8.77,
+      "est_distance_cm": 134.2
+    },
+    {
+      "kind": "progress",
+      "target": "View 2 room corner, with the small wheeled robot visible at the end",
+      "known_count": 20,
+      "t_rel_s": 8.89,
+      "est_distance_cm": 136.1,
+      "latency_s": 4.62,
+      "frame_path": "logs/frames/11cb1b893f8e/kf_02.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable",
+          "dark rectangular floor strip",
+          "wall",
+          "white wall"
+        ],
+        "unexpected": [
+          "light-colored floor"
+        ],
+        "description": "A black floor strip leads toward a dark area, but the robot is not visible."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 11.54,
+      "est_distance_cm": 176.6
+    },
+    {
+      "kind": "progress",
+      "target": "left endpoint of the long black floor strip or cable",
+      "known_count": 20,
+      "t_rel_s": 11.59,
+      "est_distance_cm": 177.3,
+      "latency_s": 4.77,
+      "frame_path": "logs/frames/11cb1b893f8e/kf_02.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable"
+        ],
+        "unexpected": [
+          "floor"
+        ],
+        "description": "A black floor line is visible across the otherwise clear floor, but its left endpoint is not visible."
+      }
+    },
+    {
+      "kind": "bend",
+      "side": "left",
+      "t_rel_s": 11.94,
+      "est_distance_cm": 182.6
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 14.32,
+      "est_distance_cm": 219.1
+    },
+    {
+      "kind": "progress",
+      "target": "View 2 room corner, with the small wheeled robot visible at the end",
+      "known_count": 20,
+      "t_rel_s": 14.36,
+      "est_distance_cm": 219.7,
+      "latency_s": 3.25,
+      "frame_path": "logs/frames/11cb1b893f8e/kf_03.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable",
+          "dark rectangular floor strip"
+        ],
+        "unexpected": [],
+        "description": "A dark floor strip is visible ahead, but the small wheeled robot and room corner are not visible."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "left endpoint of the long black floor strip or cable",
+      "known_count": 20,
+      "t_rel_s": 17.13,
+      "est_distance_cm": 262.1,
+      "latency_s": 4.25,
+      "frame_path": "logs/frames/11cb1b893f8e/kf_03.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable"
+        ],
+        "unexpected": [],
+        "description": "A black floor cable is visible across the otherwise clear floor, but its left endpoint is not clearly visible."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 17.15,
+      "est_distance_cm": 262.4
+    },
+    {
+      "kind": "progress",
+      "target": "View 2 room corner, with the small wheeled robot visible at the end",
+      "known_count": 20,
+      "t_rel_s": 19.78,
+      "est_distance_cm": 302.6,
+      "latency_s": 5.71,
+      "frame_path": "logs/frames/11cb1b893f8e/kf_04.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": false,
+        "seen": [
+          "loose black cable",
+          "black floor strip or cable",
+          "dark rectangular floor strip"
+        ],
+        "unexpected": [
+          "yellow connector"
+        ],
+        "description": "A black T-shaped floor strip and a loose looped cable are visible, but the small robot is not."
+      }
+    },
+    {
+      "kind": "skipped",
+      "reason": "vlm_busy",
+      "t_rel_s": 19.91,
+      "est_distance_cm": 304.6
+    },
+    {
+      "kind": "progress",
+      "target": "left endpoint of the long black floor strip or cable",
+      "known_count": 20,
+      "t_rel_s": 22.72,
+      "est_distance_cm": 347.7,
+      "latency_s": 4.07,
+      "frame_path": "logs/frames/11cb1b893f8e/kf_04.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "black floor strip or cable"
+        ],
+        "unexpected": [],
+        "description": "A black floor strip is visible running diagonally from the lower left to its endpoint near the far edge of the floor."
+      }
+    }
+  ],
+  "look_left": {
+    "kind": "look_left",
+    "target": "left endpoint of the long black floor strip or cable",
+    "known_count": 20,
+    "t_rel_s": 5.36,
+    "est_distance_cm": 81.9,
+    "latency_s": 7.08,
+    "frame_path": "logs/frames/11cb1b893f8e/left_01.jpg",
+    "result": {
+      "objects": [
+        "black floor strip or cable"
+      ],
+      "target_visible": false,
+      "seen": [
+        "black floor strip or cable"
+      ],
+      "unexpected": [
+        "yellow cable"
+      ],
+      "description": "A black cable curves across the light-colored floor, with a yellow cable alongside it, while the surrounding area is mostly dark."
+    }
+  },
+  "arrival": {
+    "kind": "arrival",
+    "target": "small wheeled robot",
+    "expected": [
+      "small wheeled robot"
+    ],
+    "known": [
+      "large white projection screen or whiteboard",
+      "black border around screen or whiteboard",
+      "yellow horizontal stripe",
+      "wall-mounted black monitor",
+      "black wall fan",
+      "loose black cable",
+      "tall equipment rack or cabinet",
+      "wooden vertical support or shelf side",
+      "electronic equipment",
+      "small white objects on shelf",
+      "wall outlet or switch",
+      "ceiling",
+      "wall",
+      "small wheeled robot",
+      "black floor strip or cable",
+      "dark rectangular floor strip",
+      "open storage cabinet or shelving unit",
+      "shelves inside storage unit",
+      "stored items",
+      "white wall"
+    ],
+    "t_rel_s": 26.16,
+    "latency_s": 3.11,
+    "frame_path": "logs/frames/11cb1b893f8e/arrival.jpg",
+    "result": {
+      "target_visible": false,
+      "confidence": "high",
+      "seen": [
+        "black floor strip or cable"
+      ],
+      "missing": [
+        "small wheeled robot"
+      ],
+      "unexpected": [],
+      "description": "The image is mostly dark, with a light-colored floor and a black line or cable visible across it. No small wheeled robot is clearly visible."
+    }
+  },
+  "bends": [
+    {
+      "side": "left",
+      "t_rel_s": 11.94,
+      "est_distance_cm": 182.6
+    }
+  ],
+  "route_summary": "took 1 left bend",
+  "scene_id": "41002c4bd562",
+  "room_grounding": {
+    "known": [
+      "large white projection screen or whiteboard",
+      "black border around screen or whiteboard",
+      "yellow horizontal stripe",
+      "wall-mounted black monitor",
+      "black wall fan",
+      "loose black cable",
+      "tall equipment rack or cabinet",
+      "wooden vertical support or shelf side",
+      "electronic equipment",
+      "small white objects on shelf",
+      "wall outlet or switch",
+      "ceiling",
+      "wall",
+      "small wheeled robot",
+      "black floor strip or cable",
+      "dark rectangular floor strip",
+      "open storage cabinet or shelving unit",
+      "shelves inside storage unit",
+      "stored items",
+      "white wall"
+    ],
+    "seen": [
+      "black floor strip or cable",
+      "dark rectangular floor strip",
+      "loose black cable",
+      "wall",
+      "white wall",
+      "yellow horizontal stripe"
+    ],
+    "never_seen": [
+      "black border around screen or whiteboard",
+      "black wall fan",
+      "ceiling",
+      "electronic equipment",
+      "large white projection screen or whiteboard",
+      "open storage cabinet or shelving unit",
+      "shelves inside storage unit",
+      "small wheeled robot",
+      "small white objects on shelf",
+      "stored items",
+      "tall equipment rack or cabinet",
+      "wall outlet or switch",
+      "wall-mounted black monitor",
+      "wooden vertical support or shelf side"
+    ],
+    "unexpected": [
+      "floor",
+      "light-colored floor",
+      "person's legs and feet",
+      "yellow cable",
+      "yellow connector"
+    ],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 473,
+    "t_start": 1790714282.257013,
+    "obstacle_events": 0,
+    "bends": []
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 56.47,
+    "per_step_s": [
+      25.66,
+      0.5,
+      0.0,
+      26.95
+    ],
+    "vlm_latency_mean_s": 5.11,
+    "vlm_latency_max_s": 8.32,
+    "checks_completed": 8,
+    "checks_skipped": 5,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "f354fbc3099a",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "drive toward a visible target until close to it",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 4,
+    "capped": false,
+    "verified": true,
+    "concerns": "No red ball is listed, so step 6 should report that it is absent. The long black floor strip may be a cable or floor obstacle rather than a navigational line, and its left endpoint may be near the storage cabinet; proceed cautiously.",
+    "replan_count": 1
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 18,
+      "latency_total_s": 87.337,
+      "latency_mean_s": 4.852,
+      "prompt_tokens_total": 26977,
+      "completion_tokens_total": 6227,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 4,
+      "latency_total_s": 21.133,
+      "latency_mean_s": 5.283,
+      "prompt_tokens_total": 8316,
+      "completion_tokens_total": 1768,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "target_not_seen",
+      "detail": "the target was not visible at arrival"
+    },
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: small wheeled robot"
+    },
+    {
+      "code": "visibility_inconsistent",
+      "detail": "the target was visible on the way but not at arrival"
+    },
+    {
+      "code": "path_not_clear",
+      "detail": "1 check(s) reported the path ahead was not clear"
+    },
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (line_timeout)"
+    },
+    {
+      "code": "line_timeout_after_bend",
+      "detail": "the drive timed out on a route with 1 bend(s) \u2014 a stop landing during a pivot turn cancels it and the rover resumes off the tape (known limitation, not a planning failure)"
+    },
+    {
+      "code": "unexpected_objects",
+      "detail": "the rover reported 5 thing(s) the filmed room does not contain: floor, light-colored floor, person's legs and feet, yellow cable, yellow connector \u2014 either the room changed or the model invented them"
+    }
+  ],
+  "spoken_summary": "Mission halted after following the black floor strip or cable through one left bend. The small wheeled robot was not visible at arrival."
+}

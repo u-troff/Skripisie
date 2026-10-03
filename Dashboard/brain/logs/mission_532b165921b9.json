@@ -1,0 +1,378 @@
+{
+  "session_id": "532b165921b9",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "find the whole ball",
+  "resolved_command": "Drive toward and visually locate the entire red ball on the left side of the floor.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "the left side of the floor where the red ball should be visible"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "the entire red ball"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "whether the entire red ball was visually located"
+      }
+    ],
+    "notes": "Follow the floor line toward the left side, then visually confirm and report the entire red ball."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "the left side of the floor where the red ball should be visible"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "the entire red ball"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "whether the entire red ball was visually located"
+      }
+    ],
+    "notes": "Follow the floor line toward the left side, then visually confirm and report the entire red ball."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "the left side of the floor where the red ball should be visible",
+      "status": "ok",
+      "detail": {
+        "arrived": true,
+        "elapsed_s": 6.76,
+        "stopped_s": 0.75,
+        "obstacle_events": 0,
+        "target_confirmed": "the left side of the floor where the red ball should be visible"
+      },
+      "elapsed_s": 9.37
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "the entire red ball",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "whether the entire red ball was visually located",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "progress",
+      "target": "the left side of the floor where the red ball should be visible",
+      "aimed": "centre",
+      "known_count": 0,
+      "t_rel_s": 3.65,
+      "est_distance_cm": 55.8,
+      "latency_s": 3.37,
+      "frame_path": "logs/frames/532b165921b9/kf_01_centre.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "floor line",
+          "floor",
+          "wall"
+        ],
+        "unexpected": [
+          "dark opening"
+        ],
+        "description": "The floor line is clear, but no red ball is visible."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "the left side of the floor where the red ball should be visible",
+      "aimed": "left",
+      "known_count": 0,
+      "t_rel_s": 4.34,
+      "est_distance_cm": 66.4,
+      "latency_s": 2.67,
+      "frame_path": "logs/frames/532b165921b9/kf_02_left.jpg",
+      "result": {
+        "target_visible": true,
+        "path_clear": true,
+        "seen": [
+          "red ball",
+          "yellow floor line",
+          "floor"
+        ],
+        "unexpected": [
+          "dark objects along the back edge"
+        ],
+        "description": "A red ball is visible on the left side beyond the clear floor line."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "the left side of the floor where the red ball should be visible",
+      "aimed": "right",
+      "known_count": 0,
+      "t_rel_s": 5.0,
+      "est_distance_cm": 76.5,
+      "latency_s": 3.13,
+      "frame_path": "logs/frames/532b165921b9/kf_03_right.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "floor",
+          "wall"
+        ],
+        "unexpected": [],
+        "description": "The floor area is clear, but no red ball is visible."
+      }
+    },
+    {
+      "kind": "look_left",
+      "target": "the left side of the floor where the red ball should be visible",
+      "aimed": "left",
+      "known_count": 0,
+      "t_rel_s": 5.2,
+      "est_distance_cm": 79.6,
+      "latency_s": 3.38,
+      "frame_path": "logs/frames/532b165921b9/left_01.jpg",
+      "result": {
+        "objects": [
+          "red ball"
+        ],
+        "target_visible": false,
+        "seen": [],
+        "unexpected": [
+          "small brown object"
+        ],
+        "description": "The camera shows a light-colored floor and gray wall, but the red ball is not visible."
+      }
+    }
+  ],
+  "look_left": {
+    "kind": "look_left",
+    "target": "the left side of the floor where the red ball should be visible",
+    "aimed": "left",
+    "known_count": 0,
+    "t_rel_s": 5.2,
+    "est_distance_cm": 79.6,
+    "latency_s": 3.38,
+    "frame_path": "logs/frames/532b165921b9/left_01.jpg",
+    "result": {
+      "objects": [
+        "red ball"
+      ],
+      "target_visible": false,
+      "seen": [],
+      "unexpected": [
+        "small brown object"
+      ],
+      "description": "The camera shows a light-colored floor and gray wall, but the red ball is not visible."
+    }
+  },
+  "arrival": {
+    "kind": "arrival",
+    "target": "the entire red ball",
+    "expected": [
+      "the entire red ball",
+      "visually",
+      "locate",
+      "entire",
+      "red",
+      "ball",
+      "left",
+      "side"
+    ],
+    "known": [],
+    "t_rel_s": 9.87,
+    "latency_s": 4.06,
+    "frame_path": "logs/frames/532b165921b9/arrival.jpg",
+    "result": {
+      "target_visible": false,
+      "confidence": "high",
+      "seen": [],
+      "missing": [
+        "the entire red ball",
+        "visually",
+        "locate",
+        "entire",
+        "red",
+        "ball",
+        "left",
+        "side"
+      ],
+      "unexpected": [
+        "floor",
+        "wall",
+        "dark gap"
+      ],
+      "description": "No red ball is visible in the image. The scene shows a light-colored floor, a wall, and a dark gap or opening."
+    }
+  },
+  "target_confirmed": {
+    "kind": "progress",
+    "target": "the left side of the floor where the red ball should be visible",
+    "aimed": "left",
+    "known_count": 0,
+    "t_rel_s": 4.34,
+    "est_distance_cm": 66.4,
+    "latency_s": 2.67,
+    "frame_path": "logs/frames/532b165921b9/kf_02_left.jpg",
+    "result": {
+      "target_visible": true,
+      "path_clear": true,
+      "seen": [
+        "red ball",
+        "yellow floor line",
+        "floor"
+      ],
+      "unexpected": [
+        "dark objects along the back edge"
+      ],
+      "description": "A red ball is visible on the left side beyond the clear floor line."
+    }
+  },
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "looked": {
+    "centre": 2,
+    "left": 2,
+    "right": 1
+  },
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "dark gap",
+      "dark objects along the back edge",
+      "dark opening",
+      "floor",
+      "floor line",
+      "red ball",
+      "small brown object",
+      "wall",
+      "yellow floor line"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 1358,
+    "t_start": 1790808578.227531,
+    "obstacle_events": 0,
+    "bends": []
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 14.71,
+    "per_step_s": [
+      9.37,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 3.32,
+    "vlm_latency_max_s": 4.06,
+    "checks_completed": 3,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "f354fbc3099a",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "drive toward a visible target until close to it",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 7,
+      "latency_total_s": 24.471,
+      "latency_mean_s": 3.496,
+      "prompt_tokens_total": 3319,
+      "completion_tokens_total": 1426,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 5.677,
+      "latency_mean_s": 2.838,
+      "prompt_tokens_total": 336,
+      "completion_tokens_total": 300,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "target_not_seen",
+      "detail": "the target was not visible at arrival"
+    },
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: the entire red ball, visually, locate, entire, red, ball, left, side"
+    },
+    {
+      "code": "visibility_inconsistent",
+      "detail": "the target was visible on the way but not at arrival"
+    },
+    {
+      "code": "ungrounded_checks",
+      "detail": "no room video was loaded, so the camera checks had nothing to be scored against \u2014 an empty 'unexpected' here is not evidence that nothing was hallucinated"
+    }
+  ],
+  "spoken_summary": "The drive toward the entire red ball on the left side of the floor was completed along a straight route. The red ball was not visible at arrival, although it was visible on the way."
+}

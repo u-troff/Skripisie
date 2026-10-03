@@ -1,0 +1,394 @@
+{
+  "session_id": "785c51857399",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "can you go to the chair in view 2",
+  "resolved_command": "Go to the large gray upholstered chair with the dark circular pattern in View 2.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "large gray upholstered chair or sofa with dark circular pattern in View 2"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "large gray upholstered chair or sofa with dark circular pattern in View 2"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "large gray upholstered chair or sofa with dark circular pattern in View 2"
+      }
+    ],
+    "notes": ""
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "large gray upholstered chair or sofa with dark circular pattern in View 2"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "large gray upholstered chair or sofa with dark circular pattern in View 2"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "large gray upholstered chair or sofa with dark circular pattern in View 2"
+      }
+    ],
+    "notes": ""
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "large gray upholstered chair or sofa with dark circular pattern in View 2",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 5
+      },
+      "elapsed_s": 20.29
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "large gray upholstered chair or sofa with dark circular pattern in View 2",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "large gray upholstered chair or sofa with dark circular pattern in View 2",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 0,
+      "phase": "search",
+      "t_rel_s": 2.28,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "initial_look",
+      "vlm_latency_s": 2.02,
+      "frame_path": "logs/frames/785c51857399/ap_00_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 4.93,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 1.9,
+      "frame_path": "logs/frames/785c51857399/ap_01_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "search",
+      "t_rel_s": 9.88,
+      "bbox": [
+        0,
+        0,
+        640,
+        205
+      ],
+      "x_center": 0.5,
+      "fill": 0.427,
+      "bottom": 0.427,
+      "confidence": "low",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 4.29,
+      "frame_path": "logs/frames/785c51857399/ap_02_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "search",
+      "t_rel_s": 12.08,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 1.55,
+      "frame_path": "logs/frames/785c51857399/ap_03_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "search",
+      "t_rel_s": 15.73,
+      "bbox": [
+        0,
+        0,
+        639,
+        477
+      ],
+      "x_center": 0.499,
+      "fill": 0.992,
+      "bottom": 0.994,
+      "confidence": "medium",
+      "sonar_mm": null,
+      "action": "pivot R 0.5s",
+      "vlm_latency_s": 2.98,
+      "frame_path": "logs/frames/785c51857399/ap_04_search.jpg"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 15.73,
+      "bbox": [
+        0,
+        0,
+        639,
+        477
+      ],
+      "x_center": 0.499,
+      "fill": 0.992,
+      "bottom": 0.994,
+      "confidence": "medium",
+      "sonar_mm": 383,
+      "action": "arrived",
+      "vlm_latency_s": 2.98,
+      "frame_path": "logs/frames/785c51857399/ap_05_arrived.jpg"
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "large gray upholstered chair or sofa with dark circular pattern in View 2",
+    "expected": [
+      "large gray upholstered chair or sofa with dark circular pattern in View 2"
+    ],
+    "known": [
+      "large black equipment cabinet",
+      "blue indicator lights",
+      "black metal shelving or frame",
+      "brown vertical support post",
+      "dark display or panel",
+      "patterned upholstered object",
+      "circular patterned upholstery sections",
+      "tripod or equipment stand",
+      "horizontal metal bar",
+      "thin vertical pole",
+      "black cables",
+      "small black circular device",
+      "small red round marker",
+      "yellow floor marking",
+      "black floor marking",
+      "large wheeled robot or robotic vehicle",
+      "robot black front housing",
+      "robot gray body panels",
+      "yellow-and-black striped robot component",
+      "blue-purple robot light"
+    ],
+    "t_rel_s": 15.73,
+    "latency_s": 3.87,
+    "frame_path": "logs/frames/785c51857399/arrival.jpg",
+    "result": {
+      "target_visible": false,
+      "confidence": "high",
+      "seen": [
+        "black floor marking"
+      ],
+      "missing": [
+        "large gray upholstered chair or sofa with dark circular pattern in View 2"
+      ],
+      "unexpected": [
+        "purple wall",
+        "light gray floor"
+      ],
+      "description": "Only a purple wall and light gray floor are visible, with a dark strip along the bottom edge. The catalogued gray patterned chair or sofa is not visible."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 5,
+    "search_steps_used": 5,
+    "vlm_time_s": 15.72,
+    "motion_time_s": 0,
+    "sonar_stops": 0,
+    "arrival_reason": "fill"
+  },
+  "looked": {
+    "centre": 7
+  },
+  "scene_id": "ccdfaa5d9b9e",
+  "room_grounding": {
+    "known": [
+      "large black equipment cabinet",
+      "blue indicator lights",
+      "black metal shelving or frame",
+      "brown vertical support post",
+      "dark display or panel",
+      "patterned upholstered object",
+      "circular patterned upholstery sections",
+      "tripod or equipment stand",
+      "horizontal metal bar",
+      "thin vertical pole",
+      "black cables",
+      "small black circular device",
+      "small red round marker",
+      "yellow floor marking",
+      "black floor marking",
+      "large wheeled robot or robotic vehicle",
+      "robot black front housing",
+      "robot gray body panels",
+      "yellow-and-black striped robot component",
+      "blue-purple robot light"
+    ],
+    "seen": [
+      "black floor marking"
+    ],
+    "never_seen": [
+      "black cables",
+      "black metal shelving or frame",
+      "blue indicator lights",
+      "blue-purple robot light",
+      "brown vertical support post",
+      "circular patterned upholstery sections",
+      "dark display or panel",
+      "horizontal metal bar",
+      "large black equipment cabinet",
+      "large wheeled robot or robotic vehicle",
+      "patterned upholstered object",
+      "robot black front housing",
+      "robot gray body panels",
+      "small black circular device",
+      "small red round marker",
+      "thin vertical pole",
+      "tripod or equipment stand",
+      "yellow floor marking",
+      "yellow-and-black striped robot component"
+    ],
+    "unexpected": [
+      "light gray floor",
+      "purple wall"
+    ],
+    "grounded": true
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 20.8,
+    "per_step_s": [
+      20.29,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 3.87,
+    "vlm_latency_max_s": 3.87,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "643a28d5266c",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 8,
+      "latency_total_s": 21.468,
+      "latency_mean_s": 2.684,
+      "prompt_tokens_total": 8189,
+      "completion_tokens_total": 1334,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 2.978,
+      "latency_mean_s": 2.978,
+      "prompt_tokens_total": 2572,
+      "completion_tokens_total": 245,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "target_not_seen",
+      "detail": "the target was not visible at arrival"
+    },
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: large gray upholstered chair or sofa with dark circular pattern in View 2"
+    },
+    {
+      "code": "unexpected_objects",
+      "detail": "the rover reported 2 thing(s) the filmed room does not contain: light gray floor, purple wall \u2014 either the room changed or the model invented them"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    }
+  ],
+  "spoken_summary": "I completed a straight run toward the large gray upholstered chair with the dark circular pattern in View 2. The target was not visible at arrival; only a black floor marking was seen. Arrival was determined by vision only, without sonar confirmation."
+}
