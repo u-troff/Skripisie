@@ -72,6 +72,12 @@ NEAR_FILL = config.get_float("NEAR_FILL", 0.08)
 ARRIVE_FILL = config.get_float("ARRIVE_FILL", 0.20)
 ARRIVE_BOTTOM = config.get_float("ARRIVE_BOTTOM", 0.90)
 ARRIVE_MM = config.get_float("ARRIVE_MM", 250.0)
+# Vision (fill/bottom) is demoted to a fallback when sonar is readable and
+# clearly disagrees — sonar is a physical measurement, vision's "looks close"
+# is scene/tilt-dependent and was observed firing at 1.7m away (2026-10-03).
+# None/unreadable sonar still lets vision arrive on its own, for a target
+# sonar genuinely can't range (off-axis, below/above the beam).
+ARRIVE_SONAR_SANITY_MM = config.get_float("ARRIVE_SONAR_SANITY_MM", 800.0)
 CENTER_TOL = config.get_float("CENTER_TOL", 0.12)
 CAMERA_HFOV_DEG = config.get_float("CAMERA_HFOV_DEG", 60.0)
 FREE_TURN_DEG_PER_S = config.get_float("FREE_TURN_DEG_PER_S", 90.0)
@@ -922,56 +928,31 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
     vlm_calls = 0
     search_offsets = _sweep_offsets()
 
-    for pan_offset in search_offsets:
-        if vlm_calls >= SEARCH_MAX_VLM_CALLS:
-            break
-        accepted = None
-        while True:
-            cycle += 1
-            set_gimbal(pan=pan_offset)
-            loc = await grab_and_locate("ap_s%d_p%d.jpg" % (sweep, pan_offset))
-            if loc.get("_skip"):
-                await record("search", "skipped_blurry", loc, None,
-                                 {"sweep": sweep, "pan_offset": pan_offset})
-                mission.checks[-1]["kind"] = "skipped"
-                mission.checks[-1]["reason"] = "blurry"
-                break
-            vlm_calls += 1
-            accepted, gate = gate_for(loc, pan_offset, None, 0)
-            reject_reason = gate if gate not in ("confirmed", "low_confirmed",
-                                                 "low_pending", "not_visible") else None
-            pan_deg = pan_offset * GIMBAL_DEG_PER_UNIT if GIMBAL_DEG_PER_UNIT > 0 else None
-            await record("search", "look pan=%d gate=%s" % (pan_offset, gate), loc, None,
-                             {"sweep": sweep, "pan_offset": pan_offset, "pan_deg": pan_deg,
-                              "gate": gate, "reject_reason": reject_reason})
-            if gate != "low_pending" or vlm_calls >= SEARCH_MAX_VLM_CALLS:
-                break
-        if accepted is not None:
-            bearing_deg = (pan_deg or 0.0) + (accepted["x_center"] - 0.5) * CAMERA_HFOV_DEG
-            found_loc = accepted
-            break
-
     for sweep in range(SEARCH_MAX_SWEEPS):
         for pan_offset in search_offsets:
             if vlm_calls >= SEARCH_MAX_VLM_CALLS:
                 break
-            cycle += 1
-            set_gimbal(pan=pan_offset)
-            loc = await grab_and_locate("ap_s%d_p%d.jpg" % (sweep, pan_offset))
-            if loc.get("_skip"):
-                await record("search", "skipped_blurry", loc, None,
-                             {"sweep": sweep, "pan_offset": pan_offset})
-                mission.checks[-1]["kind"] = "skipped"
-                mission.checks[-1]["reason"] = "blurry"
-                continue
-            vlm_calls += 1
-            accepted, gate = gate_for(loc, pan_offset, None, 0)
-            reject_reason = gate if gate not in ("confirmed", "low_confirmed",
-                                                 "low_pending", "not_visible") else None
+            accepted = None
             pan_deg = pan_offset * GIMBAL_DEG_PER_UNIT if GIMBAL_DEG_PER_UNIT > 0 else None
-            await record("search", "look pan=%d gate=%s" % (pan_offset, gate), loc, None,
-                         {"sweep": sweep, "pan_offset": pan_offset, "pan_deg": pan_deg,
-                          "gate": gate, "reject_reason": reject_reason})
+            while True:
+                cycle += 1
+                set_gimbal(pan=pan_offset)
+                loc = await grab_and_locate("ap_s%d_p%d.jpg" % (sweep, pan_offset))
+                if loc.get("_skip"):
+                    await record("search", "skipped_blurry", loc, None,
+                                 {"sweep": sweep, "pan_offset": pan_offset})
+                    mission.checks[-1]["kind"] = "skipped"
+                    mission.checks[-1]["reason"] = "blurry"
+                    break
+                vlm_calls += 1
+                accepted, gate = gate_for(loc, pan_offset, None, 0)
+                reject_reason = gate if gate not in ("confirmed", "low_confirmed",
+                                                     "low_pending", "not_visible") else None
+                await record("search", "look pan=%d gate=%s" % (pan_offset, gate), loc, None,
+                             {"sweep": sweep, "pan_offset": pan_offset, "pan_deg": pan_deg,
+                              "gate": gate, "reject_reason": reject_reason})
+                if gate != "low_pending" or vlm_calls >= SEARCH_MAX_VLM_CALLS:
+                    break
             if accepted is not None:
                 bearing_deg = (pan_deg or 0.0) + (accepted["x_center"] - 0.5) * CAMERA_HFOV_DEG
                 found_loc = accepted
@@ -1022,13 +1003,25 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
         log.warning("[mission %s] bearing_residual_high: residual_e=%.3f",
                     mission.session_id, residual_e)
 
-    loc = accepted if accepted is not None else {"visible": False, "bbox_2d": None}
+    loc = dict(verify) if verify.get("visible") else {"visible": False, "bbox_2d": None}
+    loc["gate_trusted"] = accepted is not None
 
     # -- APPROACH --------------------------------------------------------------
     deadline = started + APPROACH_MAX_S
     hops_done = 0
-    prev_fill: Optional[float] = loc.get("fill")
+    prev_fill: Optional[float] = loc.get("fill") if loc.get("gate_trusted") else None
     lost = 0
+
+    def _merge(raw: dict, gate_accepted: Optional[dict]) -> dict:
+        """raw is the geometric detection from _derive_loc (has x_center/fill
+        whenever vlm_said_visible+valid bbox, regardless of gate). Centring
+        uses this always. Only fill-sensitive decisions (hop size, arrival,
+        prev_fill bookkeeping) key off gate_trusted — a low_pending/fill_jump
+        box still has a real bearing worth steering toward, it just hasn't
+        earned trust for *distance* yet."""
+        merged = dict(raw) if raw.get("visible") else {"visible": False, "bbox_2d": None}
+        merged["gate_trusted"] = gate_accepted is not None
+        return merged
 
     while cycle < APPROACH_MAX_CYCLES and time.time() < deadline:
         cycle += 1
@@ -1040,10 +1033,10 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
                 accepted, gate = (None, "skipped_blurry") if loc2.get("_skip") \
                     else gate_for(loc2, 0, prev_fill, hops_done)
                 await record("approach", "relocate_look gate=%s" % gate, loc2, None, {"gate": gate})
-                if accepted is None:
+                if not loc2.get("visible"):
                     return {"status": "blocked",
                             "detail": {"reason": "target_not_found", "cycles": cycle}}
-                loc = accepted
+                loc = _merge(loc2, accepted)
                 lost = 0
                 continue
             back_cm = HOP_BACK_S * getattr(rover, "free_speed_cmps", 15.0)
@@ -1053,15 +1046,16 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
                 else gate_for(loc2, 0, prev_fill, hops_done)
             await record("approach", "hop_back %.1fs gate=%s" % (HOP_BACK_S, gate), loc2, None,
                          {"gate": gate, "hop_moved_s": hop_result.get("moved_s")})
-            loc = accepted or {"visible": False, "bbox_2d": None}
+            loc = _merge(loc2, accepted)
             continue
         lost = 0
 
         e = loc["x_center"] - 0.5
         sonar_mm = await sonar_now()
+        trusted = loc.get("gate_trusted")
 
         sonar_hit = sonar_mm is not None and sonar_mm <= ARRIVE_MM and abs(e) <= CENTER_TOL
-        vision_hit = (
+        vision_hit = trusted and (
             (loc.get("fill") is not None and loc["fill"] >= ARRIVE_FILL)
             or (loc.get("bottom") is not None and loc["bottom"] >= ARRIVE_BOTTOM)
         )
@@ -1073,10 +1067,13 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
             if hops_done == 0:
                 arrival_block = "arrival_without_motion"
         elif vision_hit and hops_done >= MIN_HOPS_BEFORE_ARRIVAL:
+            sonar_contradicts = sonar_mm is not None and sonar_mm > ARRIVE_SONAR_SANITY_MM
             non_shrinking = prev_fill is None or (loc.get("fill") or 0) >= prev_fill
-            if non_shrinking:
+            if non_shrinking and not sonar_contradicts:
                 arrived = True
                 arrival_reason = "fill" if (loc.get("fill") or 0) >= ARRIVE_FILL else "bottom"
+            elif sonar_contradicts:
+                arrival_block = "vision_arrival_sonar_contradicted"
 
         if arrived:
             if APPROACH_ARRIVAL_CROSSCHECK:
@@ -1090,11 +1087,11 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
                         else gate_for(recheck, 0, prev_fill, hops_done)
                     await record("approach", "arrival_recheck gate=%s" % gate, recheck, sonar_mm,
                                  {"gate": gate, "arrival_block": "arrival_contradicted"})
-                    if accepted is None:
+                    if not recheck.get("visible"):
                         return {"status": "blocked",
                                 "detail": {"reason": "arrival_contradicted", "cycles": cycle,
                                            "arrival_cross_check": "contradicted"}}
-                    loc = accepted
+                    loc = _merge(recheck, accepted)
                     continue
 
             await record("approach", "arrived (%s)" % arrival_reason, loc, sonar_mm,
@@ -1114,15 +1111,17 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
             await asyncio.to_thread(rover.pivot, pivot_dir2, pivot_s2)
             action_desc = "pivot %s %.2fs " % ("R" if pivot_dir2 > 0 else "L", pivot_s2)
 
-        hop_cm = HOP_NEAR_CM if loc.get("fill", 0) > NEAR_FILL else HOP_CM
+        # Untrusted fill -> don't guess near/far, just take the cautious hop.
+        hop_cm = HOP_NEAR_CM if (not trusted or loc.get("fill", 0) > NEAR_FILL) else HOP_CM
         hop_result = await asyncio.to_thread(rover.hop, hop_cm)
         action_desc += "hop %d" % hop_cm
         hops_done += 1
-        prev_fill = loc.get("fill")
+        if trusted:
+            prev_fill = loc.get("fill")
 
         if hop_result.get("status") == "sonar_stop":
             sonar_mm = hop_result.get("sonar_mm")
-            if loc.get("fill", 0) > NEAR_FILL and abs(e) <= CENTER_TOL:
+            if trusted and loc.get("fill", 0) > NEAR_FILL and abs(e) <= CENTER_TOL:
                 await record("approach", action_desc + " sonar_stop", loc, sonar_mm,
                              {"pivot_cmd_s": pivot_s2, "pivot_dir": pivot_dir2,
                               "hop_moved_s": hop_result.get("moved_s"), "hops_done": hops_done})
@@ -1145,8 +1144,8 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
                      {"pivot_cmd_s": pivot_s2, "pivot_dir": pivot_dir2,
                       "hop_moved_s": hop_result.get("moved_s"), "gate": gate,
                       "hops_done": hops_done, "fill_prev": prev_fill,
-                      "reject_reason": reject_reason})
-        loc = accepted or {"visible": False, "bbox_2d": None}
+                      "reject_reason": reject_reason, "arrival_block": arrival_block})
+        loc = _merge(loc2, accepted)
 
     return {"status": "blocked", "detail": {"reason": "cycle_budget_exhausted", "cycles": cycle}}
 

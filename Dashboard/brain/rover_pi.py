@@ -709,13 +709,15 @@ class PiRoverController(RoverController):
         from e = x_center - 0.5 (right of centre = positive), and this
         mirrors that directly rather than making the caller flip a sign.
 
-        Sign flipped 2026-10-02: the approach loop's correction pivot was
-        observed pushing the target further off-centre instead of toward it
-        (mission_c613de320269.json — target at x_center=0.113, corrected
-        left, then lost entirely). -direction was wrong; direction is right.
+        Sign flipped 2026-10-02, then flipped BACK 2026-10-03: the 10-02 fix
+        was based on an inferred symptom (target pushed off-centre) and
+        turned out backward. Directly observed 2026-10-03
+        (mission_69ebe46cc023.json, cycle 5 — x_center=0.116, pivot_dir=-1,
+        logged as "L"): the chassis physically turned RIGHT on `direction`
+        with no negation. -direction is right; direction was wrong.
         """
         self._lf("STOP")
-        return self._timed_twist(angular_z=direction * self.free_turn_z, seconds=seconds)
+        return self._timed_twist(angular_z=-direction * self.free_turn_z, seconds=seconds)
 
     def hop(self, cm: float, backwards: bool = False) -> dict:
         """Timed forward/back Twist pulse with its own 20 Hz sonar watchdog.

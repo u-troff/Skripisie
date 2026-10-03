@@ -6,10 +6,12 @@ goes to the VLM so it can look as well as read.
 """
 
 import base64
+import json
 import threading
 import time
 import uuid
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import config
@@ -21,6 +23,11 @@ log = get_logger("scene")
 
 KEYFRAMES_MAX = config.get_int("KEYFRAMES_MAX", 10)
 FRAME_MAX_EDGE = config.get_int("FRAME_MAX_EDGE", 512)
+
+# Persisted scenes, sibling to rooms/ and logs/. A scene built once survives a
+# backend restart here, so re-uploading the same room video — and paying the
+# ~15s/frame VLM inventory cost again — is a choice, not a requirement.
+SCENES_DIR = Path(__file__).parent / "scenes"
 
 
 @dataclass
@@ -63,6 +70,7 @@ class SceneFrame:
 @dataclass
 class Scene:
     scene_id: str
+    name: str = ""
     frames: List[SceneFrame] = field(default_factory=list)
     elapsed_s: float = 0.0
     created_at: float = field(default_factory=time.time)
@@ -110,11 +118,69 @@ class Scene:
     def to_dict(self) -> dict:
         return {
             "scene_id": self.scene_id,
+            "name": self.name,
             "frame_count": len(self.frames),
             "elapsed": self.elapsed_s,
             "digest": self.digest(),
             "frames": [frame.to_dict() for frame in self.frames],
         }
+
+    def save_to_disk(self) -> None:
+        """One folder per scene: meta.json (everything but the JPEGs) plus
+        one frame_<i>.jpg each. Lets _load_scene_from_disk rebuild an
+        identical Scene without re-running keyframe extraction or the VLM."""
+        folder = SCENES_DIR / self.scene_id
+        folder.mkdir(parents=True, exist_ok=True)
+        meta = {
+            "scene_id": self.scene_id,
+            "name": self.name,
+            "created_at": self.created_at,
+            "elapsed_s": self.elapsed_s,
+            "frames": [
+                {"index": f.index, "place": f.place, "objects": f.objects,
+                 "obstacles": f.obstacles, "error": f.error}
+                for f in self.frames
+            ],
+        }
+        (folder / "meta.json").write_text(json.dumps(meta), encoding="utf-8")
+        for f in self.frames:
+            (folder / f"frame_{f.index}.jpg").write_bytes(f.jpeg)
+
+
+def _load_scene_from_disk(scene_id: str) -> Optional[Scene]:
+    folder = SCENES_DIR / scene_id
+    meta_path = folder / "meta.json"
+    if not meta_path.exists():
+        return None
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    scene = Scene(scene_id=meta["scene_id"], name=meta.get("name", ""),
+                  elapsed_s=meta.get("elapsed_s", 0.0),
+                  created_at=meta.get("created_at", time.time()))
+    for fmeta in meta.get("frames", []):
+        jpeg_path = folder / f"frame_{fmeta['index']}.jpg"
+        scene.frames.append(SceneFrame(
+            index=fmeta["index"],
+            jpeg=jpeg_path.read_bytes() if jpeg_path.exists() else b"",
+            place=fmeta.get("place", ""), objects=fmeta.get("objects") or [],
+            obstacles=fmeta.get("obstacles") or [], error=fmeta.get("error"),
+        ))
+    return scene
+
+
+def list_saved_scenes() -> List[dict]:
+    """Newest first, for the UI's room picker."""
+    if not SCENES_DIR.exists():
+        return []
+    out = []
+    for folder in sorted(SCENES_DIR.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
+        meta_path = folder / "meta.json"
+        if not meta_path.exists():
+            continue
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        out.append({"scene_id": meta["scene_id"], "name": meta.get("name", ""),
+                    "frame_count": len(meta.get("frames", [])),
+                    "created_at": meta.get("created_at")})
+    return out
 
 
 class SceneStore:
@@ -128,20 +194,26 @@ class SceneStore:
 
     def get(self, scene_id: str) -> Optional[Scene]:
         with self._lock:
-            return self._scenes.get(scene_id)
+            found = self._scenes.get(scene_id)
+        if found is not None:
+            return found
+        loaded = _load_scene_from_disk(scene_id)
+        if loaded is not None:
+            self.put(loaded)
+        return loaded
 
 
 store = SceneStore()
 
 
-def build_scene(video: bytes) -> Scene:
+def build_scene(video: bytes, name: str = "") -> Scene:
     """Blocking: keyframe extraction plus one VLM call per surviving frame.
 
     Call it from a threadpool — on local Ollama this is roughly 15s per frame.
     """
     started = time.perf_counter()
     jpegs = frames.keyframes(video, max_frames=KEYFRAMES_MAX, max_edge=FRAME_MAX_EDGE)
-    scene = Scene(scene_id=uuid.uuid4().hex[:12])
+    scene = Scene(scene_id=uuid.uuid4().hex[:12], name=name)
 
     for index, jpeg in enumerate(jpegs):
         parsed = vlm.inventory_frame(jpeg)
@@ -165,6 +237,7 @@ def build_scene(video: bytes) -> Scene:
 
     scene.elapsed_s = time.perf_counter() - started
     store.put(scene)
+    scene.save_to_disk()
     log.info("[scene %s] %d frame(s), %d unreadable, %.1fs",
              scene.scene_id, len(scene.frames),
              sum(1 for f in scene.frames if f.error), scene.elapsed_s)

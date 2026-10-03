@@ -548,6 +548,14 @@ def _uncertainties(mission, progress: List[dict], completed: List[dict],
             flag("false_arrival_rejected",
                  "an apparent arrival was rejected because the arrival check contradicted it")
 
+        sonar_contradicted = [c for c in approach_cycles
+                              if c.get("arrival_block") == "vision_arrival_sonar_contradicted"]
+        if sonar_contradicted:
+            flag("vision_arrival_sonar_contradicted",
+                 "%d time(s) vision reported the target close enough to arrive while sonar "
+                 "still read it as far away — vision was not trusted, the rover kept approaching"
+                 % len(sonar_contradicted))
+
         if reason in ("arrival_contradicted", "target_not_found") and "arrived" not in str(reason):
             flag("arrival_unconfirmed",
                  "the approach ended without a confirmed arrival")

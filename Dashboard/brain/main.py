@@ -13,9 +13,13 @@ from pipeline import handle_confirmation_audio,handle_confirmation_text,handle_d
 import av
 from fastapi import FastAPI, File, Form, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
 
 import stt
-from log_setup import setup_logging
+from log_setup import get_logger, setup_logging
+
+log = get_logger("main")
 from pipeline import handle_voice_command
 import base64
 import json
@@ -43,6 +47,7 @@ def _bool_env(name: str, default: bool) -> bool:
 TEXT_COMMANDS_ENABLED = _bool_env("ALLOW_TEXT_COMMANDS", False)
 
 app = FastAPI()
+app.mount("/logs/frames", StaticFiles(directory="logs/frames") , name="frames") 
 
 app.add_middleware(
     CORSMiddleware,
@@ -160,16 +165,25 @@ def _decode(value):
 
 
 @app.post("/scene")
-async def upload_scene(video: UploadFile = File(...)):
+async def upload_scene(video: UploadFile = File(...), name: str = Form("")):
     """Room video in, scene digest out.
 
     Slow on purpose: keyframe extraction is cheap, but every surviving frame
     costs one VLM call. Locally that is roughly 15s a frame, so a five-frame
-    clip is well over a minute. It is paid once per room, not per turn.
+    clip is well over a minute. It is paid once per room, not per turn — the
+    result is also persisted to Dashboard/brain/scenes/ so it survives a
+    backend restart and can be picked again via GET /scenes without
+    re-uploading or re-running the VLM inventory.
     """
     raw = await video.read()
-    built = await run_in_threadpool(scene_mod.build_scene, raw)
+    built = await run_in_threadpool(scene_mod.build_scene, raw, name)
     return built.to_dict()
+
+
+@app.get("/scenes")
+def list_scenes():
+    """Previously catalogued rooms, newest first — for the UI's room picker."""
+    return scene_mod.list_saved_scenes()
 
 
 @app.get("/scene/{scene_id}")
@@ -312,6 +326,13 @@ async def execution(websocket: WebSocket):
                     continue
                 mission = mission_session.store.create(dialogue)
                 task = asyncio.create_task(mission_mod.run_mission(mission,rover,emit))
+                def _log_task_exception(t, _sid=mission.session_id):
+                    if t.cancelled():
+                        return
+                    exc = t.exception()
+                    if exc is not None:
+                        log.error("[mission %s] run_mission crashed", _sid, exc_info=exc)
+                task.add_done_callback(_log_task_exception)
                 continue
 
             if mission is None:
