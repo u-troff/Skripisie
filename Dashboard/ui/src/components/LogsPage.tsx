@@ -18,8 +18,12 @@ function outcomeClass(outcome: string | null | undefined): string {
   return 'outcome'
 }
 
+type RoverFilter = 'all' | 'virtual' | 'pi'
+const ROVER_FILTERS: RoverFilter[] = ['all', 'virtual', 'pi']
+
 export default function LogsPage() {
   const [runs, setRuns] = useState<RunSummary[]>([])
+  const [roverFilter, setRoverFilter] = useState<RoverFilter>('all')
   const [loadingList, setLoadingList] = useState(true)
   const [listError, setListError] = useState<string | null>(null)
 
@@ -69,6 +73,26 @@ export default function LogsPage() {
   }, [selected])
 
   const lastStep = trace?.steps[trace.steps.length - 1]
+  const countFor = (filter: RoverFilter) =>
+    filter === 'all' ? runs.length : runs.filter((run) => run.rover === filter).length
+  const shownRuns = roverFilter === 'all' ? runs : runs.filter((run) => run.rover === roverFilter)
+
+  // The route actually driven: an approach follows its planned waypoints
+  // (around obstacles), while move/turn go straight to where they ended. Joining
+  // only each step's END pose would draw straight lines through furniture.
+  const route: Array<[number, number]> = []
+  const collisions: Array<[number, number]> = []
+  if (trace) {
+    route.push([trace.start.x, trace.start.y])
+    for (const step of trace.steps) {
+      if (step.planned_path && step.planned_path.length > 1) {
+        route.push(...step.planned_path.slice(1))
+      } else {
+        route.push([step.pose.x, step.pose.y])
+      }
+      if (step.reason === 'collision') collisions.push([step.pose.x, step.pose.y])
+    }
+  }
 
   return (
     <main className="wrap wide">
@@ -109,11 +133,9 @@ export default function LogsPage() {
               width_m: trace.settings.robot_width_m,
               clearance_m: trace.settings.clearance_m,
             }}
-            travelled={[
-              [trace.start.x, trace.start.y],
-              ...trace.steps.map((s): [number, number] => [s.pose.x, s.pose.y]),
-            ]}
-            planned={lastStep?.planned_path ?? null}
+            travelled={route}
+            planned={null}
+            collisions={collisions}
             pose={lastStep?.pose ?? trace.start}
             footer={
               lastStep
@@ -125,15 +147,34 @@ export default function LogsPage() {
       </section>
 
       <section className="panel">
-        <h2>Runs ({runs.length})</h2>
+        <h2>
+          Runs ({shownRuns.length}
+          {roverFilter !== 'all' ? ` of ${runs.length}` : ''})
+        </h2>
+        <div className="filterbar" role="group" aria-label="Filter runs by rover">
+          {ROVER_FILTERS.map((filter) => (
+            <button
+              key={filter}
+              className={`ghost ${roverFilter === filter ? 'active' : ''}`}
+              onClick={() => setRoverFilter(filter)}
+            >
+              {filter} ({countFor(filter)})
+            </button>
+          ))}
+        </div>
         {listError && <pre className="error">{listError}</pre>}
+        {!listError && runs.length > 0 && shownRuns.length === 0 && (
+          <p className="note" style={{ marginTop: 0 }}>
+            No {roverFilter} runs in the logs.
+          </p>
+        )}
         {!listError && runs.length === 0 && !loadingList && (
           <p className="note" style={{ marginTop: 0 }}>
             No run logs yet — Dashboard/brain/logs/ is empty.
           </p>
         )}
         <div className="runlist">
-          {runs.map((run) => (
+          {shownRuns.map((run) => (
             <button
               key={run.session_id}
               className={`runcard ${selected === run.session_id ? 'active' : ''}`}

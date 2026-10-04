@@ -1,0 +1,264 @@
+{
+  "session_id": "e7d97e1a3eb0",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Go to the desk, turn around, move forward 0.5 metres, turn left 90 degrees, move forward 0.4 metres, then go to the door.",
+  "resolved_command": "Go to the desk, turn around, move forward 0.5 metres, turn left 90 degrees, move forward 0.4 metres, then go to the door.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "degrees": 180
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "distance_m": 0.5
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "degrees": -90
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "distance_m": 0.4
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "door"
+      }
+    ],
+    "notes": "The 90-degree turn uses -90 degrees to indicate left. The fixed moves may encounter floor obstacles because the room layout and distances are unspecified."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "degrees": 180
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "distance_m": 0.5
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "degrees": -90
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "distance_m": 0.4
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "door"
+      }
+    ],
+    "notes": "The 90-degree turn uses -90 degrees to indicate left. The fixed moves may encounter floor obstacles because the room layout and distances are unspecified."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.3
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.11
+    },
+    {
+      "index": 2,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.16
+    },
+    {
+      "index": 3,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 4,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.12
+    },
+    {
+      "index": 5,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.86
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 2.62,
+    "per_step_s": [
+      1.3,
+      0.11,
+      0.16,
+      0.06,
+      0.12,
+      0.86
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 60,
+    "seed": 578882498,
+    "steps": 6,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 7.546,
+    "sim_time_s": 48.962,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "desk",
+      "door"
+    ],
+    "final_pose": {
+      "x": 0.4,
+      "y": 3.8,
+      "theta": 169.99
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-201537.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 6,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "desk",
+      "door"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The room layout and distances are unspecified, so the fixed turns and moves after approaching the desk cannot be verified as collision-free or as leading to the door. The plan may encounter the couch, coffee table, bookshelf, or desk.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 4.946,
+      "latency_mean_s": 2.473,
+      "prompt_tokens_total": 599,
+      "completion_tokens_total": 335,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 11.472,
+      "latency_mean_s": 5.736,
+      "prompt_tokens_total": 972,
+      "completion_tokens_total": 896,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "Completed the command and visited the desk and door. No obstacles or collisions were recorded."
+}

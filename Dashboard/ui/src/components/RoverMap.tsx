@@ -47,10 +47,12 @@ interface RoomMapViewProps {
   travelled: Array<[number, number]>
   planned: Array<[number, number]> | null
   pose: RoverPose | null
+  /** Where a literal move stopped short on an obstacle or the wall. */
+  collisions?: Array<[number, number]>
   footer?: string
 }
 
-export function RoomMapView({ room, robot, travelled, planned, pose, footer }: RoomMapViewProps) {
+export function RoomMapView({ room, robot, travelled, planned, pose, collisions, footer }: RoomMapViewProps) {
   const scale = TARGET_W / room.width_m
   const width = room.width_m * scale + 2 * MARGIN
   const height = room.height_m * scale + 2 * MARGIN
@@ -94,6 +96,12 @@ export function RoomMapView({ room, robot, travelled, planned, pose, footer }: R
         ))}
         {planned && <polyline points={poly(planned)} fill="none" stroke="#3d78d1" strokeWidth={1} />}
         <polyline points={poly(travelled)} fill="none" stroke="#444444" strokeWidth={2} />
+        {(collisions ?? []).map(([x, y], i) => (
+          <g key={`collision-${i}`} stroke="#d93025" strokeWidth={2}>
+            <line x1={sx(x) - 5} y1={sy(y) - 5} x2={sx(x) + 5} y2={sy(y) + 5} />
+            <line x1={sx(x) - 5} y1={sy(y) + 5} x2={sx(x) + 5} y2={sy(y) - 5} />
+          </g>
+        ))}
         {pose && robot && (
           <polygon
             points={poly(footprintCorners(pose, robot.length_m, robot.width_m))}

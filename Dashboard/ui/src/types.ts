@@ -119,6 +119,7 @@ export interface RunTrace {
     pose: RoverPose
     planned_path: Array<[number, number]> | null
     status: string
+    reason?: string | null
     odometer_m: number
     sim_time_s: number
   }>

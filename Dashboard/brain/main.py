@@ -454,6 +454,7 @@ def get_log_trace(session_id: str):
                         "pose": record.get("pose"),
                         "planned_path": record.get("planned_path"),
                         "status": record.get("status"),
+                        "reason": record.get("reason"),
                         "odometer_m": record.get("odometer_m"),
                         "sim_time_s": record.get("sim_time_s"),
                     })

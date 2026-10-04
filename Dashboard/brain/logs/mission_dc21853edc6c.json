@@ -1,0 +1,253 @@
+{
+  "session_id": "dc21853edc6c",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Move forward half a metre, turn right 90 degrees, move forward 0.9 metres, turn left 90 degrees, move forward 0.8 metres, then turn left 90 degrees.",
+  "resolved_command": "Move forward half a metre, turn right 90 degrees, move forward 0.9 metres, turn left 90 degrees, move forward 0.8 metres, then turn left 90 degrees.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "target": "",
+        "distance_m": 0.5
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "",
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": "",
+        "distance_m": 0.9
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": "",
+        "degrees": -90
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": "",
+        "distance_m": 0.8
+      },
+      {
+        "id": 6,
+        "action": "turn",
+        "target": "",
+        "degrees": -90
+      }
+    ],
+    "notes": "The original command was purely a sequence of movements and turns. As per the advice, the plan is incomplete as it lacks an 'observe' action, but the goal was only to execute the movement/turning sequence, which has been completed. Since no specific named object was given for observation, I could not include an 'observe' step that satisfies the original command's intent to 'reach' something named."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "target": "",
+        "distance_m": 0.5
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "",
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": "",
+        "distance_m": 0.9
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": "",
+        "degrees": -90
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": "",
+        "distance_m": 0.8
+      },
+      {
+        "id": 6,
+        "action": "turn",
+        "target": "",
+        "degrees": -90
+      }
+    ],
+    "notes": "The original command was purely a sequence of movements and turns. As per the advice, the plan is incomplete as it lacks an 'observe' action, but the goal was only to execute the movement/turning sequence, which has been completed. Since no specific named object was given for observation, I could not include an 'observe' step that satisfies the original command's intent to 'reach' something named."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "move",
+      "target": "",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.16
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": "",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.07
+    },
+    {
+      "index": 2,
+      "action": "move",
+      "target": "",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.27
+    },
+    {
+      "index": 3,
+      "action": "turn",
+      "target": "",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.05
+    },
+    {
+      "index": 4,
+      "action": "move",
+      "target": "",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.25
+    },
+    {
+      "index": 5,
+      "action": "turn",
+      "target": "",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.85,
+    "per_step_s": [
+      0.16,
+      0.07,
+      0.27,
+      0.05,
+      0.25,
+      0.06
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 80,
+    "seed": 777081126,
+    "steps": 6,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 2.2,
+    "sim_time_s": 15.941,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [],
+    "final_pose": {
+      "x": 1.7,
+      "y": 0.2,
+      "theta": -180.0
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-203800.jsonl"
+  },
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot's plan only consists of movement and turning. There is no 'look' action included in the plan, which is the only other allowed action. If the mission requires observation, the plan is incomplete.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 1.948,
+      "latency_mean_s": 0.974,
+      "prompt_tokens_total": 652,
+      "completion_tokens_total": 136,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 6.266,
+      "latency_mean_s": 3.133,
+      "prompt_tokens_total": 1011,
+      "completion_tokens_total": 495,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The command was completed successfully. The rover moved 2.2 meters and ended at position x=1.7, y=0.2, with a theta of -180.0 degrees. No obstacles were detected during the run."
+}

@@ -1,0 +1,333 @@
+{
+  "session_id": "2041a37005aa",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Go to the window, then the door, then the couch, then the coffee table, then pick up the lamp, then go to the desk, then the bookshelf, and finally the window again.",
+  "resolved_command": "Go to the window, then the door, then the couch, then the coffee table, then pick up the lamp, then go to the desk, then the bookshelf, and finally the window again.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 5,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 7,
+        "action": "approach",
+        "target": "window"
+      }
+    ],
+    "notes": "Step 5 in the original command requested picking up a 'lamp', which is not in the room list. This step was interpreted as continuing the traversal sequence to the next named item ('desk') as per the planner's instructions, effectively skipping the unachievable pickup action but fulfilling the travel requirements of the original command sequence. All specified traversals were converted to 'approach' actions."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 5,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 7,
+        "action": "approach",
+        "target": "window"
+      }
+    ],
+    "notes": "Step 5 in the original command requested picking up a 'lamp', which is not in the room list. This step was interpreted as continuing the traversal sequence to the next named item ('desk') as per the planner's instructions, effectively skipping the unachievable pickup action but fulfilling the travel requirements of the original command sequence. All specified traversals were converted to 'approach' actions."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.15
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.73
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.69
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.81
+    },
+    {
+      "index": 4,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.78
+    },
+    {
+      "index": 5,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.66
+    },
+    {
+      "index": 6,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.07
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 5.87,
+    "per_step_s": [
+      1.15,
+      0.73,
+      0.69,
+      0.81,
+      0.78,
+      0.66,
+      1.07
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 116,
+    "seed": 777081126,
+    "steps": 7,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 17.36,
+    "sim_time_s": 112.023,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "window",
+      "door",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "window"
+    ],
+    "final_pose": {
+      "x": 2.6,
+      "y": 3.7,
+      "theta": 120.65
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-203800.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    },
+    {
+      "step_id": 3,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 5,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 6,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    },
+    {
+      "step_id": 7,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "window",
+      "door",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "window"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "Step 5, 'report' target 'lamp', refers to an object ('lamp') not listed in the room contents. Additionally, the plan includes many 'approach' actions which are valid, but the note about 'pick up the lamp' suggests a misunderstanding of the robot's capabilities or the plan's intent, even though the plan itself only uses 'approach' and 'report'.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 2.682,
+      "latency_mean_s": 1.341,
+      "prompt_tokens_total": 667,
+      "completion_tokens_total": 159,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 6.377,
+      "latency_mean_s": 3.189,
+      "prompt_tokens_total": 1040,
+      "completion_tokens_total": 489,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The command was completed in 5.87 seconds. The rover traveled 17.36 meters during its 7 steps. The final pose was at X: 2.6, Y: 3.7, Theta: 120.65."
+}

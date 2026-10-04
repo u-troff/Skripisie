@@ -1,0 +1,420 @@
+{
+  "session_id": "ac62985450a4",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Go to the couch, then the coffee table, then the desk, then the bookshelf, then the door, then the window, then the couch again, then the desk again, then the coffee table again, and finally the bookshelf again.",
+  "resolved_command": "go to the couch, then the coffee table, then the desk, then the bookshelf, then the door, then the window, then the couch, then the desk, then the coffee table, and finally the bookshelf",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 5,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 7,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 8,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 9,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 10,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The command implies reaching several locations in sequence. Since the only travel action provided is 'approach' (which handles navigation to a target), and no specific distances or turns are given between targets, the rover will execute a sequence of 'approach' actions targeting each item listed in the sequence. As per the checker's advice, 'observe' actions are omitted as they were not explicitly commanded, sticking strictly to reaching the locations."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 5,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 7,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 8,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 9,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 10,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The command implies reaching several locations in sequence. Since the only travel action provided is 'approach' (which handles navigation to a target), and no specific distances or turns are given between targets, the rover will execute a sequence of 'approach' actions targeting each item listed in the sequence. As per the checker's advice, 'observe' actions are omitted as they were not explicitly commanded, sticking strictly to reaching the locations."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.79
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.87
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.78
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.66
+    },
+    {
+      "index": 4,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.63
+    },
+    {
+      "index": 5,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.76
+    },
+    {
+      "index": 6,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.44
+    },
+    {
+      "index": 7,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.66
+    },
+    {
+      "index": 8,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.84
+    },
+    {
+      "index": 9,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.6
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 8.04,
+    "per_step_s": [
+      0.79,
+      0.87,
+      0.78,
+      0.66,
+      1.63,
+      0.76,
+      0.44,
+      0.66,
+      0.84,
+      0.6
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 47,
+    "seed": 777081126,
+    "steps": 10,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 23.333,
+    "sim_time_s": 153.787,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "desk",
+      "coffee table",
+      "bookshelf"
+    ],
+    "final_pose": {
+      "x": 4.2,
+      "y": 1.0,
+      "theta": 0.0
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-203800.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 3,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    },
+    {
+      "step_id": 5,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    },
+    {
+      "step_id": 6,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    },
+    {
+      "step_id": 7,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 8,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 9,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 10,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "desk",
+      "coffee table",
+      "bookshelf"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot can only drive and look. The 'approach' action is valid for driving, but the mission plan seems repetitive, repeatedly approaching items. More importantly, the plan does not include any 'look' action, which is the only other capability mentioned. If the goal is just to drive to all targets, the plan is valid, but if the goal is to verify/inspect, 'look' is missing.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 2.811,
+      "latency_mean_s": 1.405,
+      "prompt_tokens_total": 713,
+      "completion_tokens_total": 176,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 8.475,
+      "latency_mean_s": 4.238,
+      "prompt_tokens_total": 1050,
+      "completion_tokens_total": 756,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The command was completed. The rover traveled 23.333 meters. The route was a single straight run."
+}

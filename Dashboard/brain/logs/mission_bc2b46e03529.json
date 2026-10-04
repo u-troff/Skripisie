@@ -1,0 +1,230 @@
+{
+  "session_id": "bc2b46e03529",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Go to the coffee table, turn right 90 degrees, move forward half a metre, then go to the bookshelf.",
+  "resolved_command": "go to the coffee table, turn right 90 degrees, move forward half a metre, then go to the bookshelf",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": null,
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.5
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The plan adheres to the command structure. The 'approach' commands for 'coffee table' and 'bookshelf' imply navigating to these locations. Given the constraint that the rover cannot interact physically, we assume 'approach' will navigate around the designated floor obstacles (couch, coffee table, desk, bookshelf) to reach the target location for observation, as is standard for indoor navigation systems unless specific collision avoidance logic is provided for 'move'. The move command after the turn is executed as directed."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": null,
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.5
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The plan adheres to the command structure. The 'approach' commands for 'coffee table' and 'bookshelf' imply navigating to these locations. Given the constraint that the rover cannot interact physically, we assume 'approach' will navigate around the designated floor obstacles (couch, coffee table, desk, bookshelf) to reach the target location for observation, as is standard for indoor navigation systems unless specific collision avoidance logic is provided for 'move'. The move command after the turn is executed as directed."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.58
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 2,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.16
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.55
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.35,
+    "per_step_s": [
+      0.58,
+      0.06,
+      0.16,
+      0.55
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 92,
+    "seed": 777081126,
+    "steps": 4,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 3.903,
+    "sim_time_s": 25.785,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "coffee table",
+      "bookshelf"
+    ],
+    "final_pose": {
+      "x": 4.2,
+      "y": 1.0,
+      "theta": 17.1
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-203800.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "coffee table",
+      "bookshelf"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot is instructed to approach and move near obstacles (coffee table, bookshelf) which are listed as floor obstacles. While the robot can 'drive' (move) and 'look' (approach implies perception), the plan doesn't explicitly state how the robot will navigate around or interact with these obstacles while strictly adhering to the 'cannot pick up or touch anything' constraint. If 'approach' implies moving into the obstacle area, the plan needs confirmation that movement will be safe around fixed obstacles.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 2.748,
+      "latency_mean_s": 1.374,
+      "prompt_tokens_total": 570,
+      "completion_tokens_total": 162,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 5.309,
+      "latency_mean_s": 2.655,
+      "prompt_tokens_total": 1028,
+      "completion_tokens_total": 354,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The command was completed. The rover visited the coffee table and the bookshelf. The total execution time was 1.35 seconds."
+}

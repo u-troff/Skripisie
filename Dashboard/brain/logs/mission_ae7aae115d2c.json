@@ -1,0 +1,298 @@
+{
+  "session_id": "ae7aae115d2c",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Go to the desk, turn around, move forward 0.5 metres, turn left 90 degrees, move forward 0.4 metres, then go to the door.",
+  "resolved_command": "Go to the desk, turn around, move forward 0.5 metres, turn left 90 degrees, move forward 0.4 metres, then go to the door.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "right",
+        "degrees": 180
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.5
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": "left",
+        "degrees": 90
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.4
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "door"
+      }
+    ],
+    "notes": "The plan adheres to the movement sequence specified. Approaching the 'desk' (a floor obstacle) is executed as per the requirement to reach the named destination, despite the plan checker's caution about collision risk inherent to the rover's limitations."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "right",
+        "degrees": 180
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.5
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": "left",
+        "degrees": 90
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.4
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "door"
+      }
+    ],
+    "notes": "The plan adheres to the movement sequence specified. Approaching the 'desk' (a floor obstacle) is executed as per the requirement to reach the named destination, despite the plan checker's caution about collision risk inherent to the rover's limitations."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.3
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": "right",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.1
+    },
+    {
+      "index": 2,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.16
+    },
+    {
+      "index": 3,
+      "action": "turn",
+      "target": "left",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.07
+    },
+    {
+      "index": 4,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.14
+    },
+    {
+      "index": 5,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.12
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 2.89,
+    "per_step_s": [
+      1.3,
+      0.1,
+      0.16,
+      0.07,
+      0.14,
+      1.12
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 100,
+    "seed": 777081126,
+    "steps": 6,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 8.071,
+    "sim_time_s": 53.115,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "desk",
+      "door"
+    ],
+    "final_pose": {
+      "x": 0.4,
+      "y": 3.8,
+      "theta": 167.54
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-203800.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "turn",
+      "target": "right",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 4,
+      "action": "turn",
+      "target": "left",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 6,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "desk",
+      "right",
+      "left",
+      "door"
+    ],
+    "unresolved": [
+      "right",
+      "left"
+    ],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": true,
+    "verified": false,
+    "concerns": "Step 1: 'approach' to 'desk'. The desk is listed as a floor obstacle, and the robot cannot pick up or touch anything. Approaching an obstacle might lead to collision or being stuck, which is not explicitly handled by the robot's limited capabilities (drive/look).",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 3.285,
+      "latency_mean_s": 1.642,
+      "prompt_tokens_total": 692,
+      "completion_tokens_total": 193,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 5.562,
+      "latency_mean_s": 2.781,
+      "prompt_tokens_total": 1013,
+      "completion_tokens_total": 416,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "plan_target_unresolved",
+      "detail": "the plan named a target the room doesn't have: right, left"
+    }
+  ],
+  "spoken_summary": "Command execution is complete. The most important uncertainty is plan_target_unresolved regarding room targets. The rover's final pose is x: 0.4, y: 3.8, theta: 167.54."
+}

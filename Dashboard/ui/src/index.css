@@ -563,3 +563,8 @@ table.logtable th {
   letter-spacing: 0.04em;
 }
 table.logtable tr.hit { background: #14261e; }
+
+.filterbar { display: flex; gap: 6px; margin: 0 0 12px; }
+.filterbar button.ghost { text-transform: capitalize; padding: 4px 12px; }
+.filterbar button.ghost:hover { color: var(--text); border-color: var(--accent); }
+.filterbar button.ghost.active { color: var(--text); border-color: var(--accent); background: rgba(255, 255, 255, 0.06); }

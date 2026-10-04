@@ -1,0 +1,262 @@
+{
+  "session_id": "b0cf143b1c75",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Head over to the door, then the bookshelf, then the window, and finally the couch.",
+  "resolved_command": "Head over to the door, then the bookshelf, then the window, and finally the couch.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "door",
+        "distance_m": null,
+        "degrees": null
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "bookshelf",
+        "distance_m": null,
+        "degrees": null
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "window",
+        "distance_m": null,
+        "degrees": null
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "couch",
+        "distance_m": null,
+        "degrees": null
+      }
+    ],
+    "notes": "The plan fulfills the movement requirements by using 'approach' for each specified target. Based on the checker's advice, no explicit 'observe' or 'scan' commands are included as the core command only mandates 'Head over to' the locations, which is achieved via approach."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "door",
+        "distance_m": null,
+        "degrees": null
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "bookshelf",
+        "distance_m": null,
+        "degrees": null
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "window",
+        "distance_m": null,
+        "degrees": null
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "couch",
+        "distance_m": null,
+        "degrees": null
+      }
+    ],
+    "notes": "The plan fulfills the movement requirements by using 'approach' for each specified target. Based on the checker's advice, no explicit 'observe' or 'scan' commands are included as the core command only mandates 'Head over to' the locations, which is achieved via approach."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.43
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.63
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.06
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.42
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 4.54,
+    "per_step_s": [
+      1.43,
+      1.63,
+      1.06,
+      0.42
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 23,
+    "seed": 777081126,
+    "steps": 4,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 13.451,
+    "sim_time_s": 85.891,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "door",
+      "bookshelf",
+      "window",
+      "couch"
+    ],
+    "final_pose": {
+      "x": 1.7,
+      "y": 2.9,
+      "theta": -138.37
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-203800.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    },
+    {
+      "step_id": 3,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "door",
+      "bookshelf",
+      "window",
+      "couch"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot can only drive and look. The plan consists entirely of 'approach' commands. While 'approach' implies movement, it does not include a 'look' action to fulfill a typical mission requirement for inspection/observation, nor does it guarantee any specific observable action other than reaching the location. If the mission requires observation, 'look' actions are missing. If the plan is only about reaching these locations, it is technically feasible based on locomotion, but the sequence might be inefficient or logically flawed without knowing the starting point.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 3.177,
+      "latency_mean_s": 1.589,
+      "prompt_tokens_total": 676,
+      "completion_tokens_total": 163,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 5.78,
+      "latency_mean_s": 2.89,
+      "prompt_tokens_total": 1023,
+      "completion_tokens_total": 396,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The command to visit the door, bookshelf, window, and couch has been completed. The rover traveled a total of 13.451 meters in 4.54 seconds. The route was a single straight run with no bends taken."
+}

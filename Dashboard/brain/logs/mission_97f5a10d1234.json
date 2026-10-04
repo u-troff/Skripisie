@@ -1,0 +1,321 @@
+{
+  "session_id": "97f5a10d1234",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Move forward half a metre, turn right 90 degrees, move forward 0.9 metres, turn left 90 degrees, move forward 0.8 metres, then turn left 90 degrees.",
+  "resolved_command": "Move forward half a metre, turn right 90 degrees, move forward 0.9 metres, turn left 90 degrees, move forward 0.8 metres, then turn left 90 degrees.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "target": "floor",
+        "distance_m": 0.5
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "none",
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": "floor",
+        "distance_m": 0.9
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": "none",
+        "degrees": -90
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": "floor",
+        "distance_m": 0.8
+      },
+      {
+        "id": 6,
+        "action": "turn",
+        "target": "none",
+        "degrees": -90
+      }
+    ],
+    "notes": "The target for 'move' and 'turn' was specified relative to the current position/direction, so 'floor' was used as a placeholder target for movement actions, and 'none' for turns, as per instruction interpretation for relative commands."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "target": "floor",
+        "distance_m": 0.5
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "none",
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": "floor",
+        "distance_m": 0.9
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": "none",
+        "degrees": -90
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": "floor",
+        "distance_m": 0.8
+      },
+      {
+        "id": 6,
+        "action": "turn",
+        "target": "none",
+        "degrees": -90
+      }
+    ],
+    "notes": "The target for 'move' and 'turn' was specified relative to the current position/direction, so 'floor' was used as a placeholder target for movement actions, and 'none' for turns, as per instruction interpretation for relative commands."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "move",
+      "target": "floor",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.16
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": "none",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 2,
+      "action": "move",
+      "target": "floor",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.27
+    },
+    {
+      "index": 3,
+      "action": "turn",
+      "target": "none",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 4,
+      "action": "move",
+      "target": "floor",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.25
+    },
+    {
+      "index": 5,
+      "action": "turn",
+      "target": "none",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.87,
+    "per_step_s": [
+      0.16,
+      0.06,
+      0.27,
+      0.06,
+      0.25,
+      0.06
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 79,
+    "seed": 777081126,
+    "steps": 6,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 2.2,
+    "sim_time_s": 15.941,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [],
+    "final_pose": {
+      "x": 1.7,
+      "y": 0.2,
+      "theta": -180.0
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-203800.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "move",
+      "target": "floor",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 2,
+      "action": "turn",
+      "target": "none",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 3,
+      "action": "move",
+      "target": "floor",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 4,
+      "action": "turn",
+      "target": "none",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 5,
+      "action": "move",
+      "target": "floor",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 6,
+      "action": "turn",
+      "target": "none",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "floor",
+      "none",
+      "floor",
+      "none",
+      "floor",
+      "none"
+    ],
+    "unresolved": [
+      "floor",
+      "none",
+      "floor",
+      "none",
+      "floor",
+      "none"
+    ],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 1.842,
+      "latency_mean_s": 0.921,
+      "prompt_tokens_total": 708,
+      "completion_tokens_total": 116,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 2.875,
+      "latency_mean_s": 2.875,
+      "prompt_tokens_total": 458,
+      "completion_tokens_total": 217,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "plan_target_unresolved",
+      "detail": "the plan named a target the room doesn't have: floor, none, floor, none, floor, none"
+    }
+  ],
+  "spoken_summary": "Command execution is complete. The rover moved a total of 2.2 meters. The most important uncertainty was plan_target_unresolved regarding the floor."
+}

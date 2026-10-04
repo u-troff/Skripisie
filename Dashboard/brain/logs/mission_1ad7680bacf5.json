@@ -1,0 +1,340 @@
+{
+  "session_id": "1ad7680bacf5",
+  "outcome": "halted",
+  "rover": "virtual",
+  "command": "Go to the bookshelf, turn left 90 degrees, move forward 0.6 metres, turn around, move forward 0.6 metres, go to the window, turn right 45 degrees, then move back half a metre.",
+  "resolved_command": "go to the bookshelf, turn left 90 degrees, move forward 0.6 metres, turn around, move forward 0.6 metres, go to the window, turn right 45 degrees, then move back half a metre.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": null,
+        "distance_m": null,
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.6,
+        "degrees": null
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": null,
+        "distance_m": null,
+        "degrees": 180
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.6,
+        "degrees": null
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 7,
+        "action": "turn",
+        "target": null,
+        "distance_m": null,
+        "degrees": -45
+      },
+      {
+        "id": 8,
+        "action": "move",
+        "target": null,
+        "distance_m": -0.5,
+        "degrees": null
+      }
+    ],
+    "notes": "The plan adheres strictly to the requested sequence of actions. It is noted that movements after 'approach bookshelf' may lead to collisions with the designated floor obstacles, as per the plan checker's warning, but the steps follow the explicit instruction."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": null,
+        "distance_m": null,
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.6,
+        "degrees": null
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": null,
+        "distance_m": null,
+        "degrees": 180
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": null,
+        "distance_m": 0.6,
+        "degrees": null
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 7,
+        "action": "turn",
+        "target": null,
+        "distance_m": null,
+        "degrees": -45
+      },
+      {
+        "id": 8,
+        "action": "move",
+        "target": null,
+        "distance_m": -0.5,
+        "degrees": null
+      }
+    ],
+    "notes": "The plan adheres strictly to the requested sequence of actions. It is noted that movements after 'approach bookshelf' may lead to collisions with the designated floor obstacles, as per the plan checker's warning, but the steps follow the explicit instruction."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.09
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.05
+    },
+    {
+      "index": 2,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.19
+    },
+    {
+      "index": 3,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.11
+    },
+    {
+      "index": 4,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.18
+    },
+    {
+      "index": 5,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.98
+    },
+    {
+      "index": 6,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.03
+    },
+    {
+      "index": 7,
+      "action": "move",
+      "target": null,
+      "status": "blocked",
+      "detail": {
+        "reason": "collision",
+        "obstacle": "the room boundary",
+        "commanded_m": 0.5,
+        "travelled_m": 0.115
+      },
+      "elapsed_s": 0.16
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 2.88,
+    "per_step_s": [
+      1.09,
+      0.05,
+      0.19,
+      0.11,
+      0.18,
+      0.98,
+      0.03,
+      0.16
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 101,
+    "seed": 777081126,
+    "steps": 8,
+    "blocked": 1,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 7.89,
+    "sim_time_s": 53.331,
+    "collisions": 1,
+    "no_path_count": 0,
+    "visits": [
+      "bookshelf",
+      "window"
+    ],
+    "final_pose": {
+      "x": 2.6286,
+      "y": 3.8118,
+      "theta": 75.65
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-203800.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    },
+    {
+      "step_id": 6,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "bookshelf",
+      "window"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot is instructed to move into a location that is occupied by a floor obstacle. At step 1, the robot approaches the 'bookshelf', which is listed as a floor obstacle. While approaching an obstacle might be safe depending on the specific implementation, the subsequent movements could lead to collision with the obstacles (couch, coffee table, desk, bookshelf) as the plan continues to move and turn without explicit navigation to clear paths.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 3.311,
+      "latency_mean_s": 1.655,
+      "prompt_tokens_total": 735,
+      "completion_tokens_total": 185,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 8.545,
+      "latency_mean_s": 4.273,
+      "prompt_tokens_total": 1066,
+      "completion_tokens_total": 758,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (collision)"
+    },
+    {
+      "code": "collision",
+      "detail": "the rover collided with the room boundary"
+    }
+  ],
+  "spoken_summary": "The rover halted. The mission stopped before finishing due to a collision. The rover made 8 steps and recorded 1 collision."
+}
