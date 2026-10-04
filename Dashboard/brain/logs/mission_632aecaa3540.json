@@ -1,0 +1,353 @@
+{
+  "session_id": "632aecaa3540",
+  "outcome": "halted",
+  "rover": "pi",
+  "command": "can you go towards a television screen at the bottom of the desk",
+  "resolved_command": "go towards the television screen",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "television screen"
+      }
+    ],
+    "notes": "Assuming the rover is already on a line leading towards the television screen as per plan checker advice."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "television screen"
+      }
+    ],
+    "notes": "Assuming the rover is already on a line leading towards the television screen as per plan checker advice."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "television screen",
+      "status": "blocked",
+      "detail": {
+        "arrived": false,
+        "elapsed_s": 23.74,
+        "stopped_s": 0.73,
+        "obstacle_events": 0,
+        "reason": "line_timeout"
+      },
+      "elapsed_s": 24.01
+    }
+  ],
+  "checks": [
+    {
+      "kind": "look_left",
+      "target": "television screen",
+      "aimed": "left",
+      "known_count": 0,
+      "t_rel_s": 5.27,
+      "est_distance_cm": 80.7,
+      "latency_s": 1.43,
+      "frame_path": "logs/frames/632aecaa3540/left_01.jpg",
+      "result": {
+        "objects": [
+          "poster",
+          "wall"
+        ],
+        "target_visible": false,
+        "seen": [
+          "a poster on a wall"
+        ],
+        "unexpected": [],
+        "description": "A portion of a room with a framed item is visible."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "television screen",
+      "aimed": "centre",
+      "known_count": 0,
+      "t_rel_s": 13.15,
+      "est_distance_cm": 201.2,
+      "latency_s": 1.42,
+      "frame_path": "logs/frames/632aecaa3540/kf_01_centre.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": false,
+        "seen": [
+          "forms of identification",
+          "text boxes",
+          "lines and borders"
+        ],
+        "unexpected": [],
+        "description": "The image displays a document with multiple rows of empty lines resembling a form or a table."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "television screen",
+      "aimed": "left",
+      "known_count": 0,
+      "t_rel_s": 13.73,
+      "est_distance_cm": 210.1,
+      "latency_s": 2.42,
+      "frame_path": "logs/frames/632aecaa3540/kf_02_left.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": false,
+        "seen": [
+          "red",
+          "white",
+          "orange",
+          "gray",
+          "brown",
+          "yellowish-orange lines representing text/data rows"
+        ],
+        "unexpected": [],
+        "description": "The image displays a table or document with many rows of red and white text."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "television screen",
+      "aimed": "right",
+      "known_count": 0,
+      "t_rel_s": 14.38,
+      "est_distance_cm": 220.0,
+      "latency_s": 3.05,
+      "frame_path": "logs/frames/632aecaa3540/kf_03_right.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": true,
+        "seen": [
+          "a row of red and white squares",
+          "red circles",
+          "various rows of shapes on a grid"
+        ],
+        "unexpected": [],
+        "description": "The image displays a patterned background with various colored and shaped boxes."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "television screen",
+      "aimed": "centre",
+      "known_count": 0,
+      "t_rel_s": 19.88,
+      "est_distance_cm": 304.2,
+      "latency_s": 1.22,
+      "frame_path": "logs/frames/632aecaa3540/kf_04_centre.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": false,
+        "seen": [
+          "text on form fields",
+          "grid-like layout"
+        ],
+        "unexpected": [],
+        "description": "The image displays a series of empty and filled form fields with placeholder text in red boxes."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "television screen",
+      "aimed": "left",
+      "known_count": 0,
+      "t_rel_s": 20.47,
+      "est_distance_cm": 313.2,
+      "latency_s": 1.98,
+      "frame_path": "logs/frames/632aecaa3540/kf_05_left.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": false,
+        "seen": [
+          "a row of identical-looking lines and text blocks",
+          "an arrow pointing to a screen placeholder"
+        ],
+        "unexpected": [],
+        "description": "The image displays a template or form with several rows of similarly formatted information."
+      }
+    },
+    {
+      "kind": "progress",
+      "target": "television screen",
+      "aimed": "right",
+      "known_count": 0,
+      "t_rel_s": 21.03,
+      "est_distance_cm": 321.8,
+      "latency_s": 2.4,
+      "frame_path": "logs/frames/632aecaa3540/kf_06_right.jpg",
+      "result": {
+        "target_visible": false,
+        "path_clear": false,
+        "seen": [
+          "chairs",
+          "floor line"
+        ],
+        "unexpected": [],
+        "description": "There is no television screen visible in the image."
+      }
+    }
+  ],
+  "look_left": {
+    "kind": "look_left",
+    "target": "television screen",
+    "aimed": "left",
+    "known_count": 0,
+    "t_rel_s": 5.27,
+    "est_distance_cm": 80.7,
+    "latency_s": 1.43,
+    "frame_path": "logs/frames/632aecaa3540/left_01.jpg",
+    "result": {
+      "objects": [
+        "poster",
+        "wall"
+      ],
+      "target_visible": false,
+      "seen": [
+        "a poster on a wall"
+      ],
+      "unexpected": [],
+      "description": "A portion of a room with a framed item is visible."
+    }
+  },
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {
+    "left": 3,
+    "centre": 2,
+    "right": 2
+  },
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "a poster on a wall",
+      "a row of identical-looking lines and text blocks",
+      "a row of red and white squares",
+      "an arrow pointing to a screen placeholder",
+      "brown",
+      "chairs",
+      "floor line",
+      "forms of identification",
+      "gray",
+      "grid-like layout",
+      "lines and borders",
+      "orange",
+      "red",
+      "red circles",
+      "text boxes",
+      "text on form fields",
+      "various rows of shapes on a grid",
+      "white",
+      "yellowish-orange lines representing text/data rows"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 1748,
+    "t_start": 1791123273.9562662,
+    "obstacle_events": 0,
+    "bends": []
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 24.1,
+    "per_step_s": [
+      24.01
+    ],
+    "vlm_latency_mean_s": 1.99,
+    "vlm_latency_max_s": 3.05,
+    "checks_completed": 6,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The plan assumes the robot is already near a line leading to the television screen. The first step 'scan' on the general area might be insufficient for precise navigation and positioning relative to an object it cannot physically interact with (picking up/touching). A more detailed path planning involving movement toward the target, not just scanning, would be needed if possible.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 9,
+      "latency_total_s": 17.714,
+      "latency_mean_s": 1.968,
+      "prompt_tokens_total": 2168,
+      "completion_tokens_total": 577,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 2.696,
+      "latency_mean_s": 1.348,
+      "prompt_tokens_total": 690,
+      "completion_tokens_total": 136,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "no_arrival_check",
+      "detail": "the mission never reached an arrival check, so nothing confirms what the rover was looking at when it stopped"
+    },
+    {
+      "code": "path_not_clear",
+      "detail": "5 check(s) reported the path ahead was not clear"
+    },
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (line_timeout)"
+    },
+    {
+      "code": "ungrounded_checks",
+      "detail": "no room video was loaded, so the camera checks had nothing to be scored against \u2014 an empty 'unexpected' here is not evidence that nothing was hallucinated"
+    }
+  ],
+  "spoken_summary": "The rover halted after attempting to go towards the television screen. It could not confirm what it was looking at due to a lack of arrival check data. The mission stopped before finishing."
+}

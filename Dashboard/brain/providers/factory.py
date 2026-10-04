@@ -24,7 +24,7 @@ _DEFAULT_MODEL = {
     ("vlm", "openai"): "gpt-4o-mini",
 }
 _DEFAULT_NUM_CTX = {"planner": 8192, "vlm": 8192}
-_DEFAULT_REPEAT_PENALTY = 1.3
+_DEFAULT_REPEAT_PENALTY = 1.0
 # Only the VLM's per-frame cataloguing prompt has shown degenerate looping
 # (a near-zero-temperature model repeating the same object block instead of
 # ever finishing); the planner is left uncapped since plan length legitimately

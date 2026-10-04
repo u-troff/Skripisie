@@ -1,0 +1,427 @@
+{
+  "session_id": "d10d18b86b77",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "can you please go towards the re cardboard box on the clock",
+  "resolved_command": "go to the cardboard box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "cardboard box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "cardboard box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "cardboard box"
+      }
+    ],
+    "notes": "Approach the visible cardboard box, observe it, and report findings."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "cardboard box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "cardboard box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "cardboard box"
+      }
+    ],
+    "notes": "Approach the visible cardboard box, observe it, and report findings."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "cardboard box",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 6,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 27.83
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "cardboard box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "cardboard box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 4.13,
+      "bbox": [
+        231,
+        130,
+        327,
+        216
+      ],
+      "x_center": 0.436,
+      "fill": 0.027,
+      "bottom": 0.45,
+      "confidence": "high",
+      "sharpness": 562.2219848632812,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 2.22,
+      "frame_path": "logs/frames/d10d18b86b77/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 9.54,
+      "bbox": [
+        230,
+        130,
+        327,
+        216
+      ],
+      "x_center": 0.435,
+      "fill": 0.027,
+      "bottom": 0.45,
+      "confidence": "high",
+      "sharpness": 526.1644897460938,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=0 pivot_s=0.00 gate=confirmed",
+      "vlm_latency_s": 2.68,
+      "frame_path": "logs/frames/d10d18b86b77/ap_lock_verify.jpg",
+      "bearing_deg": -3.58,
+      "pivot_requested_deg": -3.58,
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "residual_e": -0.065,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 15.28,
+      "bbox": [
+        173,
+        129,
+        303,
+        246
+      ],
+      "x_center": 0.372,
+      "fill": 0.05,
+      "bottom": 0.512,
+      "confidence": "high",
+      "sharpness": 477.24163818359375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 50 gate=confirmed",
+      "vlm_latency_s": 2.37,
+      "frame_path": "logs/frames/d10d18b86b77/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.43,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.027,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 20.53,
+      "bbox": [
+        300,
+        88,
+        507,
+        271
+      ],
+      "x_center": 0.63,
+      "fill": 0.123,
+      "bottom": 0.565,
+      "confidence": "high",
+      "sharpness": 673.8604125976562,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot L 0.06s hop 50 gate=confirmed",
+      "vlm_latency_s": 1.75,
+      "frame_path": "logs/frames/d10d18b86b77/ap_04_check.jpg",
+      "pivot_cmd_s": 0.06074576271186441,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.45,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.05,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 24.27,
+      "bbox": [
+        111,
+        51,
+        377,
+        286
+      ],
+      "x_center": 0.381,
+      "fill": 0.203,
+      "bottom": 0.596,
+      "confidence": "high",
+      "sharpness": 415.4193115234375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot R 0.06s hop 20 gate=confirmed",
+      "vlm_latency_s": 1.79,
+      "frame_path": "logs/frames/d10d18b86b77/ap_05_check.jpg",
+      "pivot_cmd_s": 0.061694915254237294,
+      "pivot_dir": 1,
+      "hop_moved_s": 0.97,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.123,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 27.83,
+      "bbox": [
+        111,
+        51,
+        377,
+        286
+      ],
+      "x_center": 0.381,
+      "fill": 0.203,
+      "bottom": 0.596,
+      "confidence": "high",
+      "sharpness": 415.4193115234375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 596,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 1.79,
+      "frame_path": "logs/frames/d10d18b86b77/ap_05_check.jpg",
+      "hops_done": 3,
+      "fill_prev": 0.123,
+      "arrival_block": null
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "cardboard box",
+    "expected": [
+      "cardboard box",
+      "cardboard",
+      "box",
+      "clock"
+    ],
+    "known": [],
+    "t_rel_s": 24.27,
+    "latency_s": 2.95,
+    "frame_path": "logs/frames/d10d18b86b77/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "cardboard box",
+        "cardboard",
+        "box"
+      ],
+      "missing": [
+        "clock"
+      ],
+      "unexpected": [
+        "floor",
+        "walls",
+        "cables",
+        "machinery"
+      ],
+      "description": "A cardboard box is clearly visible in the center of the image. No clock is visible."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 6,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 2,
+    "chassis_spin_deg_total": -3.6,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -3.58,
+    "residual_e_at_lock": -0.065,
+    "hops_done": 3,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 415.4,
+    "sharpness_median": 526.2,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 12.6,
+    "motion_time_s": 5.97,
+    "wall_time_s": 11.1,
+    "sonar_stops": 0,
+    "arrival_reason": "fill"
+  },
+  "looked": {
+    "centre": 7
+  },
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "box",
+      "cables",
+      "cardboard",
+      "cardboard box",
+      "floor",
+      "machinery",
+      "walls"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 28.34,
+    "per_step_s": [
+      27.83,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 2.95,
+    "vlm_latency_max_s": 2.95,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 9,
+      "latency_total_s": 25.657,
+      "latency_mean_s": 2.851,
+      "prompt_tokens_total": 4359,
+      "completion_tokens_total": 1275,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 2.159,
+      "latency_mean_s": 2.159,
+      "prompt_tokens_total": 272,
+      "completion_tokens_total": 133,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: clock"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    }
+  ],
+  "spoken_summary": "Completed: I went to the cardboard box, which was clearly visible with high confidence. The expected clock was not visible, and arrival was decided by vision only; sonar did not confirm."
+}

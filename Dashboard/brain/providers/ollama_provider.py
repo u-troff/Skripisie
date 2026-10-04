@@ -6,6 +6,8 @@ import ollama
 
 from .base import Completion, ImageSource, InferenceProvider, ProviderError
 
+_RUNNER_RETRIES = 2
+
 
 class OllamaProvider(InferenceProvider):
     """Wraps the calls planner.py and vlm.py used to make directly.
@@ -73,10 +75,18 @@ class OllamaProvider(InferenceProvider):
             kwargs["keep_alive"] = self.keep_alive
 
         started = time.perf_counter()
-        try:
-            response = self._client.chat(**kwargs)
-        except Exception as exc:  # ResponseError, ConnectionError, httpx errors
-            raise ProviderError(f"ollama {self.model}: {exc}") from exc
+        # gemma4:e4b's runner intermittently dies during CUDA init on a cold
+        # load (2026-10-04: same request fails, then succeeds seconds later), so
+        # a runner crash is retried before it is allowed to abort a mission.
+        for attempt in range(_RUNNER_RETRIES + 1):
+            try:
+                response = self._client.chat(**kwargs)
+                break
+            except Exception as exc:  # ResponseError, ConnectionError, httpx errors
+                if attempt < _RUNNER_RETRIES and "llama-server" in str(exc):
+                    time.sleep(2)
+                    continue
+                raise ProviderError(f"ollama {self.model}: {exc}") from exc
         elapsed = time.perf_counter() - started
 
         try:

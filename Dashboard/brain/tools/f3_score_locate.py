@@ -23,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 import frames  # noqa: E402
+from mission import _derive_loc  # noqa: E402
 from vlm import locate_target  # noqa: E402
 
 TARGET = sys.argv[2] if len(sys.argv) > 2 else "the target"
@@ -40,9 +41,8 @@ def ground_truth_side(name: str) -> str:
     raise ValueError(f"no left/centre/right in filename: {name}")
 
 
-def classify(bbox, frame_w):
-    cx = (bbox[0] + bbox[2]) / 2
-    frac = cx / frame_w
+def classify(frac):
+    """frac = x_center as a 0-1 fraction of frame width (from _derive_loc)."""
     if frac < 1 / 3:
         return "left"
     if frac > 2 / 3:
@@ -58,18 +58,16 @@ def main():
         truth = ground_truth_side(path.name)
         raw = path.read_bytes()
         stats = frames.analyse(raw)
-        frame_w = stats.width if stats else None
         result = locate_target(raw, TARGET)
 
-        bbox = result.get("bbox_2d")
-        valid_bbox = (frame_w and isinstance(bbox, list) and len(bbox) == 4
-                      and bbox[0] < bbox[2] and bbox[1] < bbox[3]
-                      and 0 <= bbox[0] and bbox[2] <= frame_w)
+        # Same conversion the mission uses: handles each model's box format
+        # (pixels vs 0-1000 normalised, x,y vs y,x order) via vlm.bbox_format().
+        loc = _derive_loc(result, stats.width, stats.height) if stats else {"visible": False}
 
-        if not result.get("visible") or not valid_bbox:
+        if not loc.get("visible"):
             verdict = "FAIL (not visible / invalid box)"
         else:
-            guess = classify(bbox, frame_w)
+            guess = classify(loc["x_center"])
             ok = guess == truth
             correct += 1 if ok else 0
             verdict = f"{'OK' if ok else 'WRONG'} (guessed {guess})"

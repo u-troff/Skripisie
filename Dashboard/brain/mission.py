@@ -27,7 +27,7 @@ from planner import revise_plan
 from providers import usage
 from rover import RoverController
 from stt import transcribe_audio
-from vlm import BBOX_SCALE, KNOWN_MAX, check_arrival, check_progress, check_side_look, describe_frame, locate_target
+from vlm import KNOWN_MAX, bbox_format,check_arrival, check_progress, check_side_look, describe_frame, locate_target
 from vlm import failed as vlm_failed
 
 log = get_logger("mission")
@@ -100,6 +100,8 @@ SWEEP_MARGIN_DEG = config.get_float("SWEEP_MARGIN_DEG", 20.0)
 SWEEP_ADVANCE_DEG = config.get_float("SWEEP_ADVANCE_DEG", 110.0)
 SEARCH_MAX_SWEEPS = config.get_int("SEARCH_MAX_SWEEPS", 3)
 SEARCH_MAX_VLM_CALLS = config.get_int("SEARCH_MAX_VLM_CALLS", 18)
+RELOCATE_MAX_VLM_CALLS = config.get_int("RELOCATE_MAX_VLM_CALLS", 6)
+
 APPROACH_SETTLE_S = config.get_float("APPROACH_SETTLE_S", 0.8)
 APPROACH_MIN_SHARPNESS = config.get_float("APPROACH_MIN_SHARPNESS", 25.0)
 APPROACH_FRAME_RETRIES = config.get_int("APPROACH_FRAME_RETRIES", 2)
@@ -723,6 +725,17 @@ def _arrived(loc: dict, sonar_mm: Optional[int], e: float) -> bool:
     return False
 
 
+QWEN_MIN_PIXELS = 1024 * 28 * 28      # ollama --image-min-tokens 1024
+
+
+def _qwen_view_size(w: int, h: int) -> Tuple[int, int]:
+    """Size of the enlarged image qwen2.5vl reports pixel boxes in: scaled up
+    to at least QWEN_MIN_PIXELS, each side rounded to a multiple of 28
+    (640x480 -> 1036x784, checked against a known ball position)."""
+    s = max(1.0, (QWEN_MIN_PIXELS / (w * h)) ** 0.5)
+    return round(w * s / 28) * 28, round(h * s / 28) * 28
+
+
 def _derive_loc(raw: dict, frame_w: Optional[int], frame_h: Optional[int]) -> dict:
     """bbox_2d (pixels) -> x_center/fill/bottom/w_frac/h_frac (frame fractions).
 
@@ -734,14 +747,33 @@ def _derive_loc(raw: dict, frame_w: Optional[int], frame_h: Optional[int]) -> di
     if (not vlm_said_visible or not frame_w or not frame_h
             or not isinstance(bbox, list) or len(bbox) != 4):
         return {"visible": False, "bbox_2d": None, "vlm_said_visible": vlm_said_visible}
-    x1, y1, x2, y2 = bbox
-    if BBOX_SCALE > 0:
+    
+
+    scale , yx = bbox_format()
+    if scale >0:
         try:
-            x1, x2 = x1 / BBOX_SCALE * frame_w, x2 / BBOX_SCALE * frame_w
-            y1, y2 = y1 / BBOX_SCALE * frame_h, y2 / BBOX_SCALE * frame_h
-        except TypeError:
+            if yx:
+               y1, x1, y2, x2 = bbox
+            else:
+                x1,y1,x2,y2=bbox
+            x1, x2 = x1 / scale * frame_w, x2 / scale * frame_w
+            y1, y2 = y1 / scale * frame_h, y2 / scale * frame_h
+        except (TypeError,ValueError):
+            return {"visible":False,"bbox_2d":None,"vlm_said_visible":vlm_said_visible}
+
+        bbox = [round(x1),round(y1),round(x2),round(y2)]
+    elif scale < 0:
+        try:
+            vw, vh = _qwen_view_size(frame_w, frame_h)
+            x1, y1, x2, y2 = bbox
+            x1, x2 = x1 / vw * frame_w, x2 / vw * frame_w
+            y1, y2 = y1 / vh * frame_h, y2 / vh * frame_h
+        except (TypeError, ValueError):
             return {"visible": False, "bbox_2d": None, "vlm_said_visible": vlm_said_visible}
         bbox = [round(x1), round(y1), round(x2), round(y2)]
+    else:
+        x1,y1,x2,y2 = bbox
+
     if not (x1 < x2 and y1 < y2 and x1 >= 0 and y1 >= 0
             and x2 <= frame_w and y2 <= frame_h):
         return {"visible": False, "bbox_2d": None, "vlm_said_visible": vlm_said_visible}
@@ -934,64 +966,69 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
 
     set_gimbal(pan=0, tilt=APPROACH_TILT_OFFSET)
 
-    # -- SEARCH: chassis stationary, gimbal does the looking -----------------
-    bearing_deg = None
-    found_loc = None
-    vlm_calls = 0
+    #SEARCHING:
     search_offsets = _sweep_offsets()
 
-    for sweep in range(SEARCH_MAX_SWEEPS):
-        for pan_offset in search_offsets:
-            if vlm_calls >= SEARCH_MAX_VLM_CALLS:
-                break
-            accepted = None
-            pan_deg = pan_offset * GIMBAL_DEG_PER_UNIT if GIMBAL_DEG_PER_UNIT > 0 else None
-            while True:
+    async def search_sweep(max_calls: int, sweeps: int, label: str):
+        """Stationary gimbal sweep. Returns (accepted_loc, bearing_deg) or (None, None)."""
+        nonlocal cycle
+        calls = 0
+        for sweep in range(sweeps):
+            for pan_offset in search_offsets:
+                if calls >= max_calls:
+                    return None, None
+                accepted = None
+                pan_deg = pan_offset * GIMBAL_DEG_PER_UNIT if GIMBAL_DEG_PER_UNIT > 0 else None
+                while True:
+                    cycle += 1
+                    set_gimbal(pan=pan_offset)
+                    loc = await grab_and_locate("ap_%s%d_p%d.jpg" % (label, sweep, pan_offset))
+                    if loc.get("_skip"):
+                        await record("search", "skipped_blurry", loc, None,
+                                     {"sweep": sweep, "pan_offset": pan_offset})
+                        mission.checks[-1]["kind"] = "skipped"
+                        mission.checks[-1]["reason"] = "blurry"
+                        break
+                    calls += 1
+                    accepted, gate = gate_for(loc, pan_offset, None, 0)
+                    reject_reason = gate if gate not in ("confirmed", "low_confirmed",
+                                                         "low_pending", "not_visible") else None
+                    await record("search", "look pan=%d gate=%s" % (pan_offset, gate), loc, None,
+                                 {"sweep": sweep, "pan_offset": pan_offset, "pan_deg": pan_deg,
+                                  "gate": gate, "reject_reason": reject_reason})
+                    if gate != "low_pending" or calls >= max_calls:
+                        break
+                if accepted is not None:
+                    bearing = (pan_deg or 0.0) + (accepted["x_center"] - 0.5) * CAMERA_HFOV_DEG
+                    return accepted, bearing
+            set_gimbal(pan=0)
+            if sweep < sweeps - 1 and SWEEP_ADVANCE_DEG > 0 and FREE_TURN_DEG_PER_S > 0:
+                pivot_s = SWEEP_ADVANCE_DEG / FREE_TURN_DEG_PER_S
+                await asyncio.to_thread(rover.pivot, SEARCH_DIR, pivot_s)
                 cycle += 1
-                set_gimbal(pan=pan_offset)
-                loc = await grab_and_locate("ap_s%d_p%d.jpg" % (sweep, pan_offset))
-                if loc.get("_skip"):
-                    await record("search", "skipped_blurry", loc, None,
-                                 {"sweep": sweep, "pan_offset": pan_offset})
-                    mission.checks[-1]["kind"] = "skipped"
-                    mission.checks[-1]["reason"] = "blurry"
-                    break
-                vlm_calls += 1
-                accepted, gate = gate_for(loc, pan_offset, None, 0)
-                reject_reason = gate if gate not in ("confirmed", "low_confirmed",
-                                                     "low_pending", "not_visible") else None
-                await record("search", "look pan=%d gate=%s" % (pan_offset, gate), loc, None,
-                             {"sweep": sweep, "pan_offset": pan_offset, "pan_deg": pan_deg,
-                              "gate": gate, "reject_reason": reject_reason})
-                if gate != "low_pending" or vlm_calls >= SEARCH_MAX_VLM_CALLS:
-                    break
-            if accepted is not None:
-                bearing_deg = (pan_deg or 0.0) + (accepted["x_center"] - 0.5) * CAMERA_HFOV_DEG
-                found_loc = accepted
-                break
-        if found_loc is not None or vlm_calls >= SEARCH_MAX_VLM_CALLS:
-            break
-        set_gimbal(pan=0)
-        if SWEEP_ADVANCE_DEG > 0 and FREE_TURN_DEG_PER_S > 0:
-            pivot_s = SWEEP_ADVANCE_DEG / FREE_TURN_DEG_PER_S
-            await asyncio.to_thread(rover.pivot, SEARCH_DIR, pivot_s)
-            cycle += 1
-            await record("search", "sweep_advance_pivot", {"visible": False}, None,
-                         {"sweep": sweep, "pivot_requested_deg": SWEEP_ADVANCE_DEG,
-                          "pivot_cmd_s": pivot_s, "pivot_dir": SEARCH_DIR})
+                await record("search", "sweep_advance_pivot", {"visible": False}, None,
+                             {"sweep": sweep, "pivot_requested_deg": SWEEP_ADVANCE_DEG,
+                              "pivot_cmd_s": pivot_s, "pivot_dir": SEARCH_DIR})
+        return None, None
 
+    async def pivot_to(bearing_deg: float):
+        """Re-centre the gimbal and make ONE pivot toward bearing_deg."""
+        set_gimbal(pan=0)
+        if abs(bearing_deg) >= MIN_PIVOT_DEG and FREE_TURN_DEG_PER_S > 0:
+            d = 1 if bearing_deg > 0 else -1
+            s = max(MIN_PIVOT_S, abs(bearing_deg) / FREE_TURN_DEG_PER_S)
+            await asyncio.to_thread(rover.pivot, d, s)
+            return d, s
+        return 0, 0.0
+    found_loc,bearing_deg = await search_sweep(SEARCH_MAX_VLM_CALLS,SEARCH_MAX_SWEEPS,"s")
     if found_loc is None:
-        return {"status": "blocked",
-                "detail": {"reason": "target_not_found", "cycles": cycle}}
+        return {"status":"blocked", "detail":{"reason":"target_not_found","cycles":cycle}}
+
+    
 
     # -- LOCK: re-centre gimbal, ONE pivot toward the measured bearing -------
     set_gimbal(pan=0)
-    pivot_dir = 0
-    pivot_s = 0.0
-    if abs(bearing_deg) >= MIN_PIVOT_DEG and FREE_TURN_DEG_PER_S > 0:
-        pivot_dir = 1 if bearing_deg > 0 else -1
-        pivot_s = max(MIN_PIVOT_S, abs(bearing_deg) / FREE_TURN_DEG_PER_S)
-        await asyncio.to_thread(rover.pivot, pivot_dir, pivot_s)
+    pivot_dir , pivot_s =  await pivot_to(bearing_deg)
     cycle += 1
 
     await asyncio.sleep(APPROACH_SETTLE_S)
@@ -1046,8 +1083,20 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
                     else gate_for(loc2, 0, prev_fill, hops_done)
                 await record("approach", "relocate_look gate=%s" % gate, loc2, None, {"gate": gate})
                 if not loc2.get("visible"):
-                    return {"status": "blocked",
-                            "detail": {"reason": "target_not_found", "cycles": cycle}}
+                    found, bearing = await search_sweep(RELOCATE_MAX_VLM_CALLS, 1, "re")
+                    if found is None:
+                        return {"status": "blocked",
+                                "detail": {"reason": "target_not_found", "cycles": cycle}}
+                    await pivot_to(bearing)
+                    await asyncio.sleep(APPROACH_SETTLE_S)
+                    loc2 = await grab_and_locate("ap_%02d_relock.jpg" % cycle)
+                    accepted, gate = (None, "skipped_blurry") if loc2.get("_skip") \
+                        else gate_for(loc2, 0, prev_fill, hops_done)
+                    await record("approach", "relock_look gate=%s" % gate, loc2, None, {"gate": gate})
+                    if not loc2.get("visible"):
+                        return {"status": "blocked",
+                                "detail": {"reason": "target_not_found", "cycles": cycle}}
+
                 loc = _merge(loc2, accepted)
                 lost = 0
                 continue

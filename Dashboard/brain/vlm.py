@@ -1,7 +1,7 @@
 import json
 import time
 import config
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from log_setup import get_logger
 from providers import ImageSource, ProviderError, get_provider, log_completion, user_message
@@ -18,6 +18,26 @@ __all__ = ["ImageSource", "check_ambiguity", "verify_plan", "describe_frame",
 # as "the command was perfectly clear" — which is how a flaky VLM turns into a
 # pipeline that silently skips clarification.
 ERROR_KEY = "_error"
+# (scale, yx_order) by model-name prefix. scale 0 = pixels. Anything not listed
+# (openai, ...) is pixels in [x1, y1, x2, y2], which is what we ask for.
+# scale -1 = pixels of the enlarged view the model actually sees (qwen via
+# ollama upscales to >= 1024 image tokens); mission._derive_loc maps it back.
+_BBOX_FORMATS = {
+    "gemma4": (1000, True),      # normalised 0-1000, [y1, x1, y2, x2]
+    "qwen2.5vl": (-1, False),
+}
+
+
+def bbox_format() -> Tuple[int, bool]:
+    try:
+        model = get_provider("vlm").model.lower()
+    except ProviderError:
+        return 0, False
+    for prefix, fmt in _BBOX_FORMATS.items():
+        if model.startswith(prefix):
+            return fmt
+    return 0, False
+
 
 
 def failed(result: Optional[dict]) -> bool:
@@ -242,7 +262,7 @@ def check_side_look(image: ImageSource, target: str,
     return _ask("check_side_look", prompt, image)
 
 # 0 = the model returns pixels; N>0 = it returns 0..N normalised (gemma4: 1000).
-BBOX_SCALE = config.get_int("VLM_BBOX_SCALE", 0)
+
 
 
 def locate_target(image: ImageSource, target: str) -> dict:
@@ -251,11 +271,22 @@ def locate_target(image: ImageSource, target: str) -> dict:
     check_arrival: those ask yes/no against a room catalogue, this asks
     WHERE, in pixels, so mission.py can derive x_center/fill/bottom itself
     rather than trusting the model's own notion of "left" or "close"."""
+
+    scale,yx = bbox_format()
+
+    if scale > 0:
+        order = "[y1, x1, y2, x2]" if yx else "[x1, y1, x2, y2]"
+        coords = (f"give its bounding box as {order}, each coordinate normalised to 0-{scale} "
+                  "(0,0 = top-left of the image).\n")
+    else:
+        order = "[x1, y1, x2, y2]"
+        coords = "give its bounding box in pixel coordinates.\n"
+        
     prompt = (
         f'Find "{target}" in this image from a small floor robot\'s camera.\n'
-        "If it is visible, give its bounding box in pixel coordinates.\n"
+        "If it is visible, " + coords +
         "Respond ONLY with JSON: "
-        '{"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, '
+        '{"visible": true/false, "bbox_2d": ' + order +' or null, '
         '"confidence": "high"|"medium"|"low", "description": "one short sentence"}'
     )
     return _ask("locate_target", prompt, image)

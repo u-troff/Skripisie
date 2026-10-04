@@ -1,0 +1,366 @@
+{
+  "session_id": "6b3c421f582d",
+  "outcome": "halted",
+  "rover": "pi",
+  "command": "can you please go to the cardboard box",
+  "resolved_command": "go to the cardboard box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "cardboard_box"
+      }
+    ],
+    "notes": "The instruction implies reaching and confirming the object. 'Approach' initiates movement toward the target until it is in view or reached (based on system behavior). The subsequent observation/reporting requirement noted by the checker can be fulfilled implicitly if approach brings it close enough, but a direct action sequence fulfilling travel to goal via available actions ends at Approach."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "cardboard_box"
+      }
+    ],
+    "notes": "The instruction implies reaching and confirming the object. 'Approach' initiates movement toward the target until it is in view or reached (based on system behavior). The subsequent observation/reporting requirement noted by the checker can be fulfilled implicitly if approach brings it close enough, but a direct action sequence fulfilling travel to goal via available actions ends at Approach."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "cardboard_box",
+      "status": "blocked",
+      "detail": {
+        "reason": "target_not_found",
+        "cycles": 7
+      },
+      "elapsed_s": 23.12
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.32,
+      "bbox": [
+        196,
+        262,
+        289,
+        297
+      ],
+      "x_center": 0.38,
+      "fill": 0.01,
+      "bottom": 0.618,
+      "confidence": "high",
+      "sharpness": 372.2530212402344,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.4,
+      "frame_path": "logs/frames/6b3c421f582d/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 6.99,
+      "bbox": [
+        239,
+        415,
+        314,
+        480
+      ],
+      "x_center": 0.432,
+      "fill": 0.016,
+      "bottom": 1.0,
+      "confidence": "high",
+      "sharpness": 564.5120849609375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 1.28,
+      "frame_path": "logs/frames/6b3c421f582d/ap_lock_verify.jpg",
+      "bearing_deg": -6.72,
+      "pivot_requested_deg": -6.72,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": -1,
+      "residual_e": -0.068,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 11.49,
+      "bbox": [
+        195,
+        147,
+        280,
+        206
+      ],
+      "x_center": 0.371,
+      "fill": 0.016,
+      "bottom": 0.429,
+      "confidence": "high",
+      "sharpness": 617.5264892578125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 50 gate=confirmed",
+      "vlm_latency_s": 1.15,
+      "frame_path": "logs/frames/6b3c421f582d/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.46,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.016,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 16.2,
+      "bbox": [
+        47,
+        146,
+        273,
+        349
+      ],
+      "x_center": 0.25,
+      "fill": 0.149,
+      "bottom": 0.728,
+      "confidence": "high",
+      "sharpness": 559.734375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot L 0.06s hop 50 gate=fill_jump",
+      "vlm_latency_s": 1.2,
+      "frame_path": "logs/frames/6b3c421f582d/ap_04_check.jpg",
+      "pivot_cmd_s": 0.06122033898305085,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.48,
+      "gate": "fill_jump",
+      "hops_done": 2,
+      "fill_prev": 0.016,
+      "reject_reason": "fill_jump",
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 19.01,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 464.0966796875,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "pivot L 0.12s hop 20 gate=not_visible",
+      "vlm_latency_s": 0.82,
+      "frame_path": "logs/frames/6b3c421f582d/ap_05_check.jpg",
+      "pivot_cmd_s": 0.11864406779661017,
+      "pivot_dir": -1,
+      "hop_moved_s": 0.98,
+      "gate": "not_visible",
+      "hops_done": 3,
+      "fill_prev": 0.016,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 21.39,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 439.40399169921875,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "hop_back 0.6s gate=not_visible",
+      "vlm_latency_s": 0.86,
+      "frame_path": "logs/frames/6b3c421f582d/ap_06_lostlook.jpg",
+      "gate": "not_visible",
+      "hop_moved_s": 0.61
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 23.12,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 441.4118957519531,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "relocate_look gate=not_visible",
+      "vlm_latency_s": 0.82,
+      "frame_path": "logs/frames/6b3c421f582d/ap_07_relocate.jpg",
+      "gate": "not_visible"
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 7,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 3,
+    "chassis_spin_deg_total": -6.7,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -6.72,
+    "residual_e_at_lock": -0.068,
+    "hops_done": 4,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 372.3,
+    "sharpness_median": 464.1,
+    "detections_rejected": {
+      "fill_jump": 1
+    },
+    "arrival_cross_check": null,
+    "gimbal_only_lock": null,
+    "vlm_time_s": 7.53,
+    "motion_time_s": 6.83,
+    "wall_time_s": 12.27,
+    "sonar_stops": 0,
+    "arrival_reason": "target_not_found"
+  },
+  "looked": {
+    "centre": 7
+  },
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 23.22,
+    "per_step_s": [
+      23.12
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "'approach' implies movement towards a target. Since the robot can only drive and look, simply approaching might not be sufficient for mission completion if observation is required after arrival. The plan lacks an explicit 'look' action to verify proximity/state of the cardboard_box before potentially stopping or reporting.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 9,
+      "latency_total_s": 90.137,
+      "latency_mean_s": 10.015,
+      "prompt_tokens_total": 2189,
+      "completion_tokens_total": 428,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 4.416,
+      "latency_mean_s": 2.208,
+      "prompt_tokens_total": 678,
+      "completion_tokens_total": 177,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (target_not_found)"
+    },
+    {
+      "code": "target_lost_repeatedly",
+      "detail": "the target was lost and re-acquired 2 time(s) during the approach"
+    },
+    {
+      "code": "hallucinated_box_rejected",
+      "detail": "1 detection(s) were rejected as implausible (fill_jump) \u2014 counted, not believed"
+    },
+    {
+      "code": "arrival_unconfirmed",
+      "detail": "the approach ended without a confirmed arrival"
+    }
+  ],
+  "spoken_summary": "The rover halted while attempting to go to the cardboard box. The mission stopped before finishing because the target was not found. Target loss occurred twice during approach."
+}
