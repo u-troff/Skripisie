@@ -1,0 +1,351 @@
+[
+  {
+    "command": "Go to the desk.",
+    "depth": 1,
+    "kind": "approach",
+    "expected_visits": [
+      "desk"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the window, then the desk.",
+    "depth": 2,
+    "kind": "approach",
+    "expected_visits": [
+      "window",
+      "desk"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the bookshelf, then the door, then the window.",
+    "depth": 3,
+    "kind": "approach",
+    "expected_visits": [
+      "bookshelf",
+      "door",
+      "window"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the bookshelf, then the door, then the window, and finally the desk.",
+    "depth": 4,
+    "kind": "approach",
+    "expected_visits": [
+      "bookshelf",
+      "door",
+      "window",
+      "desk"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the door, then the couch, then the coffee table, and finally the window.",
+    "depth": 4,
+    "kind": "approach",
+    "expected_visits": [
+      "door",
+      "couch",
+      "coffee table",
+      "window"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the door, then the desk, then the coffee table, then the bookshelf, then the window, and finally the couch.",
+    "depth": 6,
+    "kind": "approach",
+    "expected_visits": [
+      "door",
+      "desk",
+      "coffee table",
+      "bookshelf",
+      "window",
+      "couch"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the door, then the coffee table, then the window, then the couch, then the desk, and finally the bookshelf.",
+    "depth": 6,
+    "kind": "approach",
+    "expected_visits": [
+      "door",
+      "coffee table",
+      "window",
+      "couch",
+      "desk",
+      "bookshelf"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the door, then the desk, then the window, then the couch, then the bookshelf, then the coffee table, then the couch again, and finally the bookshelf again.",
+    "depth": 8,
+    "kind": "approach",
+    "expected_visits": [
+      "door",
+      "desk",
+      "window",
+      "couch",
+      "bookshelf",
+      "coffee table",
+      "couch",
+      "bookshelf"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the bookshelf, then the door, then the coffee table, then the window, then the desk, then the couch, then the bookshelf again, and finally the coffee table again.",
+    "depth": 8,
+    "kind": "approach",
+    "expected_visits": [
+      "bookshelf",
+      "door",
+      "coffee table",
+      "window",
+      "desk",
+      "couch",
+      "bookshelf",
+      "coffee table"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the bookshelf, then the coffee table, then the couch, then the desk, then the door, then the window, then the door again, then the coffee table again, then the desk again, and finally the couch again.",
+    "depth": 10,
+    "kind": "approach",
+    "expected_visits": [
+      "bookshelf",
+      "coffee table",
+      "couch",
+      "desk",
+      "door",
+      "window",
+      "door",
+      "coffee table",
+      "desk",
+      "couch"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the bookshelf, then the coffee table, then the door, then the couch, then the window, then the desk, then the door again, then the couch again, then the bookshelf again, and finally the window again.",
+    "depth": 10,
+    "kind": "approach",
+    "expected_visits": [
+      "bookshelf",
+      "coffee table",
+      "door",
+      "couch",
+      "window",
+      "desk",
+      "door",
+      "couch",
+      "bookshelf",
+      "window"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the couch, then the desk, then the door, then the bookshelf, then the coffee table, then the window, then the door again, then the couch again, then the desk again, then the coffee table again, then the bookshelf again, and finally the window again.",
+    "depth": 12,
+    "kind": "approach",
+    "expected_visits": [
+      "couch",
+      "desk",
+      "door",
+      "bookshelf",
+      "coffee table",
+      "window",
+      "door",
+      "couch",
+      "desk",
+      "coffee table",
+      "bookshelf",
+      "window"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Go to the couch, then the door, then the coffee table, then the bookshelf, then the desk, then the window, then the bookshelf again, then the door again, then the desk again, then the couch again, then the window again, and finally the coffee table again.",
+    "depth": 12,
+    "kind": "approach",
+    "expected_visits": [
+      "couch",
+      "door",
+      "coffee table",
+      "bookshelf",
+      "desk",
+      "window",
+      "bookshelf",
+      "door",
+      "desk",
+      "couch",
+      "window",
+      "coffee table"
+    ],
+    "expected_final": null,
+    "probe": null
+  },
+  {
+    "command": "Turn right 90 degrees, then move forward 60 centimetres.",
+    "depth": 2,
+    "kind": "literal",
+    "expected_visits": [],
+    "expected_final": {
+      "x": 0.8,
+      "y": 0.2,
+      "tol_m": 0.15
+    },
+    "probe": null
+  },
+  {
+    "command": "Move forward 1 metre, then turn right 90 degrees, then move forward 60 centimetres, then turn left 90 degrees.",
+    "depth": 4,
+    "kind": "literal",
+    "expected_visits": [],
+    "expected_final": {
+      "x": 1.8,
+      "y": 0.2,
+      "tol_m": 0.15
+    },
+    "probe": null
+  },
+  {
+    "command": "Move forward 80 centimetres, then turn right 90 degrees, then move forward 60 centimetres, then turn left 90 degrees, then move forward 80 centimetres, then turn left 90 degrees.",
+    "depth": 6,
+    "kind": "literal",
+    "expected_visits": [],
+    "expected_final": {
+      "x": 2.4,
+      "y": 0.2,
+      "tol_m": 0.15
+    },
+    "probe": null
+  },
+  {
+    "command": "Move forward 60 centimetres, then turn right 90 degrees, then move forward 60 centimetres, then turn right 90 degrees, then move forward 60 centimetres, then turn right 90 degrees, then move forward 60 centimetres, then turn right 90 degrees.",
+    "depth": 8,
+    "kind": "literal",
+    "expected_visits": [],
+    "expected_final": {
+      "x": 0.8,
+      "y": 0.8,
+      "tol_m": 0.15
+    },
+    "probe": null
+  },
+  {
+    "command": "Move forward half a metre, then turn right 90 degrees, then move forward 60 centimetres, then turn right 90 degrees, then move forward half a metre, then turn right 90 degrees, then move forward 60 centimetres, then turn right 90 degrees.",
+    "depth": 8,
+    "kind": "literal",
+    "expected_visits": [],
+    "expected_final": {
+      "x": 0.8,
+      "y": 0.8,
+      "tol_m": 0.15
+    },
+    "probe": null
+  },
+  {
+    "command": "Go to the bookshelf, then turn left 90 degrees, then move forward 60 centimetres, then go to the desk.",
+    "depth": 4,
+    "kind": "mixed",
+    "expected_visits": [
+      "bookshelf",
+      "desk"
+    ],
+    "expected_final": {
+      "x": 5.0,
+      "y": 3.6,
+      "tol_m": 0.15
+    },
+    "probe": null
+  },
+  {
+    "command": "Go to the desk, then turn around, then move forward 60 centimetres, then turn right 90 degrees, then move forward 60 centimetres, then go to the door.",
+    "depth": 6,
+    "kind": "mixed",
+    "expected_visits": [
+      "desk",
+      "door"
+    ],
+    "expected_final": {
+      "x": 3.0,
+      "y": 2.4,
+      "tol_m": 0.15
+    },
+    "probe": null
+  },
+  {
+    "command": "Go to the door, then turn left 90 degrees, then move forward 60 centimetres, then turn around, then move forward 60 centimetres, then go to the desk, then turn right 45 degrees, then move back 60 centimetres.",
+    "depth": 8,
+    "kind": "mixed",
+    "expected_visits": [
+      "door",
+      "desk"
+    ],
+    "expected_final": {
+      "x": 4.418,
+      "y": 3.745,
+      "tol_m": 0.15
+    },
+    "probe": null
+  },
+  {
+    "command": "Go to the couch, then the bookshelf, then the door, then the fridge, then the coffee table, then the desk, then the window, and finally the bookshelf again.",
+    "depth": 8,
+    "kind": "probe",
+    "expected_visits": [
+      "couch",
+      "bookshelf",
+      "door"
+    ],
+    "expected_final": null,
+    "probe": "unknown_target"
+  },
+  {
+    "command": "Go to the desk, then the coffee table, then the couch, then the bookshelf, then the window, then the door, then the couch again, and finally the television.",
+    "depth": 8,
+    "kind": "probe",
+    "expected_visits": [
+      "desk",
+      "coffee table",
+      "couch",
+      "bookshelf",
+      "window",
+      "door",
+      "couch"
+    ],
+    "expected_final": null,
+    "probe": "unknown_target"
+  },
+  {
+    "command": "Go to the coffee table, then the window, then the bookshelf, then the desk, then pick up the lamp, then go to the couch, then the door, then the bookshelf again.",
+    "depth": 8,
+    "kind": "probe",
+    "expected_visits": [
+      "coffee table",
+      "window",
+      "bookshelf",
+      "desk"
+    ],
+    "expected_final": null,
+    "probe": "out_of_vocab"
+  }
+]

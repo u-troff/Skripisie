@@ -1,0 +1,194 @@
+{
+  "session_id": "4aa52e19739b",
+  "outcome": "halted",
+  "rover": "virtual",
+  "command": "Go to the desk, then the bookshelf.",
+  "resolved_command": "Go to the desk, then the bookshelf.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "turn": true,
+        "degrees": -90
+      },
+      {
+        "id": 3,
+        "distance_m": 4.5
+      }
+    ],
+    "notes": "The plan must explicitly navigate around assumed intervening floor obstacles (e.g., coffee table/couch) after reaching the desk before initiating proximity search for bookshelf via approach."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "turn": true,
+        "degrees": -90
+      },
+      {
+        "id": 3,
+        "distance_m": 4.5
+      }
+    ],
+    "notes": "The plan must explicitly navigate around assumed intervening floor obstacles (e.g., coffee table/couch) after reaching the desk before initiating proximity search for bookshelf via approach."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.31
+    },
+    {
+      "index": 1,
+      "action": null,
+      "target": null,
+      "status": "blocked",
+      "detail": {
+        "reason": "unknown_action",
+        "action": ""
+      },
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.4,
+    "per_step_s": [
+      1.31,
+      0.0
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 82,
+    "seed": 737803334,
+    "steps": 2,
+    "blocked": 1,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 3.925,
+    "sim_time_s": 23.93,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "desk"
+    ],
+    "final_pose": {
+      "x": 3.6,
+      "y": 2.8,
+      "theta": 14.29
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-000616.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "desk"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The plan relies on sequential 'approach' commands between targets that are located amongst multiple floor obstacles (couch, coffee table, desk, bookshelf). Since these items occupy space and function as impassable barriers/clutter in the room context, a simple proximity approach sequence does not guarantee successful traversal or obstacle avoidance for transitioning from one target area to another. Explicit pathing instructions detailing movement around specific obstructions are required.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 24.615,
+      "latency_mean_s": 12.307,
+      "prompt_tokens_total": 497,
+      "completion_tokens_total": 1266,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 53.459,
+      "latency_mean_s": 26.729,
+      "prompt_tokens_total": 993,
+      "completion_tokens_total": 2518,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (unknown_action)"
+    }
+  ],
+  "spoken_summary": "The mission halted while attempting to reach the desk then the bookshelf; I successfully visited the desk but was blocked by an unknown action during transit."
+}

@@ -1,0 +1,188 @@
+{
+  "session_id": "a3b36b6b4cc6",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Go to the desk, then the bookshelf.",
+  "resolved_command": "Go to the desk, then the bookshelf.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "Following the explicit instruction to travel sequentially from 'desk' then 'bookshelf', two sequential approach commands are used. The plan checker warning regarding obstacles is noted but disregarded as per instructions: 'The plan must still travel to and reach what the command names.'"
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "Following the explicit instruction to travel sequentially from 'desk' then 'bookshelf', two sequential approach commands are used. The plan checker warning regarding obstacles is noted but disregarded as per instructions: 'The plan must still travel to and reach what the command names.'"
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.32
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.62
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.94,
+    "per_step_s": [
+      1.32,
+      0.62
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 78,
+    "seed": 737803334,
+    "steps": 2,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 5.822,
+    "sim_time_s": 36.045,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "desk",
+      "bookshelf"
+    ],
+    "final_pose": {
+      "x": 4.2,
+      "y": 1.0,
+      "theta": -71.57
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-000616.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "desk",
+      "bookshelf"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The planned approach actions target 'desk' and 'bookshelf', both of which are explicitly listed in the environment description as fixed 'floor obstacles'. Approaching objects defined as large structural barriers may be impossible or lead to blocked paths.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 23.804,
+      "latency_mean_s": 11.902,
+      "prompt_tokens_total": 451,
+      "completion_tokens_total": 1309,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 26.008,
+      "latency_mean_s": 13.004,
+      "prompt_tokens_total": 958,
+      "completion_tokens_total": 1317,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The task was completed successfully; I went to both the desk and bookshelf. The execution took a total of 1.94 seconds over two steps. My odometer registered travel of 5.82 meters."
+}

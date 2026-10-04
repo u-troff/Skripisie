@@ -1,0 +1,304 @@
+{
+  "session_id": "2680fec263f4",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Start at the window, then go to the door, then the bookshelf, then the couch, then the desk, and finally the coffee table.",
+  "resolved_command": "Start at the window, then go to the door, then the bookshelf, then the couch, then the desk, and finally the coffee table.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 5,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "coffee table"
+      }
+    ],
+    "notes": ""
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 5,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "coffee table"
+      }
+    ],
+    "notes": ""
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.16
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.72
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.63
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.13
+    },
+    {
+      "index": 4,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.67
+    },
+    {
+      "index": 5,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.83
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 6.15,
+    "per_step_s": [
+      1.16,
+      0.72,
+      1.63,
+      1.13,
+      0.67,
+      0.83
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 106,
+    "seed": 737803334,
+    "steps": 6,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 18.211,
+    "sim_time_s": 117.05,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "window",
+      "door",
+      "bookshelf",
+      "couch",
+      "desk",
+      "coffee table"
+    ],
+    "final_pose": {
+      "x": 2.5,
+      "y": 1.0,
+      "theta": -169.82
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-000616.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    },
+    {
+      "step_id": 3,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 5,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 6,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "window",
+      "door",
+      "bookshelf",
+      "couch",
+      "desk",
+      "coffee table"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": null,
+    "concerns": "the plan could not be verified",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 4,
+      "latency_total_s": 54.456,
+      "latency_mean_s": 13.614,
+      "prompt_tokens_total": 1122,
+      "completion_tokens_total": 2957,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 15.698,
+      "latency_mean_s": 15.698,
+      "prompt_tokens_total": 450,
+      "completion_tokens_total": 933,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The mission completed successfully after six steps, visiting all designated targets.\nTotal distance traveled was recorded at 18.2 meters with zero collisions reported.\nThe entire execution of this route took exactly 6.15 seconds."
+}

@@ -23,11 +23,20 @@ class OllamaProvider(InferenceProvider):
         host: Optional[str] = None,
         repeat_penalty: Optional[float] = None,
         num_predict: Optional[int] = None,
+        keep_alive: Optional[str] = None,
+        think: Optional[bool] = None,
     ):
         super().__init__(model)
         self.num_ctx = num_ctx
         self.repeat_penalty = repeat_penalty
         self.num_predict = num_predict
+        # Blank = Ollama's own default (5 min). Set (e.g. "30m") so a single
+        # model serving both the planner and VLM roles stays resident
+        # between calls instead of reloading.
+        self.keep_alive = keep_alive
+        # None = don't send the field (non-thinking models reject it). False
+        # stops gemma4 spending num_predict on reasoning before the JSON.
+        self.think = think
         # Client(host=None) resolves to 127.0.0.1:11434, matching the old
         # module-level ollama.chat() calls.
         self._client = ollama.Client(host=host or None)
@@ -58,6 +67,10 @@ class OllamaProvider(InferenceProvider):
         }
         if json_mode:
             kwargs["format"] = "json"
+        if self.think is not None:
+            kwargs["think"] = self.think
+        if self.keep_alive:
+            kwargs["keep_alive"] = self.keep_alive
 
         started = time.perf_counter()
         try:

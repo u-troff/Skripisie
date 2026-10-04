@@ -1,0 +1,484 @@
+{
+  "session_id": "c5d74ccf6fc5",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "can you please go to the cardboard box on the left",
+  "resolved_command": "go to the cardboard box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "cardboard box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "cardboard box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "cardboard box"
+      }
+    ],
+    "notes": "Approach will search by turning until the cardboard box is visible, then drive up to it."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "cardboard box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "cardboard box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "cardboard box"
+      }
+    ],
+    "notes": "Approach will search by turning until the cardboard box is visible, then drive up to it."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "cardboard box",
+      "status": "ok",
+      "detail": {
+        "reason": "sonar",
+        "cycles": 8,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 35.84
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "cardboard box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "cardboard box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 4.07,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 217.17022705078125,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 2.16,
+      "frame_path": "logs/frames/c5d74ccf6fc5/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "search",
+      "t_rel_s": 7.49,
+      "bbox": [
+        168,
+        129,
+        253,
+        203
+      ],
+      "x_center": 0.329,
+      "fill": 0.02,
+      "bottom": 0.423,
+      "confidence": "high",
+      "sharpness": 357.0882263183594,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=-290 gate=confirmed",
+      "vlm_latency_s": 2.0,
+      "frame_path": "logs/frames/c5d74ccf6fc5/ap_s0_p-290.jpg",
+      "sweep": 0,
+      "pan_offset": -290,
+      "pan_deg": -23.809,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "lock",
+      "t_rel_s": 12.24,
+      "bbox": [
+        396,
+        136,
+        480,
+        208
+      ],
+      "x_center": 0.684,
+      "fill": 0.02,
+      "bottom": 0.433,
+      "confidence": "high",
+      "sharpness": 438.711669921875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.28 gate=confirmed",
+      "vlm_latency_s": 2.23,
+      "frame_path": "logs/frames/c5d74ccf6fc5/ap_lock_verify.jpg",
+      "bearing_deg": -33.38,
+      "pivot_requested_deg": -33.38,
+      "pivot_cmd_s": 0.28,
+      "pivot_dir": -1,
+      "residual_e": 0.184,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 17.37,
+      "bbox": [
+        182,
+        119,
+        294,
+        216
+      ],
+      "x_center": 0.372,
+      "fill": 0.035,
+      "bottom": 0.45,
+      "confidence": "high",
+      "sharpness": 485.84490966796875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot R 0.09s hop 50 gate=confirmed",
+      "vlm_latency_s": 1.67,
+      "frame_path": "logs/frames/c5d74ccf6fc5/ap_04_check.jpg",
+      "pivot_cmd_s": 0.08732203389830512,
+      "pivot_dir": 1,
+      "hop_moved_s": 2.43,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.02,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 22.39,
+      "bbox": [
+        249,
+        75,
+        413,
+        221
+      ],
+      "x_center": 0.517,
+      "fill": 0.078,
+      "bottom": 0.46,
+      "confidence": "high",
+      "sharpness": 290.35821533203125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot L 0.06s hop 50 gate=confirmed",
+      "vlm_latency_s": 1.59,
+      "frame_path": "logs/frames/c5d74ccf6fc5/ap_05_check.jpg",
+      "pivot_cmd_s": 0.06074576271186441,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.44,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.035,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 28.03,
+      "bbox": [
+        157,
+        7,
+        485,
+        313
+      ],
+      "x_center": 0.502,
+      "fill": 0.327,
+      "bottom": 0.652,
+      "confidence": "high",
+      "sharpness": 481.0952453613281,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 50 gate=fill_jump",
+      "vlm_latency_s": 2.31,
+      "frame_path": "logs/frames/c5d74ccf6fc5/ap_06_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.44,
+      "gate": "fill_jump",
+      "hops_done": 3,
+      "fill_prev": 0.078,
+      "reject_reason": "fill_jump",
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 31.97,
+      "bbox": [
+        20,
+        0,
+        580,
+        424
+      ],
+      "x_center": 0.469,
+      "fill": 0.773,
+      "bottom": 0.883,
+      "confidence": "high",
+      "sharpness": 334.9087219238281,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 20 gate=degenerate_fill",
+      "vlm_latency_s": 2.06,
+      "frame_path": "logs/frames/c5d74ccf6fc5/ap_07_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.98,
+      "gate": "degenerate_fill",
+      "hops_done": 4,
+      "fill_prev": 0.078,
+      "reject_reason": "degenerate_fill",
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 8,
+      "phase": "approach",
+      "t_rel_s": 35.84,
+      "bbox": [
+        20,
+        0,
+        580,
+        424
+      ],
+      "x_center": 0.469,
+      "fill": 0.773,
+      "bottom": 0.883,
+      "confidence": "high",
+      "sharpness": 334.9087219238281,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 267,
+      "action": "arrived (sonar)",
+      "vlm_latency_s": 2.06,
+      "frame_path": "logs/frames/c5d74ccf6fc5/ap_07_check.jpg",
+      "hops_done": 4,
+      "fill_prev": 0.078,
+      "arrival_block": null
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "cardboard box",
+    "expected": [
+      "cardboard box",
+      "cardboard",
+      "box",
+      "left"
+    ],
+    "known": [],
+    "t_rel_s": 31.97,
+    "latency_s": 3.26,
+    "frame_path": "logs/frames/c5d74ccf6fc5/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "cardboard box",
+        "cardboard",
+        "box"
+      ],
+      "missing": [
+        "left"
+      ],
+      "unexpected": [
+        "tractor illustration",
+        "black mechanical object",
+        "floor"
+      ],
+      "description": "A cardboard box is clearly visible in the center of the image. It has a printed tractor graphic and a black mechanical object attached or positioned in front of it."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 8,
+    "sweeps_used": 1,
+    "gimbal_looks": 2,
+    "chassis_pivots": 3,
+    "chassis_spin_deg_total": -33.4,
+    "search_vlm_calls": 2,
+    "bearing_deg_at_lock": -33.38,
+    "residual_e_at_lock": 0.184,
+    "hops_done": 4,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 217.2,
+    "sharpness_median": 357.1,
+    "detections_rejected": {
+      "fill_jump": 1,
+      "degenerate_fill": 1
+    },
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 16.08,
+    "motion_time_s": 8.72,
+    "wall_time_s": 15.69,
+    "sonar_stops": 0,
+    "arrival_reason": "sonar"
+  },
+  "looked": {
+    "centre": 9
+  },
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "black mechanical object",
+      "box",
+      "cardboard",
+      "cardboard box",
+      "floor",
+      "tractor illustration"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 36.36,
+    "per_step_s": [
+      35.84,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 3.26,
+    "vlm_latency_max_s": 3.26,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "No cardboard box is visible in the image; the plan's target cannot be reliably approached or observed.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 10,
+      "latency_total_s": 22.896,
+      "latency_mean_s": 2.29,
+      "prompt_tokens_total": 4678,
+      "completion_tokens_total": 1357,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 4.078,
+      "latency_mean_s": 2.039,
+      "prompt_tokens_total": 614,
+      "completion_tokens_total": 267,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: left"
+    },
+    {
+      "code": "hallucinated_box_rejected",
+      "detail": "2 detection(s) were rejected as implausible (degenerate_fill, fill_jump) \u2014 counted, not believed"
+    }
+  ],
+  "spoken_summary": "I reached the cardboard box, which was clearly visible. The left side was not visible at arrival."
+}

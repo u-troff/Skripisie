@@ -29,9 +29,16 @@ _DEFAULT_REPEAT_PENALTY = 1.3
 # (a near-zero-temperature model repeating the same object block instead of
 # ever finishing); the planner is left uncapped since plan length legitimately
 # varies with the task.
-_DEFAULT_NUM_PREDICT = {"vlm": 768}
+_DEFAULT_NUM_PREDICT = {"vlm": 1536}
 
 _cache: Dict[Tuple[str, str, str], InferenceProvider] = {}
+
+
+def _optional_bool(key: str) -> Optional[bool]:
+    raw = (config.get(key) or "").strip().lower()
+    if not raw:
+        return None
+    return raw in ("1", "true", "yes", "on")
 
 
 def _resolve(role: str) -> Tuple[str, str]:
@@ -86,6 +93,8 @@ def get_provider(role: str) -> InferenceProvider:
             host=config.get("OLLAMA_HOST"),
             repeat_penalty=config.get_float("OLLAMA_REPEAT_PENALTY", _DEFAULT_REPEAT_PENALTY),
             num_predict=_optional_int(role.upper() + "_NUM_PREDICT", _DEFAULT_NUM_PREDICT.get(role)),
+            keep_alive=config.get("OLLAMA_KEEP_ALIVE") or None,
+            think=_optional_bool("OLLAMA_THINK"),
         )
     elif provider_name in ("openai", "deepseek"):
         prefix = provider_name.upper()

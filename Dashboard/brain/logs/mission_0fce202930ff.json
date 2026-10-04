@@ -1,0 +1,203 @@
+{
+  "session_id": "0fce202930ff",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Move forward 1 metre, turn right 90 degrees, move forward 80 centimetres, then turn left 90 degrees.",
+  "resolved_command": "Move forward 1 metre, turn right 90 degrees, move forward 80 centimetres, then turn left 90 degrees.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "distance_m": 1.0
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "distance_m": 0.8
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "degrees": 90
+      }
+    ],
+    "notes": "Executed the explicit movement sequence. The rover's starting position, orientation, and exact obstacle layout are not provided, so collision-free travel cannot be verified."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "distance_m": 1.0
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "distance_m": 0.8
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "degrees": 90
+      }
+    ],
+    "notes": "Executed the explicit movement sequence. The rover's starting position, orientation, and exact obstacle layout are not provided, so collision-free travel cannot be verified."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.3
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 2,
+      "action": "move",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.24
+    },
+    {
+      "index": 3,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.66,
+    "per_step_s": [
+      0.3,
+      0.06,
+      0.24,
+      0.06
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 45,
+    "seed": 737803334,
+    "steps": 4,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 1.8,
+    "sim_time_s": 12.588,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [],
+    "final_pose": {
+      "x": 1.6,
+      "y": 1.5,
+      "theta": -90.0
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-000616.jsonl"
+  },
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The plan lacks the robot's starting position, orientation, and obstacle layout, so the two moves cannot be verified as collision-free around the couch, coffee table, desk, and bookshelf.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 5.038,
+      "latency_mean_s": 2.519,
+      "prompt_tokens_total": 493,
+      "completion_tokens_total": 291,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 9.931,
+      "latency_mean_s": 4.965,
+      "prompt_tokens_total": 943,
+      "completion_tokens_total": 567,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "Command completed in 4 steps and 0.66 seconds. No obstacles or collisions were recorded."
+}

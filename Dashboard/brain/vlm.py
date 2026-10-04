@@ -1,5 +1,6 @@
 import json
 import time
+import config
 from typing import Any, Dict, List, Optional
 
 from log_setup import get_logger
@@ -66,6 +67,12 @@ def check_ambiguity(
             "enough information to act, set ambiguous to false."
         )
 
+    lines.append(
+        "resolved_command must name the object only (e.g. \"go to the cardboard box\"). "
+        "NEVER include where it appears in the image or camera view (left, right, centre, "
+        "edge, foreground, partially visible, in view) — the robot turns, so view-relative "
+        "positions are wrong a moment later."
+    )
     lines.append(
         "Respond ONLY with JSON: "
         '{"ambiguous": true/false, "reason": "...", '
@@ -233,6 +240,10 @@ def check_side_look(image: ImageSource, target: str,
         '"description": "one sentence"}'
     )
     return _ask("check_side_look", prompt, image)
+
+# 0 = the model returns pixels; N>0 = it returns 0..N normalised (gemma4: 1000).
+BBOX_SCALE = config.get_int("VLM_BBOX_SCALE", 0)
+
 
 def locate_target(image: ImageSource, target: str) -> dict:
     """Bounding-box localisation for the free-roam approach loop

@@ -1,0 +1,455 @@
+{
+  "session_id": "33e4ad6b2d85",
+  "outcome": "completed",
+  "rover": "pi",
+  "command": "please go to the cardboard box",
+  "resolved_command": "Drive toward the cardboard box on the floor in the center foreground and stop nearby.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "cardboard box on the floor in the center foreground"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "cardboard box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "cardboard box"
+      },
+      {
+        "id": 4,
+        "action": "stop",
+        "target": "near the cardboard box"
+      }
+    ],
+    "notes": "Approach the visible box without touching it, inspect it, report the result, and remain stopped nearby."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "cardboard box on the floor in the center foreground"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "cardboard box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "cardboard box"
+      },
+      {
+        "id": 4,
+        "action": "stop",
+        "target": "near the cardboard box"
+      }
+    ],
+    "notes": "Approach the visible box without touching it, inspect it, report the result, and remain stopped nearby."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "cardboard box on the floor in the center foreground",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 6,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 27.74
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "cardboard box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "cardboard box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    },
+    {
+      "index": 3,
+      "action": "stop",
+      "target": "near the cardboard box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 4.0,
+      "bbox": [
+        188,
+        134,
+        286,
+        220
+      ],
+      "x_center": 0.37,
+      "fill": 0.027,
+      "bottom": 0.458,
+      "confidence": "high",
+      "sharpness": 273.9159851074219,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 2.12,
+      "frame_path": "logs/frames/33e4ad6b2d85/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 8.47,
+      "bbox": [
+        450,
+        139,
+        548,
+        225
+      ],
+      "x_center": 0.78,
+      "fill": 0.027,
+      "bottom": 0.469,
+      "confidence": "high",
+      "sharpness": 359.130615234375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 2.07,
+      "frame_path": "logs/frames/33e4ad6b2d85/ap_lock_verify.jpg",
+      "bearing_deg": -7.28,
+      "pivot_requested_deg": -7.28,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": -1,
+      "residual_e": 0.28,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 13.93,
+      "bbox": [
+        127,
+        125,
+        261,
+        244
+      ],
+      "x_center": 0.303,
+      "fill": 0.052,
+      "bottom": 0.508,
+      "confidence": "high",
+      "sharpness": 250.58168029785156,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot R 0.13s hop 50 gate=confirmed",
+      "vlm_latency_s": 1.92,
+      "frame_path": "logs/frames/33e4ad6b2d85/ap_03_check.jpg",
+      "pivot_cmd_s": 0.1328813559322034,
+      "pivot_dir": 1,
+      "hop_moved_s": 2.46,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.027,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 19.53,
+      "bbox": [
+        183,
+        73,
+        410,
+        278
+      ],
+      "x_center": 0.463,
+      "fill": 0.151,
+      "bottom": 0.579,
+      "confidence": "high",
+      "sharpness": 344.6154479980469,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "pivot L 0.09s hop 50 gate=confirmed",
+      "vlm_latency_s": 2.16,
+      "frame_path": "logs/frames/33e4ad6b2d85/ap_04_check.jpg",
+      "pivot_cmd_s": 0.09349152542372882,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.42,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.052,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 23.09,
+      "bbox": [
+        99,
+        24,
+        426,
+        315
+      ],
+      "x_center": 0.41,
+      "fill": 0.31,
+      "bottom": 0.656,
+      "confidence": "high",
+      "sharpness": 440.72442626953125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.62,
+      "frame_path": "logs/frames/33e4ad6b2d85/ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.99,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.151,
+      "reject_reason": null,
+      "arrival_block": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 27.74,
+      "bbox": [
+        99,
+        24,
+        426,
+        315
+      ],
+      "x_center": 0.41,
+      "fill": 0.31,
+      "bottom": 0.656,
+      "confidence": "high",
+      "sharpness": 440.72442626953125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 480,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 1.62,
+      "frame_path": "logs/frames/33e4ad6b2d85/ap_05_check.jpg",
+      "hops_done": 3,
+      "fill_prev": 0.151,
+      "arrival_block": null
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "cardboard box on the floor in the center foreground",
+    "expected": [
+      "cardboard box on the floor in the center foreground",
+      "cardboard",
+      "box",
+      "floor",
+      "center",
+      "foreground",
+      "stop",
+      "nearby"
+    ],
+    "known": [],
+    "t_rel_s": 23.09,
+    "latency_s": 4.04,
+    "frame_path": "logs/frames/33e4ad6b2d85/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "cardboard box on the floor in the center foreground",
+        "cardboard",
+        "box",
+        "floor",
+        "center",
+        "foreground"
+      ],
+      "missing": [
+        "stop",
+        "nearby"
+      ],
+      "unexpected": [
+        "window",
+        "cabinet",
+        "wires"
+      ],
+      "description": "A cardboard box is clearly visible on the floor in the center foreground. Windows, cabinets, and wires are visible in the background."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 6,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 3,
+    "chassis_spin_deg_total": -7.3,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -7.28,
+    "residual_e_at_lock": 0.28,
+    "hops_done": 3,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 250.6,
+    "sharpness_median": 359.1,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 11.51,
+    "motion_time_s": 6.22,
+    "wall_time_s": 12.23,
+    "sonar_stops": 0,
+    "arrival_reason": "fill"
+  },
+  "looked": {
+    "centre": 7
+  },
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "box",
+      "cabinet",
+      "cardboard",
+      "cardboard box on the floor in the center foreground",
+      "center",
+      "floor",
+      "foreground",
+      "window",
+      "wires"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 28.26,
+    "per_step_s": [
+      27.74,
+      0.51,
+      0.0,
+      0.0
+    ],
+    "vlm_latency_mean_s": 4.04,
+    "vlm_latency_max_s": 4.04,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 8,
+      "latency_total_s": 18.309,
+      "latency_mean_s": 2.289,
+      "prompt_tokens_total": 3808,
+      "completion_tokens_total": 1093,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 2.799,
+      "latency_mean_s": 2.799,
+      "prompt_tokens_total": 282,
+      "completion_tokens_total": 222,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: stop, nearby"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    }
+  ],
+  "spoken_summary": "Completed a straight run toward the cardboard box on the floor in the center foreground. The box was clearly visible at arrival. Arrival was decided by vision only; sonar did not confirm it, and \u201cstop\u201d and \u201cnearby\u201d were not visible."
+}

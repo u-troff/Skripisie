@@ -1,0 +1,246 @@
+{
+  "session_id": "62f269ed8cf8",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Head over to the door, then the bookshelf, then the window, and finally the couch.",
+  "resolved_command": "Head over to the door, then the bookshelf, then the window, and finally the couch.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "couch"
+      }
+    ],
+    "notes": ""
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "couch"
+      }
+    ],
+    "notes": ""
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.44
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.63
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.07
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.42
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 4.56,
+    "per_step_s": [
+      1.44,
+      1.63,
+      1.07,
+      0.42
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 95,
+    "seed": 737803334,
+    "steps": 4,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 13.451,
+    "sim_time_s": 85.891,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "door",
+      "bookshelf",
+      "window",
+      "couch"
+    ],
+    "final_pose": {
+      "x": 1.7,
+      "y": 2.9,
+      "theta": -138.37
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-000616.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    },
+    {
+      "step_id": 3,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "door",
+      "bookshelf",
+      "window",
+      "couch"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": false,
+    "concerns": "Step 4 indicates that the robot arrived at its final destination (couch), but based on steps 1-3, it stopped after approaching the window; there was no explicit step to approach or stop near the couch.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 5,
+      "latency_total_s": 66.177,
+      "latency_mean_s": 13.235,
+      "prompt_tokens_total": 1366,
+      "completion_tokens_total": 3520,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 31.397,
+      "latency_mean_s": 15.699,
+      "prompt_tokens_total": 976,
+      "completion_tokens_total": 1708,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [],
+  "spoken_summary": "The mission is complete; the targets visited were door, bookshelf, window, and couch. The rover completed all tasks in exactly 4.56 total seconds across four steps. It traveled a distance of 13.45 meters."
+}

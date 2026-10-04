@@ -27,7 +27,7 @@ from planner import revise_plan
 from providers import usage
 from rover import RoverController
 from stt import transcribe_audio
-from vlm import KNOWN_MAX, check_arrival, check_progress, check_side_look, describe_frame, locate_target
+from vlm import BBOX_SCALE, KNOWN_MAX, check_arrival, check_progress, check_side_look, describe_frame, locate_target
 from vlm import failed as vlm_failed
 
 log = get_logger("mission")
@@ -735,6 +735,13 @@ def _derive_loc(raw: dict, frame_w: Optional[int], frame_h: Optional[int]) -> di
             or not isinstance(bbox, list) or len(bbox) != 4):
         return {"visible": False, "bbox_2d": None, "vlm_said_visible": vlm_said_visible}
     x1, y1, x2, y2 = bbox
+    if BBOX_SCALE > 0:
+        try:
+            x1, x2 = x1 / BBOX_SCALE * frame_w, x2 / BBOX_SCALE * frame_w
+            y1, y2 = y1 / BBOX_SCALE * frame_h, y2 / BBOX_SCALE * frame_h
+        except TypeError:
+            return {"visible": False, "bbox_2d": None, "vlm_said_visible": vlm_said_visible}
+        bbox = [round(x1), round(y1), round(x2), round(y2)]
     if not (x1 < x2 and y1 < y2 and x1 >= 0 and y1 >= 0
             and x2 <= frame_w and y2 <= frame_h):
         return {"visible": False, "bbox_2d": None, "vlm_said_visible": vlm_said_visible}

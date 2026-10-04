@@ -1,0 +1,380 @@
+{
+  "session_id": "ed9cd9987096",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Go to the bookshelf, turn left 90 degrees, move forward 0.6 metres, turn around, move forward 0.6 metres, go to the window, turn right 45 degrees, then move back half a metre.",
+  "resolved_command": "Go to the bookshelf, turn left 90 degrees, move forward 0.6 metres, turn around, move forward 0.6 metres, go to the window, turn right 45 degrees, then move back half a metre.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "left",
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": "forward",
+        "distance_m": 0.6
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": "right",
+        "degrees": 180
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": "forward",
+        "distance_m": 0.6
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 7,
+        "action": "turn",
+        "target": "right",
+        "degrees": 45
+      },
+      {
+        "id": 8,
+        "action": "move",
+        "target": "backward",
+        "distance_m": 0.5
+      }
+    ],
+    "notes": "The room description does not provide positions, distances, or the rover's starting pose, so the straight movements cannot be verified as collision-free. The requested route and destinations are retained."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "left",
+        "degrees": 90
+      },
+      {
+        "id": 3,
+        "action": "move",
+        "target": "forward",
+        "distance_m": 0.6
+      },
+      {
+        "id": 4,
+        "action": "turn",
+        "target": "right",
+        "degrees": 180
+      },
+      {
+        "id": 5,
+        "action": "move",
+        "target": "forward",
+        "distance_m": 0.6
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 7,
+        "action": "turn",
+        "target": "right",
+        "degrees": 45
+      },
+      {
+        "id": 8,
+        "action": "move",
+        "target": "backward",
+        "distance_m": 0.5
+      }
+    ],
+    "notes": "The room description does not provide positions, distances, or the rover's starting pose, so the straight movements cannot be verified as collision-free. The requested route and destinations are retained."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.1
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": "left",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.06
+    },
+    {
+      "index": 2,
+      "action": "move",
+      "target": "forward",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.19
+    },
+    {
+      "index": 3,
+      "action": "turn",
+      "target": "right",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.11
+    },
+    {
+      "index": 4,
+      "action": "move",
+      "target": "forward",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.18
+    },
+    {
+      "index": 5,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.06
+    },
+    {
+      "index": 6,
+      "action": "turn",
+      "target": "right",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.03
+    },
+    {
+      "index": 7,
+      "action": "move",
+      "target": "backward",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.16
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 2.89,
+    "per_step_s": [
+      1.1,
+      0.06,
+      0.19,
+      0.11,
+      0.18,
+      1.06,
+      0.03,
+      0.16
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "vlm": {
+      "provider": "openai",
+      "model": "gpt-5.6-luna",
+      "local": false
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 61,
+    "seed": 737803334,
+    "steps": 8,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 8.275,
+    "sim_time_s": 54.836,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "bookshelf",
+      "window"
+    ],
+    "final_pose": {
+      "x": 2.4761,
+      "y": 3.2156,
+      "theta": 75.65
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261004-000616.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "turn",
+      "target": "left",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 3,
+      "action": "move",
+      "target": "forward",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 4,
+      "action": "turn",
+      "target": "right",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 5,
+      "action": "move",
+      "target": "forward",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 6,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    },
+    {
+      "step_id": 7,
+      "action": "turn",
+      "target": "right",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    },
+    {
+      "step_id": 8,
+      "action": "move",
+      "target": "backward",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "bookshelf",
+      "left",
+      "forward",
+      "right",
+      "forward",
+      "window",
+      "right",
+      "backward"
+    ],
+    "unresolved": [
+      "left",
+      "forward",
+      "right",
+      "forward",
+      "right",
+      "backward"
+    ],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The room description does not provide object positions, distances, or the robot's starting pose, so the planned movements cannot be verified as collision-free. In particular, moving 0.6 m after approaching the bookshelf and moving backward 0.5 m after approaching the window could encounter the bookshelf, window, or other floor obstacles.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 6.102,
+      "latency_mean_s": 3.051,
+      "prompt_tokens_total": 614,
+      "completion_tokens_total": 478,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 12.098,
+      "latency_mean_s": 6.049,
+      "prompt_tokens_total": 1016,
+      "completion_tokens_total": 981,
+      "cost_usd_total": null
+    }
+  },
+  "uncertainties": [
+    {
+      "code": "plan_target_unresolved",
+      "detail": "the plan named a target the room doesn't have: left, forward, right, forward, right, backward"
+    }
+  ],
+  "spoken_summary": "Completed the command in 2.89 seconds, visiting the bookshelf and window. No obstacles or collisions were recorded. Uncertainty: the plan named a target the room doesn't have: left, forward, right, forward, right, backward."
+}
