@@ -62186,3 +62186,4 @@ Respond ONLY with JSON: {"target_visible": true/false, "confidence": "high"|"med
 2026-10-04 22:55:25 INFO  brain.mission  [mission bf5a1930befe] end — completed
 2026-10-04 22:55:26 INFO  brain.report   [bench] role=planner stage=spoken_summary provider=ollama model=gemma4:e4b latency=1.033 prompt_tokens=525 completion_tokens=41 cost_usd=
 2026-10-04 22:55:27 INFO  brain.mission  [mission bf5a1930befe] run log -> C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\mission_bf5a1930befe.json
+2026-10-05 10:01:36 INFO  brain          logging to /Users/utroff/Desktop/Skripsie/Dashboard/brain/logs/brain.log
