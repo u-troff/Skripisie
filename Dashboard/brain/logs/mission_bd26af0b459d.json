@@ -1,0 +1,608 @@
+{
+  "session_id": "bd26af0b459d",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Go to the couch, then the coffee table, then the desk, then the bookshelf, then the door, then the window, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, and finally the bookshelf again.",
+  "resolved_command": "go to the couch, then the coffee table, then the desk, then the bookshelf, then the door, then the window, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, and finally the bookshelf again.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 5,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 7,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 8,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 9,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 10,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 11,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 12,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 13,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 14,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 15,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 16,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The command requires repeated sequential approaches to specific named objects. Since 'approach' inherently includes navigation to the target, and there are no explicit distance/angle instructions, only 'approach' actions are used for navigation between targets."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 5,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 6,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 7,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 8,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 9,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 10,
+        "action": "approach",
+        "target": "bookshelf"
+      },
+      {
+        "id": 11,
+        "action": "approach",
+        "target": "door"
+      },
+      {
+        "id": 12,
+        "action": "approach",
+        "target": "window"
+      },
+      {
+        "id": 13,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 14,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 15,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 16,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The command requires repeated sequential approaches to specific named objects. Since 'approach' inherently includes navigation to the target, and there are no explicit distance/angle instructions, only 'approach' actions are used for navigation between targets."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.79
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.88
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.77
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.67
+    },
+    {
+      "index": 4,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.67
+    },
+    {
+      "index": 5,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.76
+    },
+    {
+      "index": 6,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.43
+    },
+    {
+      "index": 7,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.82
+    },
+    {
+      "index": 8,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.77
+    },
+    {
+      "index": 9,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.65
+    },
+    {
+      "index": 10,
+      "action": "approach",
+      "target": "door",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.67
+    },
+    {
+      "index": 11,
+      "action": "approach",
+      "target": "window",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.76
+    },
+    {
+      "index": 12,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.43
+    },
+    {
+      "index": 13,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.8
+    },
+    {
+      "index": 14,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.77
+    },
+    {
+      "index": 15,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.66
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 13.32,
+    "per_step_s": [
+      0.79,
+      0.88,
+      0.77,
+      0.67,
+      1.67,
+      0.76,
+      0.43,
+      0.82,
+      0.77,
+      0.65,
+      1.67,
+      0.76,
+      0.43,
+      0.8,
+      0.77,
+      0.66
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 12,
+    "seed": 1825190184,
+    "steps": 16,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 38.846,
+    "sim_time_s": 254.017,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf"
+    ],
+    "final_pose": {
+      "x": 4.2,
+      "y": 1.0,
+      "theta": -71.57
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261007-001133.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 3,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    },
+    {
+      "step_id": 5,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    },
+    {
+      "step_id": 6,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    },
+    {
+      "step_id": 7,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 8,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 9,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 10,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    },
+    {
+      "step_id": 11,
+      "action": "approach",
+      "target": "door",
+      "resolved": true,
+      "matched": "door",
+      "how": "exact"
+    },
+    {
+      "step_id": 12,
+      "action": "approach",
+      "target": "window",
+      "resolved": true,
+      "matched": "window",
+      "how": "exact"
+    },
+    {
+      "step_id": 13,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 14,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 15,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 16,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot's capabilities are limited to driving and looking. The plan only contains 'approach' actions. Assuming 'approach' is a valid action that involves movement to a target, the plan is logically sound given the constraints. However, the repeated approaches (Steps 7-16 repeat 1-6) suggest redundant actions. More critically, the robot cannot 'pick up or touch anything', which is respected by the plan. The main concern is that 'approach' might not be sufficient to cover a comprehensive search, but based *only* on the defined actions and capabilities, the plan does not violate the 'no picking up/touching' rule. If 'approach' is defined as simply moving close to the object, the plan is valid but extremely redundant. Since the prompt implies verifying against capabilities, and 'approach' uses driving, it is technically permissible.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 5.309,
+      "latency_mean_s": 2.655,
+      "prompt_tokens_total": 878,
+      "completion_tokens_total": 330,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 9.991,
+      "latency_mean_s": 4.996,
+      "prompt_tokens_total": 1213,
+      "completion_tokens_total": 908,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 13.32,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [],
+  "spoken_summary": "The mission completed successfully. The rover executed 16 steps and traveled 38.846 meters. The final position is x: 4.2, y: 1.0, and theta: -71.57."
+}

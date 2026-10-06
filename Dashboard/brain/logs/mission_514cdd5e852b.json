@@ -1,0 +1,201 @@
+{
+  "session_id": "514cdd5e852b",
+  "outcome": "completed",
+  "rover": "virtual",
+  "command": "Go to the couch.",
+  "resolved_command": "Go to the couch.",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "stop",
+        "target": "couch"
+      }
+    ],
+    "notes": "The advice states that the plan attempts to approach the couch, which is an obstacle. Since the rover cannot move around obstacles unless it uses 'approach' to navigate, and the advice explicitly warns about this, the plan must account for the robot's limitations. Since the target is an obstacle, the only way to fulfill 'approach' is to acknowledge the limitation or follow the instructions strictly. Given the constraints, the approach to an obstacle is likely an error, but the command must be executed. Since the system only allows 'approach', and the plan checker flagged it, I will proceed with the literal instruction, assuming 'approach' can be attempted despite the obstacle, as it's the only way to reach the target name."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "stop",
+        "target": "couch"
+      }
+    ],
+    "notes": "The advice states that the plan attempts to approach the couch, which is an obstacle. Since the rover cannot move around obstacles unless it uses 'approach' to navigate, and the advice explicitly warns about this, the plan must account for the robot's limitations. Since the target is an obstacle, the only way to fulfill 'approach' is to acknowledge the limitation or follow the instructions strictly. Given the constraints, the approach to an obstacle is likely an error, but the command must be executed. Since the system only allows 'approach', and the plan checker flagged it, I will proceed with the literal instruction, assuming 'approach' can be attempted despite the obstacle, as it's the only way to reach the target name."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.8
+    },
+    {
+      "index": 1,
+      "action": "stop",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.02
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 1.82,
+    "per_step_s": [
+      0.8,
+      1.02
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 1,
+    "seed": 757445152,
+    "steps": 2,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 2.563,
+    "sim_time_s": 15.306,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "couch"
+    ],
+    "final_pose": {
+      "x": 1.7,
+      "y": 2.9,
+      "theta": 69.44
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261006-144953.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "stop",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "couch",
+      "couch"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": true,
+    "verified": false,
+    "concerns": "The plan attempts to approach the couch, which is an obstacle. The robot needs a path to the target that avoids obstacles.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 17.039,
+      "latency_mean_s": 8.52,
+      "prompt_tokens_total": 485,
+      "completion_tokens_total": 188,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 3.772,
+      "latency_mean_s": 1.886,
+      "prompt_tokens_total": 915,
+      "completion_tokens_total": 225,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 1.82,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [],
+  "spoken_summary": "The command to go to the couch was completed. The rover traveled 2.563 meters. The final pose is at (1.7, 2.9) with an angle of 69.44 degrees."
+}

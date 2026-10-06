@@ -1,0 +1,625 @@
+{
+  "session_id": "c53348671b45",
+  "outcome": "aborted",
+  "rover": "pi",
+  "command": "can you please go to the red ball",
+  "resolved_command": "go to the red ball on the left",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": "red ball on the left"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "red ball on the left"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "red ball on the left"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "red ball on the left"
+      }
+    ],
+    "notes": "The rover first scans to locate the target, then approaches it, observes it, and finally reports the finding, as per the constraints."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": "red ball on the left"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "red ball on the left"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "red ball on the left"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "red ball on the left"
+      }
+    ],
+    "notes": "The rover first scans to locate the target, then approaches it, observes it, and finally reports the finding, as per the constraints."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "scan",
+      "target": "red ball on the left",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.23
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "red ball on the left",
+      "status": "blocked",
+      "detail": {
+        "reason": "obstacle",
+        "sonar_mm": 175,
+        "cycles": 12
+      },
+      "elapsed_s": 65.31
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 5.37,
+      "bbox": [
+        180,
+        209,
+        203,
+        231
+      ],
+      "x_center": 0.299,
+      "fill": 0.002,
+      "bottom": 0.481,
+      "confidence": "high",
+      "sharpness": 307.74090576171875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 3.46,
+      "frame_path": "logs/frames/c53348671b45/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 11.59,
+      "bbox": [
+        217,
+        208,
+        238,
+        225
+      ],
+      "x_center": 0.356,
+      "fill": 0.001,
+      "bottom": 0.468,
+      "confidence": "high",
+      "sharpness": 512.577880859375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 3.3,
+      "frame_path": "logs/frames/c53348671b45/ap_lock_verify.jpg",
+      "bearing_deg": -11.26,
+      "pivot_requested_deg": -11.26,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": -1,
+      "residual_e": -0.144,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 18.33,
+      "bbox": [
+        369,
+        231,
+        403,
+        261
+      ],
+      "x_center": 0.603,
+      "fill": 0.003,
+      "bottom": 0.543,
+      "confidence": "high",
+      "sharpness": 651.4885864257812,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1892,
+      "action": "pivot L 0.07s hop 50 gate=confirmed",
+      "vlm_latency_s": 3.32,
+      "frame_path": "logs/frames/c53348671b45/ap_03_check.jpg",
+      "pivot_cmd_s": 0.06833898305084747,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.43,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.001,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 50.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 25.0,
+      "bbox": [
+        372,
+        318,
+        460,
+        402
+      ],
+      "x_center": 0.65,
+      "fill": 0.024,
+      "bottom": 0.838,
+      "confidence": "high",
+      "sharpness": 445.4919128417969,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 2042,
+      "action": "hop 50 gate=fill_jump",
+      "vlm_latency_s": 3.34,
+      "frame_path": "logs/frames/c53348671b45/ap_04_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.42,
+      "gate": "fill_jump",
+      "hops_done": 2,
+      "fill_prev": 0.003,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 50.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 30.26,
+      "bbox": [
+        95,
+        247,
+        111,
+        261
+      ],
+      "x_center": 0.161,
+      "fill": 0.001,
+      "bottom": 0.543,
+      "confidence": "high",
+      "sharpness": 311.10955810546875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1242,
+      "action": "pivot R 0.07s hop 20 gate=confirmed",
+      "vlm_latency_s": 3.24,
+      "frame_path": "logs/frames/c53348671b45/ap_05_check.jpg",
+      "pivot_cmd_s": 0.07118644067796612,
+      "pivot_dir": 1,
+      "hop_moved_s": 1.03,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.003,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 50.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 37.11,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 575.2691040039062,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": 738,
+      "action": "pivot L 0.16s hop 50 gate=not_visible",
+      "vlm_latency_s": 3.37,
+      "frame_path": "logs/frames/c53348671b45/ap_06_check.jpg",
+      "pivot_cmd_s": 0.16088135593220337,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.43,
+      "gate": "not_visible",
+      "hops_done": 4,
+      "fill_prev": 0.001,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 1.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 41.62,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "low",
+      "sharpness": 844.3142700195312,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "hop_back 0.6s gate=not_visible",
+      "vlm_latency_s": 3.05,
+      "frame_path": "logs/frames/c53348671b45/ap_07_lostlook.jpg",
+      "gate": "not_visible",
+      "hop_moved_s": 0.61
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 8,
+      "phase": "approach",
+      "t_rel_s": 45.57,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "low",
+      "sharpness": 861.7326049804688,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "relocate_look gate=not_visible",
+      "vlm_latency_s": 3.05,
+      "frame_path": "logs/frames/c53348671b45/ap_08_relocate.jpg",
+      "gate": "not_visible"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 9,
+      "phase": "search",
+      "t_rel_s": 50.0,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "low",
+      "sharpness": 860.7172241210938,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 3.06,
+      "frame_path": "logs/frames/c53348671b45/ap_re0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 10,
+      "phase": "search",
+      "t_rel_s": 54.47,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "low",
+      "sharpness": 543.5610961914062,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=-290 gate=not_visible",
+      "vlm_latency_s": 3.1,
+      "frame_path": "logs/frames/c53348671b45/ap_re0_p-290.jpg",
+      "sweep": 0,
+      "pan_offset": -290,
+      "pan_deg": -23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 11,
+      "phase": "search",
+      "t_rel_s": 59.38,
+      "bbox": [
+        78,
+        435,
+        204,
+        479
+      ],
+      "x_center": 0.221,
+      "fill": 0.018,
+      "bottom": 0.999,
+      "confidence": "medium",
+      "sharpness": 812.7806396484375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=290 gate=confirmed",
+      "vlm_latency_s": 3.54,
+      "frame_path": "logs/frames/c53348671b45/ap_re0_p290.jpg",
+      "sweep": 0,
+      "pan_offset": 290,
+      "pan_deg": 23.809,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 11,
+      "phase": "approach",
+      "t_rel_s": 65.01,
+      "bbox": [
+        1,
+        435,
+        136,
+        479
+      ],
+      "x_center": 0.107,
+      "fill": 0.02,
+      "bottom": 0.999,
+      "confidence": "high",
+      "sharpness": 829.0092163085938,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "relock_look gate=fill_jump",
+      "vlm_latency_s": 3.22,
+      "frame_path": "logs/frames/c53348671b45/ap_11_relock.jpg",
+      "gate": "fill_jump"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 12,
+      "phase": "approach",
+      "t_rel_s": 65.31,
+      "bbox": [
+        1,
+        435,
+        136,
+        479
+      ],
+      "x_center": 0.107,
+      "fill": 0.02,
+      "bottom": 0.999,
+      "confidence": "high",
+      "sharpness": 829.0092163085938,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 175,
+      "action": "pivot L 0.19s hop 20 sonar_stop_blocked",
+      "vlm_latency_s": 3.22,
+      "frame_path": "logs/frames/c53348671b45/ap_11_relock.jpg",
+      "pivot_cmd_s": 0.1865084745762712,
+      "pivot_dir": -1,
+      "hop_moved_s": 0.05,
+      "hop_src": "fixed",
+      "d_vlm_cm": null,
+      "centred": false
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 12,
+    "sweeps_used": 1,
+    "gimbal_looks": 4,
+    "chassis_pivots": 5,
+    "chassis_spin_deg_total": -11.3,
+    "search_vlm_calls": 4,
+    "bearing_deg_at_lock": -11.26,
+    "residual_e_at_lock": -0.144,
+    "hops_done": 6,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 307.7,
+    "sharpness_median": 651.5,
+    "detections_rejected": {
+      "fill_jump": 1
+    },
+    "arrival_cross_check": null,
+    "gimbal_only_lock": null,
+    "vlm_time_s": 42.27,
+    "motion_time_s": 9.58,
+    "wall_time_s": 17.67,
+    "sonar_stops": 1,
+    "arrival_reason": "obstacle",
+    "vlm_calls": 13,
+    "approach_wall_time_s": 59.94,
+    "hop_src_counts": {
+      "fixed": 5
+    }
+  },
+  "looked": {
+    "centre": 13
+  },
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 158.76,
+    "per_step_s": [
+      1.23,
+      65.31
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 3,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 17,
+      "latency_total_s": 69.808,
+      "latency_mean_s": 4.106,
+      "prompt_tokens_total": 20558,
+      "completion_tokens_total": 880,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 17.675,
+      "latency_mean_s": 17.675,
+      "prompt_tokens_total": 287,
+      "completion_tokens_total": 125,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [
+    {
+      "reason": "obstacle",
+      "question": "I stopped because something is in my way. What should I do next?",
+      "answer": null,
+      "t_rel_s": 66.54,
+      "replanned": false
+    }
+  ],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 1.74,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 12.82,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 46.8,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 66.24,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 66.54,
+      "state": "awaiting_guidance"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "mission_aborted",
+      "detail": "the mission was aborted by the operator"
+    },
+    {
+      "code": "target_lost_repeatedly",
+      "detail": "the target was lost and re-acquired 2 time(s) during the approach"
+    },
+    {
+      "code": "approach_budget_overrun",
+      "detail": "used 12 of 20 available cycles (>50%)"
+    },
+    {
+      "code": "hallucinated_box_rejected",
+      "detail": "1 detection(s) were rejected as implausible (fill_jump) \u2014 counted, not believed"
+    }
+  ],
+  "spoken_summary": "Mission aborted. Target unconfirmed. 4 uncertainties flagged."
+}

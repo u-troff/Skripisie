@@ -108,6 +108,25 @@ GIMBAL_PWM_MAX = 2000
 # A STOP sent this soon after the previous one covers the stock node's 0.5 s
 # pre-turn forward nudge, during which a STOP is swallowed.
 HALT_REPEAT_S = 0.7
+# -- status lights (spec-supervisor-feedback-2026-10-05.md B) ---------------------
+# RGBStates{states: [RGBState{index, red, green, blue}]}, the message the stock nodes use
+# (see line_follow_corner.py). The sonar ring's indices (0,1) are the ones that file uses;
+# the board's (1,2) are NOT confirmed - check on the unit and override in .env.
+_RGB_BOARD_IDX = [int(i) for i in config.get("RGB_BOARD_INDICES", "1,2").split(",") if i.strip()]
+_RGB_SONAR_IDX = [int(i) for i in config.get("RGB_SONAR_INDICES", "0,1").split(",") if i.strip()]
+# state -> (frames [(rgb, dwell_s)], loop?, final steady colour). Colours are a starting point.
+_OFF = (0, 0, 0)
+_LIGHTS = {
+    "listening": ([((0, 0, 255), 0.0)], False, (0, 0, 255)),
+    "thinking": ([((255, 0, 0), 0.5), ((0, 255, 0), 0.5)], True, None),
+    "confirm": ([((255, 160, 0), 0.0)], False, (255, 160, 0)),
+    "executing": ([((0, 255, 0), 0.0)], False, (0, 255, 0)),
+    "searching": ([((0, 255, 255), 0.0)], False, (0, 255, 255)),
+    "awaiting_guidance": ([((255, 0, 255), 1.0), (_OFF, 1.0)], True, None),
+    "arrived": ([((0, 255, 0), 0.25), (_OFF, 0.25)] * 3, False, (0, 255, 0)),
+    "blocked": ([((255, 0, 0), 0.0)], False, (255, 0, 0)),
+}
+
 
 
 class PiRoverController(RoverController):
@@ -129,7 +148,8 @@ class PiRoverController(RoverController):
                  pause_max_s: float = 10.0,
                  line_route: str = "STOP_NEXT_ROAD", corner_guard_s: float = 5.0,
                  pan_invert: bool = False, tilt_invert: bool = False,
-                 look_offset: int = 400, aim_settle_s: float = 0.5):
+                 look_offset: int = 400, aim_settle_s: float = 0.5,
+                 rgb_enabled: bool = True):
         if roslibpy is None:
             raise RuntimeError(
                 "roslibpy is not installed — add it to requirements.txt and "
@@ -257,6 +277,22 @@ class PiRoverController(RoverController):
         log.info("[pi] connected (snapshot=%s, route=%s, pan_invert=%s, tilt_invert=%s)",
                  self.snapshot_url, self.line_route, self.pan_invert, self.tilt_invert)
 
+        # Status lights. A failure here must never stop the rover from starting.
+        self._rgb_enabled = bool(rgb_enabled)
+        self._light_gen = 0
+        self._light_lock = threading.Lock()
+        self._rgb_topics = []
+        if self._rgb_enabled:
+            try:
+                for name in ("/ros_robot_controller/set_rgb", "/sonar_controller/set_rgb"):
+                    topic = roslibpy.Topic(self.client, name, "ros_robot_controller_msgs/msg/RGBStates")
+                    topic.advertise()
+                    self._rgb_topics.append(topic)
+            except Exception:
+                log.warning("[pi] RGB topics unavailable - status lights disabled", exc_info=True)
+                self._rgb_topics = []
+
+
     # -- the contract --------------------------------------------------------
     def execute_step(self, step: dict) -> dict:
         self._halted.clear()
@@ -324,6 +360,54 @@ class PiRoverController(RoverController):
             self._publish_twist()
         except Exception:
             log.exception("[pi] repeat HALT failed")
+    # -- status lights -------------------------------------------------------
+    def status_light(self, state: str) -> None:
+        """Show a mission state on the board LEDs and the sonar ring. Returns at once: the
+        publish is queued by roslibpy, and blinking runs on a short-lived thread that stops
+        itself as soon as a newer state arrives. Never raises."""
+        if not self._rgb_enabled or not self._rgb_topics:
+            return
+        pattern = _LIGHTS.get(state)
+        if pattern is None:
+            log.warning("[pi] status_light: unknown state %r", state)
+            return
+        with self._light_lock:
+            self._light_gen += 1
+            gen = self._light_gen
+        threading.Thread(target=self._run_light, args=(gen, pattern), daemon=True).start()
+
+    def _run_light(self, gen: int, pattern) -> None:
+        frames, loop, final = pattern
+        try:
+            while True:
+                for colour, dwell in frames:
+                    if not self._set_rgb(gen, colour):
+                        return
+                    end = time.time() + dwell
+                    while time.time() < end:
+                        if gen != self._light_gen:
+                            return
+                        time.sleep(0.05)
+                if not loop:
+                    break
+            if final is not None and frames[-1][0] != final:   # steady states are already showing
+                self._set_rgb(gen, final)
+        except Exception:
+            log.warning("[pi] status light failed", exc_info=True)
+
+    def _set_rgb(self, gen: int, colour) -> bool:
+        """Publish one colour unless a newer state has superseded `gen` (checked under the
+        lock, so a stale blink can never overwrite the new state)."""
+        red, green, blue = colour
+        with self._light_lock:
+            if gen != self._light_gen:
+                return False
+            for topic, indices in zip(self._rgb_topics, (_RGB_BOARD_IDX, _RGB_SONAR_IDX)):
+                topic.publish(roslibpy.Message({"states": [
+                    {"index": i, "red": red, "green": green, "blue": blue} for i in indices]}))
+        return True
+
+
 
     def confirm_target(self, target: str) -> None:
         """Called mid-drive when a scan confirms the step's named target is

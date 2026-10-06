@@ -33,6 +33,11 @@ class RoverController(ABC):
     def halt(self) -> None:
         """Must not require inference, a model, or a network call."""
 
+    def status_light(self, state: str) -> None:
+        """Mission-status RGB light (spec-supervisor-feedback-2026-10-05.md B). A no-op by
+        default so SimulatedRover and VirtualRover are untouched; PiRoverController overrides
+        it. Must never block and never raise into a mission."""
+
 
 class SimulatedRover(RoverController):
     """Sleeps for the step duration and reports success.
@@ -539,7 +544,7 @@ def get_rover() -> RoverController:
             linear_speed=config.get_float("ROVER_PI_LINEAR_SPEED", 0.3),
             angular_speed=config.get_float("ROVER_PI_ANGULAR_SPEED", 4.0),
             camera_port=config.get_int("ROVER_PI_CAMERA_PORT", 8080),
-            sonar_stop_mm=config.get_int("ROVER_PI_SONAR_STOP_MM", 200),
+            sonar_stop_mm=config.get_int("ROVER_PI_SONAR_STOP_MM", 300),
             sonar_clear_mm=config.get_int("ROVER_PI_SONAR_CLEAR_MM", 300),
             obstacle_wait_s=config.get_float("ROVER_PI_OBSTACLE_WAIT_S", 5.0),
             line_timeout_s=config.get_float("ROVER_PI_LINE_TIMEOUT_S", 40.0),
@@ -559,6 +564,7 @@ def get_rover() -> RoverController:
             free_speed_cmps=config.get_float("FREE_SPEED_CMPS",15.0),
             free_turn_z=config.get_float("FREE_TURN_Z",3.0),
             fallback_hop_cm=config.get_float("HOP_CM",30.0),
+            rgb_enabled=config.get_bool("RGB_ENABLED",True),
         )
     else:
         raise RoverError(f"unknown ROVER={name!r} — 'sim', 'virtual', and 'pi' are implemented")

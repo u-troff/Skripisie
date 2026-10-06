@@ -3,7 +3,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Callable
 
 import config
 from dialogue_session import DialogueSession
@@ -11,9 +11,11 @@ from dialogue_session import DialogueSession
 DIGEST_KEEP = config.get_int("PERCEPTION_DIGEST_KEEP", 6)
 
 
+
 class MissionPhase(str, Enum):
     EXECUTING = "executing"
     AWAITING_REVISION_CONFIRMATION = "awaiting_revision_confirmation"
+    AWAITING_GUIDANCE = "awaiting_guidance"
     HALTED = "halted"
     COMPLETED = "completed"
     ABORTED = "aborted"
@@ -100,6 +102,17 @@ class MissionSession:
     # provider, model, latency, tokens and cost.
     usage: List[dict] = field(default_factory=list)
 
+    guidance_log: List[dict] = field(default_factory=list)
+
+    guidance_turns : int = 0
+
+    pending_guidance : Optional[str] = None
+
+    guidance_provider : Optional[Callable[[dict], Optional[str]]] = None
+
+    halt_reason: Optional[str] = None
+    light_states:List[dict] = field(default_factory=list)
+
     def steps(self) -> List[dict]:
         return self.active_plan.get("steps") or []
 
@@ -141,6 +154,10 @@ class MissionSession:
             "grounding": self.grounding,
             "dialogue_meta": self.dialogue_meta,
             "usage": self.usage,
+            "guidance_log": self.guidance_log,
+            "guidance_turns": self.guidance_turns,
+            "halt_reason": self.halt_reason,
+            "light_states": self.light_states,
         }
 
 

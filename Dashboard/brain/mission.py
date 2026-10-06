@@ -23,12 +23,14 @@ import scene as scene_mod
 import tts
 from log_setup import get_logger
 from mission_session import TERMINAL, MissionPhase, MissionSession, RevisionRecord
-from planner import revise_plan
+from planner import revise_plan,replan_from_state
 from providers import usage
 from rover import RoverController
 from stt import transcribe_audio
-from vlm import KNOWN_MAX, bbox_format,check_arrival, check_progress, check_side_look, describe_frame, locate_target
+from vlm import KNOWN_MAX, VLM_DIST_MAX_CM, bbox_format,check_arrival, check_progress, check_side_look, describe_frame, distance_cm_from, locate_target
+
 from vlm import failed as vlm_failed
+
 
 log = get_logger("mission")
 
@@ -71,7 +73,7 @@ HOP_BACK_S = config.get_float("HOP_BACK_S", 0.6)
 NEAR_FILL = config.get_float("NEAR_FILL", 0.08)
 ARRIVE_FILL = config.get_float("ARRIVE_FILL", 0.20)
 ARRIVE_BOTTOM = config.get_float("ARRIVE_BOTTOM", 0.90)
-ARRIVE_MM = config.get_float("ARRIVE_MM", 250.0)
+ARRIVE_MM = config.get_float("ARRIVE_MM", 300.0)
 # Vision (fill/bottom) is demoted to a fallback when sonar is readable and
 # clearly disagrees — sonar is a physical measurement, vision's "looks close"
 # is scene/tilt-dependent and was observed firing at 1.7m away (2026-10-03).
@@ -114,6 +116,15 @@ MIN_PIVOT_DEG = config.get_float("MIN_PIVOT_DEG", 6.0)
 MIN_PIVOT_S = config.get_float("MIN_PIVOT_S", 0.12)
 APPROACH_ARRIVAL_CROSSCHECK = config.get_int("APPROACH_ARRIVAL_CROSSCHECK", 1)
 APPROACH_RESIDUAL_FLAG_E = config.get_float("APPROACH_RESIDUAL_FLAG_E", 0.30)
+# -- supervisor feedback 2026-10-05, section C4: distance-scaled hop -----------
+HOP_MODE = config.get("HOP_MODE", "fixed").strip().lower()   # fixed | variable
+STOP_CM = config.get_float("STOP_CM", 30.0)
+HOP_FRAC = config.get_float("HOP_FRAC", 0.6)
+HOP_MIN_CM = config.get_float("HOP_MIN_CM", 8.0)
+HOP_MAX_CM = config.get_float("HOP_MAX_CM", 50.0)
+# -- section D: guidance reprompt (failure recovery only) ----------------------
+MAX_GUIDANCE_TURNS = config.get_int("MAX_GUIDANCE_TURNS", 3)
+GUIDANCE_TIMEOUT_S = config.get_float("GUIDANCE_TIMEOUT_S", 120.0)
 
 
 LOGS_DIR = Path(__file__).parent / "logs"
@@ -147,6 +158,20 @@ async def _speak(mission: MissionSession, text: str) -> dict:
         log.warning("[mission %s] TTS synthesis failed, falling back to text-only",
                     mission.session_id, exc_info=True)
     return event
+
+def _light(mission: MissionSession, rover, state: str) -> None:
+    """Set the status light and log the transition (light_states in the run log, the
+    state-timeline figure for Ch4). Never raises and never blocks: the Pi publish is
+    queued, and sim/virtual rovers inherit the no-op status_light."""
+    if mission.light_states and mission.light_states[-1]["state"] == state:
+        return
+    mission.light_states.append({"t_rel_s": round(time.time() - mission.started_at, 2), "state": state})
+    setter = getattr(rover, "status_light", None)
+    if setter is not None:
+        try:
+            setter(state)
+        except Exception:
+            log.warning("[mission %s] status light %r failed", mission.session_id, state, exc_info=True)
 
 
 # --------------------------------------------------------------------------
@@ -877,6 +902,28 @@ def _plausible(loc: dict, prev_fill: Optional[float], hops_done: int) -> Optiona
         return "degenerate_centre_box"
     return None
 
+def _hop_for(loc: dict, sonar_mm: Optional[int], trusted: bool, centred: bool) -> Tuple[float, str]:
+    """(hop_cm, source). Pure.
+
+    fixed mode is the old binary rule. variable mode takes a FRACTION of the VLM's distance
+    estimate (HOP_FRAC, because the number is uncalibrated and long open-loop hops drift on
+    mecanum wheels), capped by the sonar clearance only when the target is centred (the
+    "nothing in its path" case), and clamped. Off-beam targets get no sonar cap, so the
+    dangerous case - an overestimate off-beam - is bounded by HOP_MAX_CM and the in-hop
+    sonar watchdog."""
+    fixed = HOP_NEAR_CM if (not trusted or (loc.get("fill") or 0) > NEAR_FILL) else HOP_CM
+    if HOP_MODE != "variable":
+        return fixed, "fixed"
+    hop, source = fixed, "fallback"
+    d_vlm = loc.get("distance_cm")
+    if trusted and isinstance(d_vlm, (int, float)) and 0 < d_vlm <= VLM_DIST_MAX_CM:
+        hop, source = HOP_FRAC * (d_vlm - STOP_CM), "vlm"
+    if sonar_mm is not None and centred:
+        clearance = sonar_mm / 10.0 - STOP_CM
+        if clearance < hop:
+            hop, source = clearance, "sonar_cap"
+    return max(HOP_MIN_CM, min(HOP_MAX_CM, hop)), source
+
 
 
 async def approach_controller(mission: MissionSession, rover, step: dict, emit: Emit) -> dict:
@@ -903,6 +950,7 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
         latency = round(time.perf_counter() - t0, 2)
         loc = _derive_loc(raw, grabbed["width"], grabbed["height"])
         loc["confidence"] = raw.get("confidence")
+        loc["distance_cm"] = distance_cm_from(raw)
         loc["sharpness"] = grabbed["sharpness"]
         loc["attempts"] = grabbed["attempts"]
         loc["_latency"] = latency
@@ -967,6 +1015,7 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
     set_gimbal(pan=0, tilt=APPROACH_TILT_OFFSET)
 
     #SEARCHING:
+    _light(mission,rover,"searching")
     search_offsets = _sweep_offsets()
 
     async def search_sweep(max_calls: int, sweeps: int, label: str):
@@ -1056,8 +1105,10 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
     loc["gate_trusted"] = accepted is not None
 
     # -- APPROACH --------------------------------------------------------------
+    _light(mission,rover,"executing")
     deadline = started + APPROACH_MAX_S
     hops_done = 0
+    sonar_stops = 0 
     prev_fill: Optional[float] = loc.get("fill") if loc.get("gate_trusted") else None
     lost = 0
 
@@ -1083,6 +1134,7 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
                     else gate_for(loc2, 0, prev_fill, hops_done)
                 await record("approach", "relocate_look gate=%s" % gate, loc2, None, {"gate": gate})
                 if not loc2.get("visible"):
+                    _light(mission,rover,"searching")
                     found, bearing = await search_sweep(RELOCATE_MAX_VLM_CALLS, 1, "re")
                     if found is None:
                         return {"status": "blocked",
@@ -1096,7 +1148,7 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
                     if not loc2.get("visible"):
                         return {"status": "blocked",
                                 "detail": {"reason": "target_not_found", "cycles": cycle}}
-
+                _light(mission,rover,"executing")
                 loc = _merge(loc2, accepted)
                 lost = 0
                 continue
@@ -1157,7 +1209,7 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
 
             await record("approach", "arrived (%s)" % arrival_reason, loc, sonar_mm,
                          {"hops_done": hops_done, "fill_prev": prev_fill,
-                          "arrival_block": arrival_block})
+                          "arrival_block": arrival_block ,"d_vlm_cm": loc.get("distance_cm")})
             return {"status": "ok",
                     "detail": {"reason": arrival_reason, "cycles": cycle,
                                "arrival_cross_check": "confirmed" if APPROACH_ARRIVAL_CROSSCHECK else "skipped",
@@ -1172,8 +1224,10 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
             await asyncio.to_thread(rover.pivot, pivot_dir2, pivot_s2)
             action_desc = "pivot %s %.2fs " % ("R" if pivot_dir2 > 0 else "L", pivot_s2)
 
-        # Untrusted fill -> don't guess near/far, just take the cautious hop.
-        hop_cm = HOP_NEAR_CM if (not trusted or loc.get("fill", 0) > NEAR_FILL) else HOP_CM
+        # Untrusted fill -> don't guess near/far, just take the cautious hop (see _hop_for).
+        hop_cm, hop_src = _hop_for(loc, sonar_mm, trusted, abs(e) <= CENTER_TOL)
+        hop_meta = {"hop_src": hop_src, "d_vlm_cm": loc.get("distance_cm"),
+                    "centred": abs(e) <= CENTER_TOL}
         hop_result = await asyncio.to_thread(rover.hop, hop_cm)
         action_desc += "hop %d" % hop_cm
         hops_done += 1
@@ -1181,20 +1235,37 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
             prev_fill = loc.get("fill")
 
         if hop_result.get("status") == "sonar_stop":
-            sonar_mm = hop_result.get("sonar_mm")
-            if trusted and loc.get("fill", 0) > NEAR_FILL and abs(e) <= CENTER_TOL:
-                await record("approach", action_desc + " sonar_stop", loc, sonar_mm,
+            # sonar_mm stays the reading this cycle DECIDED on (it is logged below);
+            # the reading that stopped the hop is stop_mm.
+            stop_mm = hop_result.get("sonar_mm")
+            sonar_stops += 1
+            if trusted and (loc.get("fill") or 0) > NEAR_FILL and abs(e) <= CENTER_TOL:
+                await record("approach", action_desc + " sonar_stop", loc, stop_mm,
                              {"pivot_cmd_s": pivot_s2, "pivot_dir": pivot_dir2,
-                              "hop_moved_s": hop_result.get("moved_s"), "hops_done": hops_done})
+                              "hop_moved_s": hop_result.get("moved_s"), "hops_done": hops_done,
+                              **hop_meta})
                 await _arrival_check(mission, rover, target, emit, keep_tilt=APPROACH_TILT_OFFSET)
                 return {"status": "ok",
                         "detail": {"reason": "sonar", "cycles": cycle,
                                    "arrival_cross_check": "confirmed", "gimbal_only_lock": True}}
-            await record("approach", action_desc + " sonar_stop_blocked", loc, sonar_mm,
-                         {"pivot_cmd_s": pivot_s2, "pivot_dir": pivot_dir2,
-                          "hop_moved_s": hop_result.get("moved_s")})
-            return {"status": "blocked",
-                    "detail": {"reason": "obstacle", "sonar_mm": sonar_mm, "cycles": cycle}}
+            if bool(loc.get("visible")) and abs(e) <= CENTER_TOL and sonar_stops < 2:
+                # With the stop at 300 mm the hop usually ends inside the hop. The last look
+                # showed the target visible and centred, so do not call this an obstacle:
+                # fall through to the normal re-look. Next cycle's sonar_hit test (sonar <=
+                # ARRIVE_MM and centred) plus the VLM cross-check then decide arrival. A second
+                # consecutive sonar stop without arriving is an obstacle (wall, chair).
+                # No pivot/hop fields here: the post-hop record below carries them, and
+                # approach_summary must count this hop once.
+                await record("approach", action_desc + " sonar_stop_relook", loc, stop_mm,
+                             {"relook_after_sonar_stop": True})
+            else:
+                await record("approach", action_desc + " sonar_stop_blocked", loc, stop_mm,
+                             {"pivot_cmd_s": pivot_s2, "pivot_dir": pivot_dir2,
+                              "hop_moved_s": hop_result.get("moved_s"), **hop_meta})
+                return {"status": "blocked",
+                        "detail": {"reason": "obstacle", "sonar_mm": stop_mm, "cycles": cycle}}
+        else:
+            sonar_stops = 0
 
         loc2 = await grab_and_locate("ap_%02d_check.jpg" % cycle)
         accepted, gate = (None, "skipped_blurry") if loc2.get("_skip") \
@@ -1205,7 +1276,9 @@ async def approach_controller(mission: MissionSession, rover, step: dict, emit: 
                      {"pivot_cmd_s": pivot_s2, "pivot_dir": pivot_dir2,
                       "hop_moved_s": hop_result.get("moved_s"), "gate": gate,
                       "hops_done": hops_done, "fill_prev": prev_fill,
-                      "reject_reason": reject_reason, "arrival_block": arrival_block})
+                      "reject_reason": reject_reason, "arrival_block": arrival_block,
+                      
+                      **hop_meta,"sonar_mm":sonar_mm})
         loc = _merge(loc2, accepted)
 
     return {"status": "blocked", "detail": {"reason": "cycle_budget_exhausted", "cycles": cycle}}
@@ -1274,6 +1347,147 @@ async def _finish_report(mission: MissionSession, emit: Emit) -> None:
         await emit(await _speak(mission, summary))
     await asyncio.to_thread(_write_run_log, mission, report)
 
+# --------------------------------------------------------------------------
+# Failure recovery (spec-supervisor-feedback-2026-10-05.md section D).
+#
+# Fires ONLY when a step comes back `blocked` (a physical/search failure). It is never
+# used to resolve ambiguity: ambiguity is asked before departure, and residual doubt is
+# reported at the end. That is the departure from KnowNo/IntroPlan; do not blur it.
+# --------------------------------------------------------------------------
+_STOP_RE = re.compile(r"^(stop|cancel|abort|give up|never ?mind|forget it|quit)\b")
+
+
+def _declines(answer: str) -> bool:
+    """Did the human say stop? Deliberately NOT confirmation.classify: its REJECT list
+    holds "no", "wait", "change", "wrong", so "there is no box on the left" would end
+    the mission. Only an opening stop-word, or a bare short "no", declines."""
+    words = re.sub(r"[^a-z0-9' ]+", " ", (answer or "").lower()).split()
+    if _STOP_RE.match(" ".join(words)):
+        return True
+    return len(words) <= 3 and confirmation.keyword_pass(answer)[0] == confirmation.REJECT
+
+
+def _failure_reason(result: dict) -> str:
+    detail = result.get("detail")
+    if isinstance(detail, dict):
+        return str(detail.get("reason") or "blocked")
+    return str(detail or "blocked")
+
+
+def _guidance_question(reason: str, target: str) -> str:
+    what = target or "target"
+    stem = {
+        "target_not_found": "I stopped because I could not find the %s after searching the room." % what,
+        "obstacle": "I stopped because something is in my way.",
+        "arrival_contradicted": "I stopped because I am not sure I reached the %s." % what,
+        "cycle_budget_exhausted": "I stopped because I could not reach the %s in the time allowed." % what,
+    }.get(reason, "I stopped because I could not complete the step.")
+    return stem + " What should I do next?"
+
+
+async def _wait_for_guidance(mission: MissionSession, entry: dict) -> Optional[str]:
+    """The human's answer; None on timeout, or when the mission left AWAITING_GUIDANCE (abort)."""
+    if mission.guidance_provider is not None:
+        answer = await asyncio.to_thread(mission.guidance_provider, dict(entry))
+        return answer or "stop"      # a script that has run out is a decline
+    mission.pending_guidance = None
+    deadline = time.time() + GUIDANCE_TIMEOUT_S
+    while time.time() < deadline and mission.phase is MissionPhase.AWAITING_GUIDANCE:
+        if mission.pending_guidance is not None:
+            answer, mission.pending_guidance = mission.pending_guidance, None
+            return answer
+        await asyncio.sleep(0.2)
+    return None
+
+
+async def _guidance_loop(mission: MissionSession, rover, step: dict, result: dict, emit: Emit) -> bool:
+    """A step came back `blocked`: ask what to do next and re-plan from where the rover is.
+
+    True  -> a new plan is staged in pending_swap and the phase is EXECUTING again
+             (run_mission's existing swap applies it and resets the cursor).
+    False -> the mission is over (HALTED or ABORTED); the caller must stop.
+
+    No rover.halt() here: a blocked step has already ended its own timed motion, and on
+    the Pi halt() latches `_halted`, which only execute_step clears. The free-roam loop
+    calls hop()/pivot() directly, so a latched flag would abort every later hop."""
+    reason = _failure_reason(result)
+    target = str(step.get("target") or "").strip()
+    if not config.get_bool("GUIDANCE_ENABLED", True):
+        mission.phase = MissionPhase.HALTED
+        await emit(await _speak(mission, "I am blocked and have stopped."))
+        return False
+
+    done = [{"action": r["step"].get("action"), "target": r["step"].get("target")}
+            for r in mission.results if r.get("status") == "ok"]
+    question = _guidance_question(reason, target)
+    mission.phase = MissionPhase.AWAITING_GUIDANCE
+    _light(mission, rover, "awaiting_guidance")
+
+    while mission.guidance_turns < MAX_GUIDANCE_TURNS:
+        entry = {"reason": reason, "question": question, "answer": None,
+                 "t_rel_s": round(time.time() - mission.started_at, 2), "replanned": False}
+        mission.guidance_log.append(entry)
+        await emit({"type": "awaiting_guidance", "session_id": mission.session_id, "reason": reason,
+                    "question": question, "turn": mission.guidance_turns + 1,
+                    "max_turns": MAX_GUIDANCE_TURNS})
+        await emit(await _speak(mission, question))
+
+        answer = await _wait_for_guidance(mission, entry)
+        if mission.phase is not MissionPhase.AWAITING_GUIDANCE:
+            return False                      # aborted while waiting
+        if answer is None:
+            mission.halt_reason = "guidance_timeout"
+            break
+        mission.guidance_turns += 1
+        entry["answer"] = answer
+        log.info("[mission %s] guidance turn %d (%s): %r", mission.session_id,
+                 mission.guidance_turns, reason, answer)
+        if _declines(answer):
+            mission.halt_reason = "guidance_declined"
+            break
+
+        _light(mission, rover, "thinking")
+        plan = await asyncio.to_thread(
+            replan_from_state, mission.command, done, step, reason,
+            list(mission.guidance_log), list(mission.digest), mission.scene_text)
+        if mission.phase is not MissionPhase.AWAITING_GUIDANCE:
+            return False
+        if plan.get("steps"):
+            entry["replanned"] = True
+            mission.pending_swap = {"steps": plan["steps"], "notes": plan.get("notes")}
+            mission.phase = MissionPhase.EXECUTING
+            _light(mission, rover, "executing")
+            await emit(await _speak(mission, "Okay. Trying again."))
+            return True
+        log.warning("[mission %s] replan failed: %s", mission.session_id, plan.get("notes"))
+        question = "I could not turn that into a plan. What should I do next?"
+        _light(mission, rover, "awaiting_guidance")
+    else:
+        mission.halt_reason = "guidance_exhausted"
+
+    mission.phase = MissionPhase.HALTED
+    _light(mission, rover, "blocked")
+    await emit({"type": "halted", "session_id": mission.session_id, "reason": mission.halt_reason})
+    await emit(await _speak(mission, "I cannot continue, so I have stopped."))
+    return False
+
+
+async def handle_guidance(mission: MissionSession, audio_or_text, emit: Emit) -> None:
+    """The human's answer to "what should I do next?": audio (STT) or already-typed text."""
+    if mission.phase is not MissionPhase.AWAITING_GUIDANCE:
+        await emit({"type": "error", "session_id": mission.session_id,
+                    "message": "not waiting for guidance"})
+        return
+    if isinstance(audio_or_text, str):
+        text = audio_or_text
+    else:
+        text = await asyncio.to_thread(transcribe_audio, audio_or_text)
+    text = (text or "").strip()
+    log.info("[mission %s] guidance reply %r", mission.session_id, text)
+    if text:                      # silence or noise: keep waiting; the timeout still applies
+        mission.pending_guidance = text
+
+
 
 # --------------------------------------------------------------------------
 # Execution — one step at a time, revisions applied only between steps.
@@ -1299,6 +1513,7 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
 
             step = mission.steps()[mission.cursor]
             action = str(step.get("action") or "").strip().lower()
+            _light(mission, rover, "executing")
             await emit({"type": "step_started", "session_id": mission.session_id,
                         "index": mission.cursor, "step": step})
 
@@ -1351,8 +1566,8 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
                 await _maybe_arrival_check(mission, rover, step, result, emit)
 
             if result.get("status") == "blocked":
-                mission.phase = MissionPhase.HALTED
-                await emit(await _speak(mission, "I am blocked and have stopped."))
+                if await _guidance_loop(mission,rover,step,result,emit):
+                    continue
                 break
             if result.get("status") == "halted":
                 break
@@ -1376,9 +1591,15 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
         log.info("[mission %s] end — %s", mission.session_id, mission.phase.value)
         # Always, on every non-aborted outcome: completed, blocked or halted.
         # A run that ends badly is exactly the run whose report matters most.
+        if mission.phase is MissionPhase.COMPLETED:
+            _light(mission,rover,"arrived")
+        elif mission.phase in (MissionPhase.HALTED,MissionPhase.ABORTED):
+            _light(mission, rover, "blocked")
+
         if mission.phase is not MissionPhase.ABORTED:
-            _collect_terminal_fields(mission, rover)
-            await _finish_report(mission, emit)
+            _collect_terminal_fields(mission,rover)
+            await _finish_report(mission,emit)
+
         await emit({"type": "mission_ended", "session_id": mission.session_id,
                     "phase": mission.phase.value, "snapshot": mission.snapshot()})
 

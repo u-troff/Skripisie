@@ -231,6 +231,11 @@ def _approach_summary(mission) -> Optional[dict]:
     frames_skipped_blurry = sum(1 for c in mission.checks
                                 if c.get("kind") == "skipped" and c.get("reason") == "blurry")
     hops_done = sum(1 for c in cycles if c.get("hop_moved_s"))
+    hop_src_counts: Dict[str, int] = {}
+    for c in cycles:
+        src = c.get("hop_src")
+        if src:
+            hop_src_counts[src] = hop_src_counts.get(src, 0) + 1
 
     approach_result = next(
         (r for r in reversed(mission.results)
@@ -260,7 +265,19 @@ def _approach_summary(mission) -> Optional[dict]:
         "wall_time_s": round(max(span - vlm_time, 0), 2),
         "sonar_stops": sum(1 for c in cycles if "sonar_stop" in str(c.get("action") or "")),
         "arrival_reason": detail.get("reason"),
+        "vlm_calls": sum(1 for c in cycles if c.get("vlm_latency_s") is not None),
+        "approach_wall_time_s": round(span, 2),
+        "hop_src_counts": hop_src_counts,
+
     }
+
+def _outcome_class(mission) -> str:
+    """completed / completed_after_guidance / halted_after_guidance / halted (/ aborted).
+    A run that needed a human's answer is never counted as a plain `completed`."""
+    phase = mission.phase.value
+    if mission.guidance_turns > 0 and phase in ("completed", "halted"):
+        return phase + "_after_guidance"
+    return phase
 
 
 def build_report(mission, spoken: bool = True) -> dict:
@@ -283,7 +300,7 @@ def build_report(mission, spoken: bool = True) -> dict:
         latencies.append(float(mission.arrival["latency_s"]))
 
     telemetry = mission.rover_telemetry or {}
-    outcome = mission.phase.value
+    outcome = _outcome_class(mission)
     profile = planner.profile_info()
 
     report: Dict[str, Any] = {
@@ -343,12 +360,18 @@ def build_report(mission, spoken: bool = True) -> dict:
         "grounding_summary": _grounding_summary(mission.grounding, mission.active_plan,
                                                 profile["actions"]),
         "dialogue": mission.dialogue_meta,
-        "usage_summary": _usage_summary(mission.usage),
+         "usage_summary": _usage_summary(mission.usage),
+        # -- supervisor feedback 2026-10-05: failure recovery (D) and status lights (B)
+        "guidance_turns": mission.guidance_turns,
+        "guidance_log": mission.guidance_log,
+        "halt_reason": mission.halt_reason,
+        "recovered": outcome == "completed_after_guidance",
+        "light_states": mission.light_states,
     }
     report["models"]["planner_profile"] = profile
 
     report["uncertainties"] = _uncertainties(mission, progress, completed, failed,
-                                             outcome, bends, room_grounding)
+                                             mission.phase.value,bends, room_grounding)
     report["spoken_summary"] = (
         _spoken_summary(report) if spoken else _fallback_summary(report)
     )

@@ -46,6 +46,42 @@ def _bool_env(name: str, default: bool) -> bool:
     return config.get(name, "1" if default else "0").strip().lower() not in ("0", "false", "no", "off")
 
 TEXT_COMMANDS_ENABLED = _bool_env("ALLOW_TEXT_COMMANDS", False)
+# -- status lights from the dialogue path (spec-supervisor-feedback-2026-10-05.md B) -
+_light_failed = False
+
+
+async def _light(state: str) -> None:
+    """Best-effort. get_rover() is the process-wide singleton, so this is the SAME
+    controller the mission uses: no second rosbridge connection. After one failure it stops
+    trying, so an unreachable Pi cannot add a connect timeout to every utterance."""
+    global _light_failed
+    if _light_failed:
+        return
+    try:
+        rover = await run_in_threadpool(get_rover)
+        setter = getattr(rover, "status_light", None)
+        if setter is not None:
+            setter(state)
+    except Exception:
+        _light_failed = True
+        log.warning("status light %r unavailable - dialogue lights disabled", state, exc_info=True)
+
+
+def _light_after(events: list) -> str:
+    types = {e.get("type") for e in events}
+    if "plan_ready" in types:
+        return "confirm"
+    if "execute" in types:
+        return "executing"
+    return "listening"
+
+
+async def _send_events(websocket, events: list) -> None:
+    await _light(_light_after(events))
+    for event in events:
+        await websocket.send_json(event)
+
+
 
 app = FastAPI()
 os.makedirs("logs/frames", exist_ok=True)
@@ -254,6 +290,7 @@ async def dialogue(websocket: WebSocket):
                     {"type": "session", "session_id": session.session_id,
                      "phase": session.phase.value, "scene_id": session.scene_id}
                 )
+                await _light("listening")
                 if kind == "start":
                     continue
 
@@ -268,23 +305,22 @@ async def dialogue(websocket: WebSocket):
                 if not text:
                     await websocket.send_json({"type": "error", "message": "empty text"})
                     continue
+                await _light("thinking")
                 if session.phase is Phase.AWAITING_CONFIRMATION:
                     events = await run_in_threadpool(handle_confirmation_text, session, text)
                 else:
                     events = await run_in_threadpool(
                         handle_dialogue_text, session, text, _decode(frame.get("image"))
                     )
-                for event in events:
-                    await websocket.send_json(event)
+                await _send_events(websocket,events)
                 continue
-
 
 
             audio = _decode(frame.get("audio"))
             if not audio:
                 await websocket.send_json({"type": "error", "message": "empty audio"})
                 continue
-
+            await _light("thinking")
             if session.phase is Phase.AWAITING_CONFIRMATION:
                 events = await run_in_threadpool(handle_confirmation_audio, session, audio)
             else:
@@ -292,8 +328,8 @@ async def dialogue(websocket: WebSocket):
                     handle_dialogue_audio, session, audio, _decode(frame.get("image"))
                 )
 
-            for event in events:
-                await websocket.send_json(event)
+            await _send_events(websocket,events)
+            
 
     except WebSocketDisconnect:
         pass
@@ -350,7 +386,16 @@ async def execution(websocket: WebSocket):
             elif kind =="revision_audio":
                 audio = _decode(frame.get("audio"))
                 if audio:
-                    await mission_mod.handle_revision_confirmation(mission,audio,emit)
+                    # Same client message either way; the phase says what the reply is for.
+                    if mission.phase is mission_session.MissionPhase.AWAITING_GUIDANCE:
+                        await mission_mod.handle_guidance(mission, audio, emit)
+                    else:
+                        await mission_mod.handle_revision_confirmation(mission,audio,emit)
+            elif kind == "guidance_text":
+                text = str(frame.get("text") or "").strip()
+                if text and TEXT_COMMANDS_ENABLED:
+                    await mission_mod.handle_guidance(mission, text, emit)
+
             elif kind == "abort":
                 await mission_mod.abort(mission,rover,emit)
 

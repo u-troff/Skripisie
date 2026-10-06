@@ -77,13 +77,16 @@ class OllamaProvider(InferenceProvider):
         started = time.perf_counter()
         # gemma4:e4b's runner intermittently dies during CUDA init on a cold
         # load (2026-10-04: same request fails, then succeeds seconds later), so
-        # a runner crash is retried before it is allowed to abort a mission.
+        # a runner crash is retried before it is allowed to abort a mission. The
+        # same goes for Ollama killing a looping generation ("token repeat limit
+        # reached", seen on gemma4:e2b): sampling is random, so a retry usually passes.
         for attempt in range(_RUNNER_RETRIES + 1):
             try:
                 response = self._client.chat(**kwargs)
                 break
             except Exception as exc:  # ResponseError, ConnectionError, httpx errors
-                if attempt < _RUNNER_RETRIES and "llama-server" in str(exc):
+                if attempt < _RUNNER_RETRIES and ("llama-server" in str(exc)
+                                                  or "token repeat limit" in str(exc)):
                     time.sleep(2)
                     continue
                 raise ProviderError(f"ollama {self.model}: {exc}") from exc

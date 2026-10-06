@@ -11,7 +11,17 @@ log = get_logger("vlm")
 # ImageSource is re-exported so pipeline.py's existing import keeps working.
 __all__ = ["ImageSource", "check_ambiguity", "verify_plan", "describe_frame",
            "inventory_frame", "check_progress", "check_side_look",
-           "check_arrival", "failed", "KNOWN_MAX", "locate_target"]
+           "check_arrival", "failed", "KNOWN_MAX", "locate_target", "distance_cm_from", "VLM_DIST_MAX_CM"]
+
+
+# -- distance estimate (spec-supervisor-feedback-2026-10-05.md C2) ----------------
+# One extra JSON field on the existing locate_target call: no extra model call. Only
+# numbers in (0, VLM_DIST_MAX_CM] are accepted; anything else is None. The hop policy
+# (mission._hop_for) uses a FRACTION of it, never the whole thing.
+VLM_DIST_MAX_CM = config.get_float("VLM_DIST_MAX_CM", 400.0)
+# VLM_DIST_MODE=bucket is the fallback if the numeric estimate fails the go/no-go test
+# (tools/f9_distance_calib.py); values are bucket midpoints in cm.
+_BUCKETS_CM = {"lt0.3": 15.0, "0.3-0.6": 45.0, "0.6-1": 80.0, "1-2": 150.0, "gt2": 250.0}
 
 # Marker key on a result that never reached a usable answer. Without this a
 # failed call returns {} and .get("ambiguous") is falsy, so a broken model reads
@@ -141,7 +151,9 @@ def inventory_frame(image: ImageSource) -> dict:
         "told to drive somewhere in this room and look at something.\n"
         "List EVERY distinct object you can see, even small ones — furniture, "
         "equipment, screens, cables, lights, signs, items on shelves and floor. "
-        "Aim for at least 8 objects if the frame contains them. Do not summarise.\n"
+        "List at most 12 objects, each object ONCE (never repeat an object or list "
+        "several of the same kind separately). Stop when you run out of new objects. "
+        "Do not summarise.\n"
         "For each object give specific attributes (colour, material, shape, size, "
         "any text or lights) and where it is relative to the frame and to nearby objects.\n"
         "Respond ONLY with JSON: "
@@ -150,7 +162,17 @@ def inventory_frame(image: ImageSource) -> dict:
         '"where": "where it is, relative to the room or other objects"}], '
         '"obstacles": ["anything on the floor that would block a small wheeled robot"]}'
     )
-    return _ask("inventory_frame", prompt, image)
+    result = _ask("inventory_frame", prompt, image, salvage=True)
+    objects = result.get("objects")
+    if isinstance(objects, list):   # a looping model repeats the same block; keep the first
+        seen, unique = set(), []
+        for obj in objects:
+            key = json.dumps(obj, sort_keys=True, default=str).lower()
+            if key not in seen:
+                seen.add(key)
+                unique.append(obj)
+        result["objects"] = unique
+    return result
 
 
 # --------------------------------------------------------------------------
@@ -281,19 +303,60 @@ def locate_target(image: ImageSource, target: str) -> dict:
     else:
         order = "[x1, y1, x2, y2]"
         coords = "give its bounding box in pixel coordinates.\n"
+
+    dist_field,dist_note = _distance_prompt()
         
     prompt = (
         f'Find "{target}" in this image from a small floor robot\'s camera.\n'
-        "If it is visible, " + coords +
+        "If it is visible, " + coords + dist_note +
         "Respond ONLY with JSON: "
         '{"visible": true/false, "bbox_2d": ' + order +' or null, '
-        '"confidence": "high"|"medium"|"low", "description": "one short sentence"}'
+        '"confidence": "high"|"medium"|"low", ' + dist_field + ', "description": "one short sentence"}'
     )
     return _ask("locate_target", prompt, image)
 
 #this funciton calls the provider to give the prompt to the LLM
 
-def _ask(stage: str, prompt: str, image: Optional[ImageSource]) -> dict:
+def _salvage_truncated_json(text: str) -> Optional[dict]:
+    """Recover a reply cut off by num_predict (typically a repetition loop).
+
+    Walks the text tracking strings and the open-bracket stack; every point just
+    after a closing } or ] is a candidate cut. Tries the latest first: truncate
+    there, close whatever is still open, and keep the first cut that parses.
+    Returns None if nothing usable remains.
+    """
+    stack: List[str] = []
+    cuts: List[Tuple[int, str]] = []   # (end index, closers needed from that point)
+    in_str = escaped = False
+    for i, ch in enumerate(text):
+        if in_str:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_str = False
+        elif ch == '"':
+            in_str = True
+        elif ch in "{[":
+            stack.append("}" if ch == "{" else "]")
+        elif ch in "}]":
+            if not stack:
+                break
+            stack.pop()
+            if stack:   # an empty stack means the JSON was complete — not our case
+                cuts.append((i + 1, "".join(reversed(stack))))
+    for end, closers in reversed(cuts[-20:]):
+        try:
+            parsed = json.loads(text[:end] + closers)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(parsed, dict):
+            return parsed
+    return None
+
+
+def _ask(stage: str, prompt: str, image: Optional[ImageSource], salvage: bool = False) -> dict:
     started = time.perf_counter()
     try:
         provider = get_provider("vlm")
@@ -316,10 +379,13 @@ def _ask(stage: str, prompt: str, image: Optional[ImageSource]) -> dict:
     log_completion(log, "vlm", stage, completion)
 
     try:
-        parsed: Dict[str, Any] = json.loads(completion.text)
+        parsed: Optional[Dict[str, Any]] = json.loads(completion.text)
     except (json.JSONDecodeError, TypeError):
         log.warning("[%s] unparseable JSON: %r", stage, completion.text[:300])
-        return {ERROR_KEY: "unparseable JSON from model"}
+        parsed = _salvage_truncated_json(completion.text) if salvage and isinstance(completion.text, str) else None
+        if parsed is None:
+            return {ERROR_KEY: "unparseable JSON from model"}
+        log.warning("[%s] salvaged truncated JSON (%d chars)", stage, len(completion.text))
 
     if not isinstance(parsed, dict):
         log.warning("[%s] JSON was not an object: %r", stage, completion.text[:200])
@@ -327,3 +393,29 @@ def _ask(stage: str, prompt: str, image: Optional[ImageSource]) -> dict:
 
     log.info("[%s] parsed: %s", stage, json.dumps(parsed)[:300])
     return parsed
+
+def _distance_prompt() -> Tuple[str,str]:
+    """(json field, one instruction line) for the distance estimate."""
+    if config.get("VLM_DIST_MODE", "numeric").strip().lower() == "bucket":
+        return ('"distance_bucket": "lt0.3"|"0.3-0.6"|"0.6-1"|"1-2"|"gt2" or null',
+                "Also give distance_bucket: your best estimate of the horizontal distance from the "
+                "camera to the point where the object touches the floor, in metres (lt0.3 = under "
+                "0.3, gt2 = over 2), or null if you cannot tell.\n")
+    return ('"distance_m": number or null',
+            "Also give distance_m: your best estimate, in metres, of the horizontal distance from "
+            "the camera to the point where the object touches the floor, or null if you cannot tell.\n")
+
+def distance_cm_from(raw) -> Optional[float]:
+    """The VLM's distance estimate in cm, or None. Never raises; unknown keys are ignored."""
+    if not isinstance(raw, dict):
+        return None
+    if config.get("VLM_DIST_MODE", "numeric").strip().lower() == "bucket":
+        return _BUCKETS_CM.get(str(raw.get("distance_bucket") or "").strip().lower().replace(" ", ""))
+    value = raw.get("distance_m")
+    if isinstance(value, bool):
+        return None
+    try:
+        cm = float(value) * 100.0
+    except (TypeError, ValueError):
+        return None
+    return round(cm, 1) if 0 < cm <= VLM_DIST_MAX_CM else None   # NaN fails the comparison

@@ -383,7 +383,9 @@ class VoiceClient:
                             revision_pending = False
                             await self._answer_revision(ws)
 
-                    elif kind == "awaiting_revision":
+                    elif kind in ("awaiting_revision", "awaiting_guidance"):
+                        # Same reply path for both: the brain routes revision_audio
+                        # to guidance while its phase is awaiting_guidance.
                         revision_pending = True
                         print("[voice] mission paused — waiting on your answer")
 

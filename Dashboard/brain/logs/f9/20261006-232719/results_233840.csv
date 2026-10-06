@@ -1,0 +1,16 @@
+model,mode,frame,d_true_cm,visible,d_vlm_cm,raw_distance
+gemma4:e4b,numeric,d030cm_1.jpg,30,False,,
+gemma4:e4b,numeric,d030cm_2.jpg,30,False,,
+gemma4:e4b,numeric,d030cm_3.jpg,30,False,,
+gemma4:e4b,numeric,d050cm_1.jpg,50,True,250.0,2.5
+gemma4:e4b,numeric,d050cm_2.jpg,50,True,50.0,0.5
+gemma4:e4b,numeric,d050cm_3.jpg,50,True,110.0,1.1
+gemma4:e4b,numeric,d075cm_1.jpg,75,True,250.0,2.5
+gemma4:e4b,numeric,d075cm_2.jpg,75,True,180.0,1.8
+gemma4:e4b,numeric,d075cm_3.jpg,75,True,200.0,2.0
+gemma4:e4b,numeric,d100cm_1.jpg,100,True,150.0,1.5
+gemma4:e4b,numeric,d100cm_2.jpg,100,True,280.0,2.8
+gemma4:e4b,numeric,d100cm_3.jpg,100,True,250.0,2.5
+gemma4:e4b,numeric,d150cm_1.jpg,150,True,280.0,2.8
+gemma4:e4b,numeric,d150cm_2.jpg,150,True,350.0,3.5
+gemma4:e4b,numeric,d150cm_3.jpg,150,True,280.0,2.8

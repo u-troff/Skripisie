@@ -51,6 +51,7 @@ import logging
 import math
 import os
 import statistics
+import re
 import sys
 import time
 import traceback
@@ -119,6 +120,9 @@ CONDITIONS: Dict[str, Dict[str, str]] = {
 _MANAGED_KEYS = sorted({k for env in CONDITIONS.values() for k in env})
 
 SUITE_PATH = Path(__file__).parent / "sweeps" / "commands_depth.json"
+
+# command -> ordered answers to "what should I do next?" (section D). Empty = guidance off.
+GUIDANCE_SCRIPT: Dict[str, List[str]] = {}
 
 # Fallback only, used when tools/sweeps/commands_depth.json is missing.
 DEFAULT_COMMANDS = [
@@ -310,6 +314,10 @@ def _row_from_report(condition: str, command: str, repeat: int, wall_clock_s: fl
         "room": (entry or {}).get("room"),
         "trace_file": (Path(rover_summary['trace']).name if executed_this_run and rover_summary.get("trace") else None),
         "run_index": rover_summary.get("run") if executed_this_run else None,
+        # -- section D (appended; none of the columns above are renamed)
+        "guidance_turns": report.get("guidance_turns"),
+        "halt_reason": report.get("halt_reason"),
+        "recovered": report.get("recovered"),
     }
     scored = _score(entry, rover_summary, grounding_summary, plan_steps, executed_this_run, start_xy)
     row.update(scored)
@@ -401,6 +409,9 @@ async def _run_one(entry: dict, condition: str, repeat: int, room, shared_rover,
                                     plan=session.plan, **extras)
 
         msn = mission_session.store.create(session)
+        if GUIDANCE_SCRIPT:   # unattended: an unscripted command, or a spent script, answers "stop"
+            answers = list(GUIDANCE_SCRIPT.get(command, []))
+            msn.guidance_provider = lambda entry, _a=answers: _a.pop(0) if _a else None
 
         events: List[dict] = []
 
@@ -662,6 +673,12 @@ def main() -> None:
     parser.add_argument("--rooms", default="room_tour1",
                         help="comma-separated room names from rooms/, or 'all' (default: room_tour1). "
                              "Each room needs its own suite (tools/gen_room_suites.py)")
+    parser.add_argument("--num-ctx", type=int, default=None,
+                        help="override PLANNER_NUM_CTX and VLM_NUM_CTX (local_e4b/local_e2b only; both roles, "
+                             "so Ollama does not reload the model between calls) - the section A experiment")
+    parser.add_argument("--guidance-script", default=None,
+                        help="JSON {command: [answers]}: enables the section D guidance reprompt with "
+                             "scripted answers (otherwise GUIDANCE_ENABLED is forced to 0)")
     parser.add_argument("--depth-max", type=int, default=None,
                         help="drop suite entries deeper than this (quick smoke test)")
     parser.add_argument("--dry-run", action="store_true",
@@ -670,12 +687,20 @@ def main() -> None:
                         help="output CSV path (default: tools/sweeps/sweep_<timestamp>.csv)")
     parser.add_argument("--verbose", action="store_true",
                         help="show the app's own INFO-level logging on console too (noisy)")
-    args = parser.parse_args()
+    # commands copied out of chat can carry an invisible zero-width space on the last
+    # argument (-> 'invalid model name' / int('40' + U+200B)); drop them
+    args = parser.parse_args([re.sub('[\u200b-\u200d\u2060\ufeff]', '', a) for a in sys.argv[1:]])
 
     conditions = [c.strip() for c in args.conditions.split(",") if c.strip()]
     for condition in conditions:
         if condition not in CONDITIONS:
             sys.exit("unknown condition %r — choose from: %s" % (condition, ", ".join(CONDITIONS)))
+
+    if args.num_ctx:
+        if any(c not in ("local_e4b", "local_e2b") for c in conditions):
+            sys.exit("--num-ctx only applies to the local_e4b / local_e2b conditions")
+        for condition in conditions:
+            CONDITIONS[condition]["PLANNER_NUM_CTX"] = CONDITIONS[condition]["VLM_NUM_CTX"] = str(args.num_ctx)
 
     _setup_console_logging(args.verbose)
 
@@ -683,6 +708,10 @@ def main() -> None:
     # real rover, and a real env var beats .env, so force both here.
     os.environ["ROVER"] = "virtual"
     os.environ["SCENE_SOURCE"] = "room"
+    # Existing RQ2 sweeps and probe chains must keep stopping at the first blocked step.
+    os.environ["GUIDANCE_ENABLED"] = "1" if args.guidance_script else "0"
+    if args.guidance_script:
+        GUIDANCE_SCRIPT.update(json.loads(Path(args.guidance_script).read_text(encoding="utf-8")))
     # Must be set before the first rover.get_rover() call (below), which
     # constructs the process-wide singleton these values are baked into.
     os.environ["VIRTUAL_TIME_SCALE"] = str(args.time_scale)

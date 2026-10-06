@@ -1,0 +1,199 @@
+{
+  "session_id": "b2159c4d07f6",
+  "outcome": "halted_after_guidance",
+  "rover": "virtual",
+  "command": "Go to the toaster.",
+  "resolved_command": "Go to the toaster.\nClarification \u2014 Is there an object in the room that you are referring to? use your best judgement\nClarification \u2014 Is there an object in the room that you are referring to? use your best judgement\nClarification \u2014 Is there an object in the room that you are referring to? use your best judgement\nClarification \u2014 Is there an object in the room that you are referring to? use your best judgement\nClarification \u2014 Is there an object in the room that you are referring to? use your best judgement",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "toaster",
+        "notes": "Object 'toaster' is not in the known list: couch, coffee table, desk, bookshelf, door, windows."
+      }
+    ]
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "toaster",
+        "notes": "Object 'toaster' is not in the known list: couch, coffee table, desk, bookshelf, door, windows."
+      }
+    ]
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "toaster",
+      "status": "blocked",
+      "detail": {
+        "reason": "unresolved_target",
+        "target": "toaster"
+      },
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.31,
+    "per_step_s": [
+      0.0
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 8,
+    "seed": 548161,
+    "steps": 1,
+    "blocked": 1,
+    "hallucinations": 1,
+    "unresolved_targets": [
+      "toaster"
+    ],
+    "odometer_m": 0.0,
+    "sim_time_s": 0.0,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [],
+    "final_pose": {
+      "x": 0.8,
+      "y": 0.5,
+      "theta": 90.0
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261006-204127.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "toaster",
+      "resolved": false,
+      "matched": null,
+      "how": "unresolved"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "toaster"
+    ],
+    "unresolved": [
+      "toaster"
+    ],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 5,
+    "capped": true,
+    "verified": false,
+    "concerns": "The plan attempts to interact with an object named 'toaster', but 'toaster' is not listed in the known objects in the room.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 7,
+      "latency_total_s": 8.375,
+      "latency_mean_s": 1.196,
+      "prompt_tokens_total": 2580,
+      "completion_tokens_total": 479,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 2.866,
+      "latency_mean_s": 1.433,
+      "prompt_tokens_total": 1128,
+      "completion_tokens_total": 154,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 1,
+  "guidance_log": [
+    {
+      "reason": "unresolved_target",
+      "question": "I stopped because I could not complete the step. What should I do next?",
+      "answer": "stop",
+      "t_rel_s": 0.0,
+      "replanned": false
+    }
+  ],
+  "halt_reason": "guidance_declined",
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 0.0,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 0.2,
+      "state": "blocked"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (unresolved_target)"
+    },
+    {
+      "code": "plan_target_unresolved",
+      "detail": "the plan named a target the room doesn't have: toaster"
+    }
+  ],
+  "spoken_summary": "The command was to go to the toaster. The mission stopped before finishing because the target was unresolved. The rover ended at position x: 0.8, y: 0.5, theta: 90.0."
+}

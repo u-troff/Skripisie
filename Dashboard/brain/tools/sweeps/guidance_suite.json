@@ -1,0 +1,17 @@
+[
+    {
+        "command": "Go to the fridge.",
+        "depth": 1,
+        "kind": "probe"
+    },
+    {
+        "command": "Go to the fridge, then the desk.",
+        "depth": 2,
+        "kind": "probe"
+    },
+    {
+        "command": "Go to the toaster.",
+        "depth": 1,
+        "kind": "probe"
+    }
+]

@@ -1,0 +1,13 @@
+{
+    "Go to the fridge.": [
+        "go to the couch instead"
+    ],
+    "Go to the fridge, then the desk.": [
+        "I do not know",
+        "it is not here",
+        "still nothing"
+    ],
+    "Go to the toaster.": [
+        "stop"
+    ]
+}

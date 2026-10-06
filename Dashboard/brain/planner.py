@@ -2,6 +2,7 @@ import hashlib
 import json
 import re
 import time
+from typing import Optional
 
 import config
 import planner_pi
@@ -33,7 +34,7 @@ def _guidance_for(profile) -> str:
     """NAV_MODE only matters for the pi profile (spec-free-roam-approach.md
     §C) — planner_virtual has no NAV_MODE concept, so other profiles are
     unaffected."""
-    if profile is planner_pi and config.get("NAV_MODE", "line").strip().lower() == "free":
+    if profile is planner_pi and config.get("NAV_MODE", "free").strip().lower() == "free":
         return planner_pi.FREE_GUIDANCE
     return profile.GUIDANCE
 
@@ -140,7 +141,18 @@ def generate_plan(command: str, scene: str = "") -> dict:
         log.warning("[plan] unparseable JSON: %r", completion.text[:300])
         return {"steps": [], "notes": "planner returned unparseable output"}
 
-    steps = plan.get("steps", [])
+    if not isinstance(plan, dict):
+        log.warning("[plan] JSON was not an object: %r", completion.text[:200])
+        return {"steps": [], "notes": "planner returned unusable output"}
+
+    # A small model sometimes writes steps as strings or nests them oddly; keep
+    # only well-formed step objects so nothing downstream calls .get on a str.
+    raw_steps = plan.get("steps", [])
+    steps = [s for s in raw_steps if isinstance(s, dict)] if isinstance(raw_steps, list) else []
+    if not isinstance(raw_steps, list) or len(steps) != len(raw_steps):
+        log.warning("[plan] dropped malformed step(s): %r", str(raw_steps)[:200])
+        plan["notes"] = (str(plan.get("notes") or "") + " [malformed steps dropped]").strip()
+    plan["steps"] = steps
     _promote_moves_to_approach(steps)
     log.info("[plan] %d step(s)", len(steps))
     for step in steps:
@@ -182,3 +194,90 @@ def revise_plan(confirmed_plan: dict, remaining_steps: list, digest: list, comma
     except (json.JSONDecodeError, TypeError):
         log.warning("[revise] unparseable JSON: %r", completion.text[:300])
         return {"change": False, "reason": "unparseable revision output", "steps": []}
+
+
+
+
+# -- failure recovery (spec-supervisor-feedback-2026-10-05.md section D) -----
+def validate_steps(steps) -> Optional[str]:
+    """The rover's capability vocabulary as a gate; None means the steps pass.
+
+    generate_plan only states the vocabulary in the prompt, and report.py audits it
+    after the fact. A replan applied mid-mission has no spoken read-back, so it is
+    checked here before it is allowed to replace the plan."""
+    profile = _profile()
+    if not isinstance(steps, list) or not steps:
+        return "no steps"
+    for step in steps:
+        if not isinstance(step, dict):
+            return "a step is not an object"
+        action = str(step.get("action") or "").strip().lower()
+        if action not in profile.ACTIONS:
+            return "action %r is not in the rover's vocabulary" % action
+    return None
+
+
+def build_replan_prompt(command: str, done_steps: list, failed_step: dict, reason: str,
+                        guidance_log: list, digest: list, scene: str = "") -> str:
+    """Pure prompt builder (tools/context_budget.py counts it for per_guidance_turn)."""
+    profile = _profile()
+    vocabulary = _build_vocabulary(profile.ACTIONS, _guidance_for(profile))
+    keep = config.get_int("PERCEPTION_DIGEST_KEEP", 6)
+    lines = [
+        "You are a mission planner for an indoor rover. The rover stopped partway through a "
+        "mission because a step failed, and a person has told it what to do next.",
+        vocabulary,
+    ]
+    if scene:
+        lines.append("The room was filmed beforehand. Everything known to be in it:\n" + scene
+                     + "\nOnly reference things from that list.")
+    lines.append('Original command: "%s"' % command)
+    lines.append("Steps already completed: " + (json.dumps(done_steps) if done_steps else "none"))
+    lines.append("The step that failed: %s (reason: %s)" % (json.dumps(failed_step), reason))
+    if digest:
+        lines.append("What the rover has seen recently, oldest first:")
+        lines.extend("  - %s" % line for line in digest[-keep:])
+    lines.append("Conversation since the failure:")
+    for turn in guidance_log:
+        lines.append("  Rover: " + str(turn.get("question") or ""))
+        lines.append("  Person: " + str(turn.get("answer") or "(no answer yet)"))
+    lines.append(
+        "Write a new plan for ONLY what is still left to do, starting from where the rover is "
+        "now. Keep the original goal. Use the person's answer to decide how to find or reach the "
+        "target; do not repeat the step that just failed unless the answer gives a reason to "
+        "expect it to work now.")
+    lines.append("Respond ONLY with JSON: " + profile.STEP_SCHEMA)
+    return "\n".join(lines)
+
+
+def replan_from_state(command: str, done_steps: list, failed_step: dict, reason: str,
+                      guidance_log: list, digest: list, scene: str = "") -> dict:
+    """A new plan from where the rover is, after a human answered "what next?".
+    {"steps": []} (with a note) on any failure; never raises."""
+    prompt = build_replan_prompt(command, done_steps, failed_step, reason, guidance_log, digest, scene)
+    try:
+        provider = get_provider("planner")
+        completion = provider.complete([user_message(prompt)], json_mode=True)
+    except ProviderError as exc:
+        log.error("[replan] failed: %s", exc)
+        return {"steps": [], "notes": "replan unavailable: %s" % exc}
+    log.info("[replan] <- %.1fs", completion.latency_s)
+    log_completion(log, "planner", "replan_from_state", completion)
+
+    try:
+        plan = json.loads(completion.text)
+    except (json.JSONDecodeError, TypeError):
+        log.warning("[replan] unparseable JSON: %r", completion.text[:300])
+        return {"steps": [], "notes": "replan returned unparseable output"}
+    steps = plan.get("steps") if isinstance(plan, dict) else None
+    if not isinstance(steps, list):
+        return {"steps": [], "notes": "replan returned no steps"}
+    _promote_moves_to_approach(steps)
+    problem = validate_steps(steps)
+    if problem:
+        log.warning("[replan] rejected: %s", problem)
+        return {"steps": [], "notes": "replan rejected: " + problem}
+    for index, step in enumerate(steps, start=1):
+        step["id"] = index
+    plan["steps"] = steps
+    return plan
