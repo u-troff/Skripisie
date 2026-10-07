@@ -35,6 +35,7 @@ import scene as scene_mod
 import vlm
 from log_setup import get_logger
 from providers import ProviderError, get_provider, log_completion, user_message
+from providers.factory import _resolve
 
 log = get_logger("report")
 
@@ -42,9 +43,15 @@ log = get_logger("report")
 # *record* of what was configured, and it must keep working even when the
 # provider itself cannot be constructed (no API key, Ollama down).
 def _role_config(role: str) -> dict:
-    provider = config.get(role.upper() + "_PROVIDER", "ollama").lower()
-    model = config.get("%s_MODEL_%s" % (role.upper(), provider.upper()), "")
+    provider, model = _resolve(role)  # same resolution the provider factory uses, incl. legacy/default model
     return {"provider": provider, "model": model, "local": provider == "ollama"}
+
+
+def _model_tag(models: dict) -> str:
+    """One greppable string, e.g. 'planner=ollama/gemma4:e4b vlm=ollama/qwen2.5vl:3b'."""
+    return " ".join("%s=%s/%s" % (role, (models.get(role) or {}).get("provider") or "?",
+                                  (models.get(role) or {}).get("model") or "?")
+                    for role in ("planner", "vlm"))
 
 
 def _result(check: Optional[dict]) -> dict:
@@ -299,6 +306,7 @@ def build_report(mission, spoken: bool = True) -> dict:
     if isinstance(mission.arrival, dict) and isinstance(mission.arrival.get("latency_s"), (int, float)):
         latencies.append(float(mission.arrival["latency_s"]))
 
+    models = {"planner": _role_config("planner"), "vlm": _role_config("vlm")}
     telemetry = mission.rover_telemetry or {}
     outcome = _outcome_class(mission)
     profile = planner.profile_info()
@@ -306,6 +314,8 @@ def build_report(mission, spoken: bool = True) -> dict:
     report: Dict[str, Any] = {
         "session_id": mission.session_id,
         "outcome": outcome,
+        "model_tag": _model_tag(models),
+        "local": all(models[role]["local"] for role in ("planner", "vlm")),
         "rover": config.get("ROVER", "sim"),
         "command": mission.original_command or mission.command,
         "resolved_command": mission.command,
@@ -353,7 +363,7 @@ def build_report(mission, spoken: bool = True) -> dict:
             "checks_skipped": len(skipped),
             "checks_failed": len(failed),
         },
-        "models": {"planner": _role_config("planner"), "vlm": _role_config("vlm")},
+        "models": models,
         # -- planner-profiles / virtual-sweep additions (§3D) ---------------
         "rover_summary": mission.rover_summary,
         "grounding": mission.grounding,

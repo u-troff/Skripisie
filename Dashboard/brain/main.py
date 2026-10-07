@@ -434,6 +434,7 @@ def list_logs():
             "command": data.get("command"),
             "outcome": data.get("outcome"),
             "rover": data.get("rover"),
+            "model_tag": data.get("model_tag") or report_mod._model_tag(data.get("models") or {}),  # older logs have only `models`
             "plan_was_revised": data.get("plan_was_revised"),
             "target_confirmed": bool(data.get("target_confirmed")),
             "step_count": len(data.get("steps") or []),

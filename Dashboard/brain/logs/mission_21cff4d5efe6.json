@@ -1,0 +1,472 @@
+{
+  "session_id": "21cff4d5efe6",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e2b vlm=ollama/qwen2.5vl:3b",
+  "local": true,
+  "rover": "pi",
+  "command": "can you please go to the orange box",
+  "resolved_command": "go to the orange box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": "orange box"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "orange box"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "orange box"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "orange box"
+      }
+    ],
+    "notes": "The rover attempts to find the orange box by scanning, then approaching it, observing it, and finally reporting the finding."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": "orange box"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "orange box"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "orange box"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "orange box"
+      }
+    ],
+    "notes": "The rover attempts to find the orange box by scanning, then approaching it, observing it, and finally reporting the finding."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "scan",
+      "target": "orange box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.22
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "orange box",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 6,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 34.46
+    },
+    {
+      "index": 2,
+      "action": "observe",
+      "target": "orange box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 3,
+      "action": "report",
+      "target": "orange box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 5.26,
+      "bbox": [
+        418,
+        96,
+        524,
+        193
+      ],
+      "x_center": 0.736,
+      "fill": 0.034,
+      "bottom": 0.403,
+      "confidence": "high",
+      "sharpness": 102.18325805664062,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 3.32,
+      "frame_path": "logs/frames/21cff4d5efe6/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 11.51,
+      "bbox": [
+        201,
+        95,
+        309,
+        189
+      ],
+      "x_center": 0.398,
+      "fill": 0.033,
+      "bottom": 0.393,
+      "confidence": "high",
+      "sharpness": 180.89744567871094,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 3.37,
+      "frame_path": "logs/frames/21cff4d5efe6/ap_lock_verify.jpg",
+      "bearing_deg": 13.22,
+      "pivot_requested_deg": 13.22,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": 1,
+      "residual_e": -0.102,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 18.2,
+      "bbox": [
+        138,
+        84,
+        292,
+        217
+      ],
+      "x_center": 0.336,
+      "fill": 0.066,
+      "bottom": 0.452,
+      "confidence": "high",
+      "sharpness": 131.9306182861328,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 2580,
+      "action": "hop 50 gate=confirmed",
+      "vlm_latency_s": 3.38,
+      "frame_path": "logs/frames/21cff4d5efe6/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.43,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.033,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 50.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 25.16,
+      "bbox": [
+        182,
+        34,
+        445,
+        261
+      ],
+      "x_center": 0.489,
+      "fill": 0.194,
+      "bottom": 0.543,
+      "confidence": "high",
+      "sharpness": 203.4774932861328,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1098,
+      "action": "pivot L 0.08s hop 50 gate=confirmed",
+      "vlm_latency_s": 3.52,
+      "frame_path": "logs/frames/21cff4d5efe6/ap_04_check.jpg",
+      "pivot_cmd_s": 0.07783050847457626,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.44,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.066,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 50.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 30.46,
+      "bbox": [
+        85,
+        0,
+        460,
+        296
+      ],
+      "x_center": 0.425,
+      "fill": 0.362,
+      "bottom": 0.617,
+      "confidence": "high",
+      "sharpness": 264.6377868652344,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 619,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 3.38,
+      "frame_path": "logs/frames/21cff4d5efe6/ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.98,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.194,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 50.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 34.46,
+      "bbox": [
+        85,
+        0,
+        460,
+        296
+      ],
+      "x_center": 0.425,
+      "fill": 0.362,
+      "bottom": 0.617,
+      "confidence": "high",
+      "sharpness": 264.6377868652344,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 435,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 3.38,
+      "frame_path": "logs/frames/21cff4d5efe6/ap_05_check.jpg",
+      "hops_done": 3,
+      "fill_prev": 0.194,
+      "arrival_block": null,
+      "d_vlm_cm": 50.0
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "orange box",
+    "expected": [
+      "orange box",
+      "orange",
+      "box"
+    ],
+    "known": [],
+    "t_rel_s": 31.68,
+    "latency_s": 3.38,
+    "frame_path": "logs/frames/21cff4d5efe6/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "orange box"
+      ],
+      "missing": [
+        "orange",
+        "box"
+      ],
+      "unexpected": [],
+      "description": "a rover has stopped in front of an orange box, which is the only visible object in the image."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 6,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 2,
+    "chassis_spin_deg_total": 13.2,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": 13.22,
+    "residual_e_at_lock": -0.102,
+    "hops_done": 3,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 102.2,
+    "sharpness_median": 203.5,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 20.35,
+    "motion_time_s": 6.05,
+    "wall_time_s": 8.85,
+    "sonar_stops": 0,
+    "arrival_reason": "fill",
+    "vlm_calls": 6,
+    "approach_wall_time_s": 29.2,
+    "hop_src_counts": {
+      "fixed": 3
+    }
+  },
+  "looked": {
+    "centre": 7
+  },
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "orange box"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 36.19,
+    "per_step_s": [
+      1.22,
+      34.46,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 3.38,
+    "vlm_latency_max_s": 3.38,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e2b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 5,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 13,
+      "latency_total_s": 41.314,
+      "latency_mean_s": 3.178,
+      "prompt_tokens_total": 16111,
+      "completion_tokens_total": 762,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 10.454,
+      "latency_mean_s": 10.454,
+      "prompt_tokens_total": 284,
+      "completion_tokens_total": 110,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 1.72,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 12.73,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 36.19,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: orange, box"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    }
+  ],
+  "spoken_summary": "The rover arrived at the orange box. The target was visible with high confidence. Sonar did not confirm the arrival."
+}
