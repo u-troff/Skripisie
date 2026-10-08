@@ -279,6 +279,7 @@ def _row_from_report(condition: str, command: str, repeat: int, wall_clock_s: fl
         "command": command,
         "repeat_index": repeat,
         "session_id": report.get("session_id"),
+        "test_level": os.environ.get("TEST_LEVEL") or None,
         "outcome": report.get("outcome"),
         "auto_confirmed": auto_confirmed,
         "turn_count": dialogue.get("turn_count"),
@@ -681,6 +682,8 @@ def main() -> None:
                              "scripted answers (otherwise GUIDANCE_ENABLED is forced to 0)")
     parser.add_argument("--depth-max", type=int, default=None,
                         help="drop suite entries deeper than this (quick smoke test)")
+    parser.add_argument("--level", default=None,
+                        help="test level label (e.g. L3) written to every run log and the CSV test_level column")
     parser.add_argument("--dry-run", action="store_true",
                         help="print the run count / time estimate and exit")
     parser.add_argument("--out", default=None,
@@ -734,6 +737,8 @@ def main() -> None:
     if not entries:
         sys.exit("no commands left after --depth-max %s" % args.depth_max)
     base_env = {k: os.environ.get(k) for k in _MANAGED_KEYS}
+    if args.level:
+        os.environ["TEST_LEVEL"] = args.level
 
     print("NOTE: virtual runs are text-only for the VLM role (SCENE_SOURCE=room), so a single-model "
           "condition (local_e4b/local_e2b) changes only the planner here.")

@@ -1,6 +1,7 @@
 import type {
   DialogueSnapshot,
   RoomData,
+  RunFlag,
   RunReport,
   RunSummary,
   RunTrace,
@@ -134,6 +135,16 @@ export async function fetchLogs(): Promise<RunSummary[]> {
   const response = await fetch('/api/logs')
   if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
   return (await response.json()) as RunSummary[]
+}
+
+/** Flag a run (or clear it with null) so it can be found again on the Logs page. */
+export async function setRunFlag(sessionId: string, flag: RunFlag | null, note = ''): Promise<void> {
+  const response = await fetch(`/api/logs/${sessionId}/flag`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ flag, note }),
+  })
+  if (!response.ok) throw new Error(`${response.status} ${await response.text()}`)
 }
 
 /** A run's recorded movement for the map. Null when it has none (non-virtual rover, old log). */

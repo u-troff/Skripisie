@@ -218,8 +218,12 @@ export interface SceneSummary {
 
 // --- run logs / reports (Logs page) ---------------------------------------
 
+export type RunFlag = 'good' | 'bad' | 'review'
+
 export interface RunSummary {
   session_id: string
+  flag?: RunFlag | null
+  flag_note?: string | null
   command: string | null
   outcome: string | null
   rover: string | null

@@ -363,7 +363,7 @@ class VoiceClient:
             return
         print(f"[voice] connecting to {self.execution_uri}")
         try:
-            async with websockets.connect(self.execution_uri) as ws:
+            async with websockets.connect(self.execution_uri, max_size=None) as ws:
                 await ws.send(json.dumps({"type": "begin", "session_id": session_id}))
                 # mission.py emits awaiting_revision and then immediately
                 # speaks the question, so record only once the question has
@@ -418,7 +418,10 @@ class VoiceClient:
     # -- connection ----------------------------------------------------------
     async def run_once(self) -> None:
         print(f"[voice] connecting to {self.dialogue_uri}")
-        async with websockets.connect(self.dialogue_uri) as ws:
+        # max_size=None: "speak" frames carry the whole TTS reply as base64 WAV,
+        # and a long one (e.g. reading out a plan) exceeds the library's 1 MiB
+        # default -> close code 1009 "message too big".
+        async with websockets.connect(self.dialogue_uri, max_size=None) as ws:
             # No unconditional "start" here: capture_loop sends one per wake
             # word, so each spoken command gets its own session.
             send_queue: "asyncio.Queue[dict]" = asyncio.Queue()

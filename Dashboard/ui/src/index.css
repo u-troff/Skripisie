@@ -568,3 +568,14 @@ table.logtable tr.hit { background: #14261e; }
 .filterbar button.ghost { text-transform: capitalize; padding: 4px 12px; }
 .filterbar button.ghost:hover { color: var(--text); border-color: var(--accent); }
 .filterbar button.ghost.active { color: var(--text); border-color: var(--accent); background: rgba(255, 255, 255, 0.06); }
+
+.flagbadge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.flagbadge.good { color: #8be0a4; border-color: #2c5a3a; }
+.flagbadge.bad { color: #ffb4ae; border-color: #542725; }
+.flagbadge.review { color: #f0d080; border-color: #5a4a22; }

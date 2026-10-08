@@ -325,6 +325,7 @@ def build_report(mission, spoken: bool = True) -> dict:
         "model_tag": _model_tag(models),
         "local": all(models[role]["local"] for role in ("planner", "vlm")),
         "rover": config.get("ROVER", "sim"),
+        "test_level": config.get("TEST_LEVEL") or None,   # e.g. "L3"; set per batch, see Progress/test-plans
         "command": mission.original_command or mission.command,
         "resolved_command": mission.command,
         "plan": mission.active_plan,

@@ -12,7 +12,7 @@ import config,room_map
 
 from pipeline import handle_confirmation_audio,handle_confirmation_text,handle_dialogue_audio,handle_dialogue_text
 import av
-from fastapi import FastAPI, File, Form, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import Body, FastAPI, File, Form, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -415,6 +415,40 @@ def mission_state(session_id:str):
     return mission.snapshot() if mission else {"error":"unknow mission"}
 
 
+RUN_FLAGS_PATH = mission_mod.LOGS_DIR / "run_flags.json"
+RUN_FLAG_VALUES = {"good", "bad", "review"}
+
+
+def _load_run_flags() -> dict:
+    """Operator flags per session id. Kept beside the run logs rather than inside
+    them, so the logs stay exactly as the run wrote them."""
+    try:
+        return json.loads(RUN_FLAGS_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+@app.put("/logs/{session_id}/flag")
+def set_run_flag(session_id: str, payload: dict = Body(...)):
+    """Flag a run (good / bad / review) with an optional note, or clear it with
+    flag=null, so it can be found again later on the Logs page."""
+    if not (mission_mod.LOGS_DIR / f"mission_{session_id}.json").exists():
+        return Response(status_code=404, content=b"unknown run")
+    flag = payload.get("flag")
+    if flag is not None and flag not in RUN_FLAG_VALUES:
+        return Response(status_code=400, content=b"flag must be good, bad, review or null")
+    flags = _load_run_flags()
+    if flag is None:
+        flags.pop(session_id, None)
+    else:
+        flags[session_id] = {"flag": flag, "note": str(payload.get("note") or ""),
+                             "flagged_at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    tmp = RUN_FLAGS_PATH.with_suffix(".tmp")
+    tmp.write_text(json.dumps(flags, indent=1, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(RUN_FLAGS_PATH)
+    return {"session_id": session_id, **(flags.get(session_id) or {"flag": None, "note": ""})}
+
+
 @app.get("/logs")
 def list_logs():
     """Summaries of every mission run log, newest first — for the Logs page.
@@ -423,17 +457,22 @@ def list_logs():
     files = sorted(mission_mod.LOGS_DIR.glob("mission_*.json"),
                    key=lambda p: p.stat().st_mtime, reverse=True)
     summaries = []
+    flags = _load_run_flags()
     for path in files:
         try:
             data = json.loads(path.read_text())
         except (OSError, json.JSONDecodeError):
             continue
         timings = data.get("timings") or {}
+        session_id = data.get("session_id") or path.stem[len("mission_"):]
         summaries.append({
-            "session_id": data.get("session_id") or path.stem[len("mission_"):],
+            "session_id": session_id,
+            "flag": (flags.get(session_id) or {}).get("flag"),
+            "flag_note": (flags.get(session_id) or {}).get("note"),
             "command": data.get("command"),
             "outcome": data.get("outcome"),
             "rover": data.get("rover"),
+            "test_level": data.get("test_level"),
             "model_tag": data.get("model_tag") or report_mod._model_tag(data.get("models") or {}),  # older logs have only `models`
             "plan_was_revised": data.get("plan_was_revised"),
             "target_confirmed": bool(data.get("target_confirmed")),

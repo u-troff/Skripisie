@@ -1,0 +1,32 @@
+{
+ "f13aa9ac3c8d": {
+  "flag": "good",
+  "note": "Good run (operator's assessment). Real rover, 'go and find the orange box', gemma4:e4b. Search matched keyframes, replanned, took 3 guidance turns (\"turn left and go there\"), did a 360 spin, relocated the box and drove to it. Ended halted_after_guidance / guidance_exhausted because the arrival check could not confirm: the orange box blended into the cupboard door behind it. Failure cause is visual camouflage, not planning or dialogue.",
+  "flagged_at": "2026-10-08T23:00:00"
+ },
+ "caf25eb230ef": {
+  "flag": "review",
+  "note": "When to the correct box and I told it ot go th ethe box in view 1 on the let it first went that way but then repolan to look around the room to find said box. It then saw the box and started navgiating towards it. It then ran into a obstacle accidentally but said it completed the run because it could see the box in the background.",
+  "flagged_at": "2026-10-08T23:27:49"
+ },
+ "26285fd30325": {
+  "flag": "bad",
+  "note": "",
+  "flagged_at": "2026-10-08T23:27:37"
+ },
+ "e792f716bf2b": {
+  "flag": "good",
+  "note": "IT went to the black bag successfully but I think the light in the room interferred with it reaching the orange box and being able to distinguish it. The gemma4:34b model was used and it is actually good and fast at makingplans and replaing but its image processing is not the brightest. ",
+  "flagged_at": "2026-10-08T23:35:07"
+ },
+ "2acdffb1c7c1": {
+  "flag": "review",
+  "note": "The model finally saw it but it kept skipping the frame as it cannot see the actually see the box due to the light in the room not being enough so it says that it skips the frame as it is to blurry. The gemma4:e4b was used here and it is a good planning mopdel but 2nd best at actualy vision. I will try using qwen now to see how it preforms also do a test in the light caus emayube that would be better\n",
+  "flagged_at": "2026-10-08T23:43:54"
+ },
+ "794bd92f55de": {
+  "flag": "bad",
+  "note": "It went to th eblack bag then went to the orange box successfully but again in the darkness of the room saw that it could not actually se the orange box and kept on saying that the box was blurry but then I moved it into the light and it could see it better. One thing to note I used qwen2.5vl here and it is so much better and vision model recognisition than gemma4",
+  "flagged_at": "2026-10-08T23:52:48"
+ }
+}

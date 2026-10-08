@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { frameUrl } from '../frameUrl'
-import { fetchLog, fetchLogs, fetchRunTrace } from '../net'
-import type { CheckRecord, RunReport, RunSummary, RunTrace } from '../types'
+import { fetchLog, fetchLogs, fetchRunTrace, setRunFlag } from '../net'
+import type { CheckRecord, RunFlag, RunReport, RunSummary, RunTrace } from '../types'
 import { RoomMapView } from './RoverMap'
 
 function fmtTime(mtime: number): string {
@@ -20,10 +20,12 @@ function outcomeClass(outcome: string | null | undefined): string {
 
 type RoverFilter = 'all' | 'virtual' | 'pi'
 const ROVER_FILTERS: RoverFilter[] = ['all', 'virtual', 'pi']
+const RUN_FLAGS: RunFlag[] = ['good', 'bad', 'review']
 
 export default function LogsPage() {
   const [runs, setRuns] = useState<RunSummary[]>([])
   const [roverFilter, setRoverFilter] = useState<RoverFilter>('all')
+  const [flaggedOnly, setFlaggedOnly] = useState(false)
   const [loadingList, setLoadingList] = useState(true)
   const [listError, setListError] = useState<string | null>(null)
 
@@ -75,7 +77,10 @@ export default function LogsPage() {
   const lastStep = trace?.steps[trace.steps.length - 1]
   const countFor = (filter: RoverFilter) =>
     filter === 'all' ? runs.length : runs.filter((run) => run.rover === filter).length
-  const shownRuns = roverFilter === 'all' ? runs : runs.filter((run) => run.rover === roverFilter)
+  const shownRuns = runs.filter(
+    (run) => (roverFilter === 'all' || run.rover === roverFilter) && (!flaggedOnly || run.flag),
+  )
+  const selectedRun = runs.find((run) => run.session_id === selected)
 
   // The route actually driven: an approach follows its planned waypoints
   // (around obstacles), while move/turn go straight to where they ended. Joining
@@ -149,7 +154,7 @@ export default function LogsPage() {
       <section className="panel">
         <h2>
           Runs ({shownRuns.length}
-          {roverFilter !== 'all' ? ` of ${runs.length}` : ''})
+          {shownRuns.length !== runs.length ? ` of ${runs.length}` : ''})
         </h2>
         <div className="filterbar" role="group" aria-label="Filter runs by rover">
           {ROVER_FILTERS.map((filter) => (
@@ -161,6 +166,12 @@ export default function LogsPage() {
               {filter} ({countFor(filter)})
             </button>
           ))}
+          <button
+            className={`ghost ${flaggedOnly ? 'active' : ''}`}
+            onClick={() => setFlaggedOnly((on) => !on)}
+          >
+            flagged ({runs.filter((run) => run.flag).length})
+          </button>
         </div>
         {listError && <pre className="error">{listError}</pre>}
         {!listError && runs.length > 0 && shownRuns.length === 0 && (
@@ -182,6 +193,7 @@ export default function LogsPage() {
             >
               <div className="runcard-top">
                 <span className={outcomeClass(run.outcome)}>{run.outcome ?? 'unknown'}</span>
+                {run.flag && <span className={`flagbadge ${run.flag}`}>{run.flag}</span>}
                 <span className="sid">{run.session_id}</span>
               </div>
               <p className="runcard-cmd">{run.command || <em>(no command)</em>}</p>
@@ -222,6 +234,7 @@ export default function LogsPage() {
       {selected && (
         <section className="panel">
           <h2>Run {selected}</h2>
+          {selectedRun && <FlagControls run={selectedRun} onChanged={loadRuns} />}
           {loadingReport && (
             <p className="note" style={{ marginTop: 0 }}>
               Loading…
@@ -232,6 +245,53 @@ export default function LogsPage() {
         </section>
       )}
     </main>
+  )
+}
+
+/** Mark a run good / bad / review with a note, so it can be found again via the
+ * "flagged" filter. Stored beside the logs (run_flags.json), not in them. */
+function FlagControls({ run, onChanged }: { run: RunSummary; onChanged: () => void }) {
+  const [note, setNote] = useState(run.flag_note ?? '')
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setNote(run.flag_note ?? '')
+  }, [run.session_id, run.flag_note])
+
+  const save = (flag: RunFlag | null) => {
+    setError(null)
+    setRunFlag(run.session_id, flag, note)
+      .then(onChanged)
+      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
+  }
+
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <div className="filterbar" role="group" aria-label="Flag this run">
+        {RUN_FLAGS.map((flag) => (
+          <button
+            key={flag}
+            className={`ghost ${run.flag === flag ? 'active' : ''}`}
+            onClick={() => save(run.flag === flag ? null : flag)}
+          >
+            {flag}
+          </button>
+        ))}
+        {run.flag && (
+          <button className="ghost" onClick={() => save(run.flag as RunFlag)}>
+            save note
+          </button>
+        )}
+      </div>
+      <textarea
+        value={note}
+        onChange={(event) => setNote(event.target.value)}
+        placeholder="Why is this run worth coming back to?"
+        rows={3}
+        style={{ width: '100%' }}
+      />
+      {error && <pre className="error">{error}</pre>}
+    </div>
   )
 }
 
