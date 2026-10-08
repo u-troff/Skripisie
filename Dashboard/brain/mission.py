@@ -439,7 +439,10 @@ async def _record_check(mission: MissionSession, rover, kind: str, frame: bytes,
     # target_visible). First confirmation wins — the guard below stops a
     # second in-flight check in the same sweep from firing twice.
     if kind in ("progress", "look_left") and target and not vlm_failed(result):
-        if result.get("target_visible") is True and mission.target_confirmed is None:
+        listed = [str(x).strip().lower() for x in list(result.get("seen") or []) + list(result.get("objects") or []) if x]
+        want = target.strip().lower()
+        named = (not listed) or any(want in item or item in want for item in listed)
+        if result.get("target_visible") is True and named and mission.target_confirmed is None:
             mission.target_confirmed = record
             log.warning("[mission %s] target %r confirmed at %.1fs (aimed=%s, ~%.0fcm) "
                         "— stopping", mission.session_id, target, t_rel_s, aimed,

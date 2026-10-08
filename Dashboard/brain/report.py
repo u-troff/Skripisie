@@ -287,6 +287,14 @@ def _outcome_class(mission) -> str:
     return phase
 
 
+def _reached_after_guidance(mission) -> bool:
+    """A recovery needs an `approach` step that succeeded after the last blocked step."""
+    results = list(mission.results)
+    last_blocked = max((i for i, r in enumerate(results) if r.get("status") == "blocked"), default=-1)
+    return any(r.get("status") == "ok" and (r.get("step") or {}).get("action") == "approach"
+               for r in results[last_blocked + 1:])
+
+
 def build_report(mission, spoken: bool = True) -> dict:
     """Assemble the run's report. `spoken=False` skips the one planner call,
     for the abort path where no network round-trip is allowed."""
@@ -375,7 +383,7 @@ def build_report(mission, spoken: bool = True) -> dict:
         "guidance_turns": mission.guidance_turns,
         "guidance_log": mission.guidance_log,
         "halt_reason": mission.halt_reason,
-        "recovered": outcome == "completed_after_guidance",
+        "recovered": outcome == "completed_after_guidance" and _reached_after_guidance(mission),
         "light_states": mission.light_states,
     }
     report["models"]["planner_profile"] = profile

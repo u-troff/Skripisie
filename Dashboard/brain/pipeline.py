@@ -167,6 +167,10 @@ def _advance_to_confirmation(session: DialogueSession) -> List[dict]:
 
     if ambiguity.get("ambiguous"):
         question = ambiguity.get("clarifying_question")
+        #stop asking the same question
+
+        if question and str(question).strip().lower() in {t.question.strip().lower() for t in session.turns}:
+            question = None
         if question and len(session.turns) < MAX_CLARIFYING_TURNS:
             session.turns.append(Turn(question=str(question)))
             session.touch()

@@ -91210,3 +91210,1095 @@ Respond ONLY with JSON: {"target_visible": true/false, "confidence": "high"|"med
 2026-10-07 12:50:41 INFO  brain.mission  [mission 7f9d7d3f6bd4] run log -> C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\mission_7f9d7d3f6bd4.json
 2026-10-07 12:52:36 INFO  brain          logging to C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\brain.log
 2026-10-07 12:52:42 INFO  brain          logging to C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\brain.log
+2026-10-08 13:41:52 INFO  brain          logging to C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\brain.log
+2026-10-08 13:42:53 INFO  brain          logging to C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\brain.log
+2026-10-08 13:43:12 INFO  brain.rover_pi [pi] connecting to rosbridge at 192.168.137.69:9090
+2026-10-08 13:43:13 INFO  brain.rover_pi [pi] connected (snapshot=http://192.168.137.69:8080/snapshot?topic=/image_raw, route=STOP_NEXT_ROAD, pan_invert=True, tilt_invert=True)
+2026-10-08 13:43:13 INFO  brain.rover    [rover] pi
+2026-10-08 13:46:23 INFO  brain.frames   [keyframes] 5 frame(s) from 1968155 bytes
+2026-10-08 13:46:23 INFO  brain.providers [factory] vlm -> ollama/qwen2.5vl:3b
+2026-10-08 13:46:23 INFO  brain.vlm      [inventory_frame] -> ollama/qwen2.5vl:3b (image=16522 bytes)
+2026-10-08 13:46:23 DEBUG brain.vlm      [inventory_frame] prompt:
+You are cataloguing one frame from a video of a room. A robot will later be told to drive somewhere in this room and look at something.
+List EVERY distinct object you can see, even small ones — furniture, equipment, screens, cables, lights, signs, items on shelves and floor. List at most 12 objects, each object ONCE (never repeat an object or list several of the same kind separately). Stop when you run out of new objects. Do not summarise.
+For each object give specific attributes (colour, material, shape, size, any text or lights) and where it is relative to the frame and to nearby objects.
+Respond ONLY with JSON: {"place": "short name for this part of the room", "objects": [{"name": "...", "attributes": ["colour", "size"], "where": "where it is, relative to the room or other objects"}], "obstacles": ["anything on the floor that would block a small wheeled robot"]}
+2026-10-08 13:46:53 INFO  brain.vlm      [inventory_frame] <- 29.6s
+2026-10-08 13:46:53 DEBUG brain.vlm      [inventory_frame] raw response:
+{
+  "place": "bedroom",
+  "objects": [
+    {
+      "name": "orange box",
+      "attributes": ["orange", "small"],
+      "where": "on the floor"
+    },
+    {
+      "name": "flip-flops",
+      "attributes": ["brown", "small"],
+      "where": "on the floor"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "long"],
+      "where": "on the floor"
+    },
+    {
+      "name": "chair",
+      "attributes": ["purple", "metal"],
+      "where": "in the room"
+    },
+    {
+      "name": "cabinet",
+      "attributes": ["blue", "metal"],
+      "where": "in the room"
+    },
+    {
+      "name": "lights",
+      "attributes": ["green", "small"],
+      "where": "on the cabinet"
+    }
+  ],
+  "obstacles": ["flip-flops", "cable", "cabinet"]
+}
+2026-10-08 13:46:53 INFO  brain.vlm      [bench] role=vlm stage=inventory_frame provider=ollama model=qwen2.5vl:3b latency=29.642 prompt_tokens=1299 completion_tokens=221 cost_usd=
+2026-10-08 13:46:53 INFO  brain.vlm      [inventory_frame] parsed: {"place": "bedroom", "objects": [{"name": "orange box", "attributes": ["orange", "small"], "where": "on the floor"}, {"name": "flip-flops", "attributes": ["brown", "small"], "where": "on the floor"}, {"name": "cable", "attributes": ["black", "long"], "where": "on the floor"}, {"name": "chair", "attr
+2026-10-08 13:46:53 INFO  brain.vlm      [inventory_frame] -> ollama/qwen2.5vl:3b (image=16954 bytes)
+2026-10-08 13:46:53 DEBUG brain.vlm      [inventory_frame] prompt:
+You are cataloguing one frame from a video of a room. A robot will later be told to drive somewhere in this room and look at something.
+List EVERY distinct object you can see, even small ones — furniture, equipment, screens, cables, lights, signs, items on shelves and floor. List at most 12 objects, each object ONCE (never repeat an object or list several of the same kind separately). Stop when you run out of new objects. Do not summarise.
+For each object give specific attributes (colour, material, shape, size, any text or lights) and where it is relative to the frame and to nearby objects.
+Respond ONLY with JSON: {"place": "short name for this part of the room", "objects": [{"name": "...", "attributes": ["colour", "size"], "where": "where it is, relative to the room or other objects"}], "obstacles": ["anything on the floor that would block a small wheeled robot"]}
+2026-10-08 13:46:59 INFO  brain.vlm      [inventory_frame] <- 5.6s
+2026-10-08 13:46:59 DEBUG brain.vlm      [inventory_frame] raw response:
+{
+  "place": "office area",
+  "objects": [
+    {
+      "name": "orange cube",
+      "attributes": ["orange", "size: small"],
+      "where": "on the floor"
+    },
+    {
+      "name": "office chair",
+      "attributes": ["metal", "size: large"],
+      "where": "behind the cube"
+    },
+    {
+      "name": "monitor",
+      "attributes": ["black", "size: large"],
+      "where": "behind the cube"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "size: thin"],
+      "where": "on the floor"
+    },
+    {
+      "name": "power strip",
+      "attributes": ["white", "size: small"],
+      "where": "on the floor"
+    },
+    {
+      "name": "cabinet",
+      "attributes": ["metal", "size: large"],
+      "where": "behind the cube"
+    }
+  ],
+  "obstacles": ["orange cube", "office chair"]
+}
+2026-10-08 13:46:59 INFO  brain.vlm      [bench] role=vlm stage=inventory_frame provider=ollama model=qwen2.5vl:3b latency=5.602 prompt_tokens=1299 completion_tokens=231 cost_usd=
+2026-10-08 13:46:59 INFO  brain.vlm      [inventory_frame] parsed: {"place": "office area", "objects": [{"name": "orange cube", "attributes": ["orange", "size: small"], "where": "on the floor"}, {"name": "office chair", "attributes": ["metal", "size: large"], "where": "behind the cube"}, {"name": "monitor", "attributes": ["black", "size: large"], "where": "behind t
+2026-10-08 13:46:59 INFO  brain.vlm      [inventory_frame] -> ollama/qwen2.5vl:3b (image=20332 bytes)
+2026-10-08 13:46:59 DEBUG brain.vlm      [inventory_frame] prompt:
+You are cataloguing one frame from a video of a room. A robot will later be told to drive somewhere in this room and look at something.
+List EVERY distinct object you can see, even small ones — furniture, equipment, screens, cables, lights, signs, items on shelves and floor. List at most 12 objects, each object ONCE (never repeat an object or list several of the same kind separately). Stop when you run out of new objects. Do not summarise.
+For each object give specific attributes (colour, material, shape, size, any text or lights) and where it is relative to the frame and to nearby objects.
+Respond ONLY with JSON: {"place": "short name for this part of the room", "objects": [{"name": "...", "attributes": ["colour", "size"], "where": "where it is, relative to the room or other objects"}], "obstacles": ["anything on the floor that would block a small wheeled robot"]}
+2026-10-08 13:47:08 INFO  brain.vlm      [inventory_frame] <- 9.2s
+2026-10-08 13:47:08 DEBUG brain.vlm      [inventory_frame] raw response:
+{
+  "place": "underneath the desk",
+  "objects": [
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    },
+    {
+      "name": "cable",
+      "attributes": ["black", "length"],
+      "where": "on the floor, under the desk"
+    }
+  ],
+  "obstacles": [
+    "cable",
+    "cable",
+    "cable",
+    "cable",
+    "cable",
+    "cable",
+    "cable",
+    "cable",
+    "cable",
+    "cable",
+    "cable",
+    "cable"
+  ]
+}
+2026-10-08 13:47:08 INFO  brain.vlm      [bench] role=vlm stage=inventory_frame provider=ollama model=qwen2.5vl:3b latency=9.240 prompt_tokens=1299 completion_tokens=508 cost_usd=
+2026-10-08 13:47:08 INFO  brain.vlm      [inventory_frame] parsed: {"place": "underneath the desk", "objects": [{"name": "cable", "attributes": ["black", "length"], "where": "on the floor, under the desk"}, {"name": "cable", "attributes": ["black", "length"], "where": "on the floor, under the desk"}, {"name": "cable", "attributes": ["black", "length"], "where": "on
+2026-10-08 13:47:08 INFO  brain.vlm      [inventory_frame] -> ollama/qwen2.5vl:3b (image=17059 bytes)
+2026-10-08 13:47:08 DEBUG brain.vlm      [inventory_frame] prompt:
+You are cataloguing one frame from a video of a room. A robot will later be told to drive somewhere in this room and look at something.
+List EVERY distinct object you can see, even small ones — furniture, equipment, screens, cables, lights, signs, items on shelves and floor. List at most 12 objects, each object ONCE (never repeat an object or list several of the same kind separately). Stop when you run out of new objects. Do not summarise.
+For each object give specific attributes (colour, material, shape, size, any text or lights) and where it is relative to the frame and to nearby objects.
+Respond ONLY with JSON: {"place": "short name for this part of the room", "objects": [{"name": "...", "attributes": ["colour", "size"], "where": "where it is, relative to the room or other objects"}], "obstacles": ["anything on the floor that would block a small wheeled robot"]}
+2026-10-08 13:47:12 INFO  brain.vlm      [inventory_frame] <- 4.3s
+2026-10-08 13:47:12 DEBUG brain.vlm      [inventory_frame] raw response:
+{
+  "place": "under the bed",
+  "objects": [
+    {
+      "name": "shoes",
+      "attributes": ["beige", "size medium"],
+      "where": "on the floor"
+    },
+    {
+      "name": "shoes",
+      "attributes": ["black", "size medium"],
+      "where": "on the floor"
+    },
+    {
+      "name": "box",
+      "attributes": ["orange", "size small"],
+      "where": "on the floor"
+    }
+  ],
+  "obstacles": ["shoes on the floor"]
+}
+2026-10-08 13:47:12 INFO  brain.vlm      [bench] role=vlm stage=inventory_frame provider=ollama model=qwen2.5vl:3b latency=4.298 prompt_tokens=1299 completion_tokens=127 cost_usd=
+2026-10-08 13:47:12 INFO  brain.vlm      [inventory_frame] parsed: {"place": "under the bed", "objects": [{"name": "shoes", "attributes": ["beige", "size medium"], "where": "on the floor"}, {"name": "shoes", "attributes": ["black", "size medium"], "where": "on the floor"}, {"name": "box", "attributes": ["orange", "size small"], "where": "on the floor"}], "obstacles
+2026-10-08 13:47:12 INFO  brain.vlm      [inventory_frame] -> ollama/qwen2.5vl:3b (image=15872 bytes)
+2026-10-08 13:47:12 DEBUG brain.vlm      [inventory_frame] prompt:
+You are cataloguing one frame from a video of a room. A robot will later be told to drive somewhere in this room and look at something.
+List EVERY distinct object you can see, even small ones — furniture, equipment, screens, cables, lights, signs, items on shelves and floor. List at most 12 objects, each object ONCE (never repeat an object or list several of the same kind separately). Stop when you run out of new objects. Do not summarise.
+For each object give specific attributes (colour, material, shape, size, any text or lights) and where it is relative to the frame and to nearby objects.
+Respond ONLY with JSON: {"place": "short name for this part of the room", "objects": [{"name": "...", "attributes": ["colour", "size"], "where": "where it is, relative to the room or other objects"}], "obstacles": ["anything on the floor that would block a small wheeled robot"]}
+2026-10-08 13:47:17 INFO  brain.vlm      [inventory_frame] <- 4.4s
+2026-10-08 13:47:17 DEBUG brain.vlm      [inventory_frame] raw response:
+{
+  "place": "floor",
+  "objects": [
+    {
+      "name": "black bag",
+      "attributes": ["black", "small"],
+      "where": "left side of the frame"
+    },
+    {
+      "name": "white cabinet",
+      "attributes": ["white", "medium"],
+      "where": "left side of the frame"
+    },
+    {
+      "name": "wooden cabinet",
+      "attributes": ["brown", "medium"],
+      "where": "right side of the frame"
+    }
+  ],
+  "obstacles": ["black bag", "white cabinet", "wooden cabinet"]
+}
+2026-10-08 13:47:17 INFO  brain.vlm      [bench] role=vlm stage=inventory_frame provider=ollama model=qwen2.5vl:3b latency=4.391 prompt_tokens=1299 completion_tokens=135 cost_usd=
+2026-10-08 13:47:17 INFO  brain.vlm      [inventory_frame] parsed: {"place": "floor", "objects": [{"name": "black bag", "attributes": ["black", "small"], "where": "left side of the frame"}, {"name": "white cabinet", "attributes": ["white", "medium"], "where": "left side of the frame"}, {"name": "wooden cabinet", "attributes": ["brown", "medium"], "where": "right si
+2026-10-08 13:47:17 INFO  brain.scene    [scene ab5e3e14ae13] 5 frame(s), 0 unreadable, 53.5s
+2026-10-08 13:48:16 INFO  brain.pipeline [dlg 9858dca51eeb] stt 12.5s transcript='Can you please dotar the boss'
+2026-10-08 13:48:16 INFO  brain.pipeline ====================================================================
+2026-10-08 13:48:16 INFO  brain.pipeline [dlg 9858dca51eeb] command='Can you please dotar the boss'
+2026-10-08 13:48:16 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=91183 bytes)
+2026-10-08 13:48:16 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "Can you please dotar the boss"
+Use the image of the robot's current view, if given, to decide.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:48:20 INFO  brain.vlm      [check_ambiguity] <- 3.6s
+2026-10-08 13:48:20 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The command 'Can you please dotar the boss' is not clear and does not provide enough information for the robot to understand what action to take.",
+  "clarifying_question": "What specific action should the robot take?",
+  "resolved_command": null
+}
+2026-10-08 13:48:20 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.553 prompt_tokens=1216 completion_tokens=66 cost_usd=
+2026-10-08 13:48:20 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The command 'Can you please dotar the boss' is not clear and does not provide enough information for the robot to understand what action to take.", "clarifying_question": "What specific action should the robot take?", "resolved_command": null}
+2026-10-08 13:48:20 INFO  brain.pipeline [dlg 9858dca51eeb] clarify turn 1/5: What specific action should the robot take?
+2026-10-08 13:48:40 INFO  brain.pipeline [dlg 9858dca51eeb] stt 8.9s transcript='you should go to the re box so go to the re box'
+2026-10-08 13:48:40 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=93934 bytes)
+2026-10-08 13:48:40 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "Can you please dotar the boss"
+Use the image of the robot's current view, if given, to decide.
+Clarifications already exchanged:
+  Q: What specific action should the robot take?
+  A: you should go to the re box so go to the re box
+Do NOT repeat a question that was already answered. If you now have enough information to act, set ambiguous to false.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:48:44 INFO  brain.vlm      [check_ambiguity] <- 3.6s
+2026-10-08 13:48:44 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The robot needs to go to the red box to interact with it, but the current view does not show the red box clearly.",
+  "clarifying_question": "Is the red box located to the left or right of the current view?",
+  "resolved_command": null
+}
+2026-10-08 13:48:44 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.645 prompt_tokens=1273 completion_tokens=69 cost_usd=
+2026-10-08 13:48:44 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The robot needs to go to the red box to interact with it, but the current view does not show the red box clearly.", "clarifying_question": "Is the red box located to the left or right of the current view?", "resolved_command": null}
+2026-10-08 13:48:44 INFO  brain.pipeline [dlg 9858dca51eeb] clarify turn 2/5: Is the red box located to the left or right of the current view?
+2026-10-08 13:49:00 INFO  brain.pipeline [dlg 9858dca51eeb] stt 8.8s transcript='it is the orange box and it is located to the left'
+2026-10-08 13:49:00 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=93737 bytes)
+2026-10-08 13:49:00 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "Can you please dotar the boss"
+Use the image of the robot's current view, if given, to decide.
+Clarifications already exchanged:
+  Q: What specific action should the robot take?
+  A: you should go to the re box so go to the re box
+  Q: Is the red box located to the left or right of the current view?
+  A: it is the orange box and it is located to the left
+Do NOT repeat a question that was already answered. If you now have enough information to act, set ambiguous to false.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:49:04 INFO  brain.vlm      [check_ambiguity] <- 3.2s
+2026-10-08 13:49:04 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": false,
+  "reason": "The robot needs to go to the red box to interact with it.",
+  "clarifying_question": null,
+  "resolved_command": "go to the red box"
+}
+2026-10-08 13:49:04 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.192 prompt_tokens=1307 completion_tokens=48 cost_usd=
+2026-10-08 13:49:04 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": false, "reason": "The robot needs to go to the red box to interact with it.", "clarifying_question": null, "resolved_command": "go to the red box"}
+2026-10-08 13:49:04 INFO  brain.providers [factory] planner -> ollama/gemma4:e2b
+2026-10-08 13:49:04 INFO  brain.planner  [plan] -> ollama/gemma4:e2b command='go to the red box'
+2026-10-08 13:49:04 DEBUG brain.planner  [plan] prompt:
+You are a mission planner for an indoor rover. Break the command into a sequence of discrete, executable steps.
+The rover can ONLY perform these actions:
+  "follow_line" - follow the floor line to its end marker — the only way to travel more than a short distance
+  "move" - drive forward or backward
+  "turn" - rotate on the spot
+  "approach" - find a visible object and drive up to it (searches by turning if it is not in view)
+  "scan" - sweep the camera around without moving the base
+  "observe" - hold still and look at a named target
+  "stop" - halt
+  "report" - say what was found
+It has no arm. It cannot pick up, carry, open, push, or touch anything.
+To go to an object without a floor line, use approach with the object as target, then observe it, then report. Never use move to reach an object or place: move is only a short hop forward or backward.
+Every step's "action" must be exactly one of those verbs.
+Command: "go to the red box"
+Respond ONLY with JSON: {"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}
+2026-10-08 13:49:27 INFO  brain.planner  [plan] <- 23.3s
+2026-10-08 13:49:27 DEBUG brain.planner  [plan] raw response:
+{"steps": [{"id": 1, "action": "scan", "target": "red box"}, {"id": 2, "action": "approach", "target": "red box"}, {"id": 3, "action": "observe", "target": "red box"}, {"id": 4, "action": "report", "target": "red box"}], "notes": "The rover searches for the red box by scanning, approaching, observing, and then reporting its location."}
+2026-10-08 13:49:27 INFO  brain.planner  [bench] role=planner stage=generate_plan provider=ollama model=gemma4:e2b latency=23.332 prompt_tokens=284 completion_tokens=106 cost_usd=
+2026-10-08 13:49:27 INFO  brain.planner  [plan] 4 step(s)
+2026-10-08 13:49:27 INFO  brain.planner         1. scan -> red box
+2026-10-08 13:49:27 INFO  brain.planner         2. approach -> red box
+2026-10-08 13:49:27 INFO  brain.planner         3. observe -> red box
+2026-10-08 13:49:27 INFO  brain.planner         4. report -> red box
+2026-10-08 13:49:27 INFO  brain.vlm      [verify_plan] -> ollama/qwen2.5vl:3b (image=93737 bytes)
+2026-10-08 13:49:27 DEBUG brain.vlm      [verify_plan] prompt:
+You are verifying a robot's mission plan before it departs.
+The robot can only drive and look. It cannot pick up or touch anything.
+Plan: {"steps": [{"id": 1, "action": "scan", "target": "red box"}, {"id": 2, "action": "approach", "target": "red box"}, {"id": 3, "action": "observe", "target": "red box"}, {"id": 4, "action": "report", "target": "red box"}], "notes": "The rover searches for the red box by scanning, approaching, observing, and then reporting its location."}
+Respond ONLY with JSON: {"verified": true/false, "concerns": "..." or null}
+2026-10-08 13:49:27 INFO  brain.vlm      [verify_plan] <- 0.4s
+2026-10-08 13:49:27 DEBUG brain.vlm      [verify_plan] raw response:
+{
+  "verified": true,
+  "concerns": null
+}
+2026-10-08 13:49:27 INFO  brain.vlm      [bench] role=vlm stage=verify_plan provider=ollama model=qwen2.5vl:3b latency=0.387 prompt_tokens=1215 completion_tokens=17 cost_usd=
+2026-10-08 13:49:27 INFO  brain.vlm      [verify_plan] parsed: {"verified": true, "concerns": null}
+2026-10-08 13:49:27 INFO  brain.pipeline [dlg 9858dca51eeb] plan ready, awaiting voice confirmation
+2026-10-08 13:49:55 INFO  brain.pipeline [dlg 9858dca51eeb] confirmation transcript='it is the orange box and it is only left'
+2026-10-08 13:49:55 INFO  brain.confirm  [bench] role=planner stage=confirm_classify provider=ollama model=gemma4:e2b latency=0.337 prompt_tokens=97 completion_tokens=9 cost_usd=
+2026-10-08 13:49:55 INFO  brain.confirm  [confirm] model CONFIRM (transcript='it is the orange box and it is only left')
+2026-10-08 13:49:55 INFO  brain.pipeline [dlg 9858dca51eeb] CONFIRMED — handing off to execution
+2026-10-08 13:49:57 INFO  brain.mission  ====================================================================
+2026-10-08 13:49:57 INFO  brain.mission  [mission 9858dca51eeb] start — 4 step(s)
+2026-10-08 13:50:00 INFO  brain.vlm      [locate_target] -> ollama/qwen2.5vl:3b (image=90126 bytes)
+2026-10-08 13:50:00 DEBUG brain.vlm      [locate_target] prompt:
+Find "red box" in this image from a small floor robot's camera.
+If it is visible, give its bounding box in pixel coordinates.
+Also give distance_m: your best estimate, in metres, of the horizontal distance from the camera to the point where the object touches the floor, or null if you cannot tell.
+Respond ONLY with JSON: {"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, "confidence": "high"|"medium"|"low", "distance_m": number or null, "description": "one short sentence"}
+2026-10-08 13:50:04 INFO  brain.vlm      [locate_target] <- 3.3s
+2026-10-08 13:50:04 DEBUG brain.vlm      [locate_target] raw response:
+{
+  "visible": true,
+  "bbox_2d": [44, 223, 277, 319],
+  "confidence": "high",
+  "distance_m": 0.5,
+  "description": "a red box on the floor"
+}
+2026-10-08 13:50:04 INFO  brain.vlm      [bench] role=vlm stage=locate_target provider=ollama model=qwen2.5vl:3b latency=3.340 prompt_tokens=1183 completion_tokens=64 cost_usd=
+2026-10-08 13:50:04 INFO  brain.vlm      [locate_target] parsed: {"visible": true, "bbox_2d": [44, 223, 277, 319], "confidence": "high", "distance_m": 0.5, "description": "a red box on the floor"}
+2026-10-08 13:50:04 INFO  brain.mission  [mission 9858dca51eeb] approach cycle 1 (search): look pan=0 gate=confirmed
+2026-10-08 13:50:05 ERROR brain.rover_pi [pi] lf cmd STOP failed: Service /line_follow/cmd does not exist
+2026-10-08 13:50:07 INFO  brain.vlm      [locate_target] -> ollama/qwen2.5vl:3b (image=94062 bytes)
+2026-10-08 13:50:07 DEBUG brain.vlm      [locate_target] prompt:
+Find "red box" in this image from a small floor robot's camera.
+If it is visible, give its bounding box in pixel coordinates.
+Also give distance_m: your best estimate, in metres, of the horizontal distance from the camera to the point where the object touches the floor, or null if you cannot tell.
+Respond ONLY with JSON: {"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, "confidence": "high"|"medium"|"low", "distance_m": number or null, "description": "one short sentence"}
+2026-10-08 13:50:10 INFO  brain.vlm      [locate_target] <- 3.5s
+2026-10-08 13:50:10 DEBUG brain.vlm      [locate_target] raw response:
+{
+  "visible": true,
+  "bbox_2d": [368, 229, 606, 315],
+  "confidence": "high",
+  "distance_m": 0.5,
+  "description": "a red box on the floor"
+}
+2026-10-08 13:50:10 INFO  brain.vlm      [bench] role=vlm stage=locate_target provider=ollama model=qwen2.5vl:3b latency=3.469 prompt_tokens=1183 completion_tokens=65 cost_usd=
+2026-10-08 13:50:10 INFO  brain.vlm      [locate_target] parsed: {"visible": true, "bbox_2d": [368, 229, 606, 315], "confidence": "high", "distance_m": 0.5, "description": "a red box on the floor"}
+2026-10-08 13:50:10 INFO  brain.mission  [mission 9858dca51eeb] approach cycle 2 (lock): verify pivot_dir=-1 pivot_s=0.16 gate=confirmed
+2026-10-08 13:50:10 ERROR brain.rover_pi [pi] lf cmd STOP failed: Service /line_follow/cmd does not exist
+2026-10-08 13:50:14 INFO  brain.vlm      [locate_target] -> ollama/qwen2.5vl:3b (image=94785 bytes)
+2026-10-08 13:50:14 DEBUG brain.vlm      [locate_target] prompt:
+Find "red box" in this image from a small floor robot's camera.
+If it is visible, give its bounding box in pixel coordinates.
+Also give distance_m: your best estimate, in metres, of the horizontal distance from the camera to the point where the object touches the floor, or null if you cannot tell.
+Respond ONLY with JSON: {"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, "confidence": "high"|"medium"|"low", "distance_m": number or null, "description": "one short sentence"}
+2026-10-08 13:50:17 INFO  brain.vlm      [locate_target] <- 3.4s
+2026-10-08 13:50:17 DEBUG brain.vlm      [locate_target] raw response:
+{
+  "visible": true,
+  "bbox_2d": [271, 245, 602, 372],
+  "confidence": "high",
+  "distance_m": 0.5,
+  "description": "a red box on the floor"
+}
+2026-10-08 13:50:17 INFO  brain.vlm      [bench] role=vlm stage=locate_target provider=ollama model=qwen2.5vl:3b latency=3.365 prompt_tokens=1183 completion_tokens=65 cost_usd=
+2026-10-08 13:50:17 INFO  brain.vlm      [locate_target] parsed: {"visible": true, "bbox_2d": [271, 245, 602, 372], "confidence": "high", "distance_m": 0.5, "description": "a red box on the floor"}
+2026-10-08 13:50:17 INFO  brain.mission  [mission 9858dca51eeb] approach cycle 3 (approach): hop 50 gate=confirmed
+2026-10-08 13:50:17 ERROR brain.rover_pi [pi] lf cmd STOP failed: Service /line_follow/cmd does not exist
+2026-10-08 13:50:20 INFO  brain.vlm      [locate_target] -> ollama/qwen2.5vl:3b (image=93450 bytes)
+2026-10-08 13:50:20 DEBUG brain.vlm      [locate_target] prompt:
+Find "red box" in this image from a small floor robot's camera.
+If it is visible, give its bounding box in pixel coordinates.
+Also give distance_m: your best estimate, in metres, of the horizontal distance from the camera to the point where the object touches the floor, or null if you cannot tell.
+Respond ONLY with JSON: {"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, "confidence": "high"|"medium"|"low", "distance_m": number or null, "description": "one short sentence"}
+2026-10-08 13:50:24 INFO  brain.vlm      [locate_target] <- 3.3s
+2026-10-08 13:50:24 DEBUG brain.vlm      [locate_target] raw response:
+{
+  "visible": true,
+  "bbox_2d": [96, 226, 638, 449],
+  "confidence": "high",
+  "distance_m": 0.5,
+  "description": "a red box on the floor"
+}
+2026-10-08 13:50:24 INFO  brain.vlm      [bench] role=vlm stage=locate_target provider=ollama model=qwen2.5vl:3b latency=3.345 prompt_tokens=1183 completion_tokens=64 cost_usd=
+2026-10-08 13:50:24 INFO  brain.vlm      [locate_target] parsed: {"visible": true, "bbox_2d": [96, 226, 638, 449], "confidence": "high", "distance_m": 0.5, "description": "a red box on the floor"}
+2026-10-08 13:50:24 INFO  brain.mission  [mission 9858dca51eeb] approach cycle 4 (approach): hop 50 gate=confirmed
+2026-10-08 13:50:24 ERROR brain.rover_pi [pi] lf cmd STOP failed: Service /line_follow/cmd does not exist
+2026-10-08 13:50:24 ERROR brain.rover_pi [pi] lf cmd STOP failed: Service /line_follow/cmd does not exist
+2026-10-08 13:50:26 INFO  brain.vlm      [locate_target] -> ollama/qwen2.5vl:3b (image=91844 bytes)
+2026-10-08 13:50:26 DEBUG brain.vlm      [locate_target] prompt:
+Find "red box" in this image from a small floor robot's camera.
+If it is visible, give its bounding box in pixel coordinates.
+Also give distance_m: your best estimate, in metres, of the horizontal distance from the camera to the point where the object touches the floor, or null if you cannot tell.
+Respond ONLY with JSON: {"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, "confidence": "high"|"medium"|"low", "distance_m": number or null, "description": "one short sentence"}
+2026-10-08 13:50:29 INFO  brain.vlm      [locate_target] <- 3.5s
+2026-10-08 13:50:29 DEBUG brain.vlm      [locate_target] raw response:
+{"visible": true, "bbox_2d": [233, 227, 969, 526], "confidence": "high", "distance_m": 0.0, "description": "an orange box with the words 'Vegetable Slicer' and 'Kitchen Ideas' on it"}
+2026-10-08 13:50:29 INFO  brain.vlm      [bench] role=vlm stage=locate_target provider=ollama model=qwen2.5vl:3b latency=3.460 prompt_tokens=1183 completion_tokens=72 cost_usd=
+2026-10-08 13:50:29 INFO  brain.vlm      [locate_target] parsed: {"visible": true, "bbox_2d": [233, 227, 969, 526], "confidence": "high", "distance_m": 0.0, "description": "an orange box with the words 'Vegetable Slicer' and 'Kitchen Ideas' on it"}
+2026-10-08 13:50:29 INFO  brain.mission  [mission 9858dca51eeb] approach cycle 5 (approach): pivot L 0.07s hop 20 gate=confirmed
+2026-10-08 13:50:30 INFO  brain.vlm      [check_arrival] -> ollama/qwen2.5vl:3b (image=91549 bytes)
+2026-10-08 13:50:30 DEBUG brain.vlm      [check_arrival] prompt:
+A rover has stopped where it should be able to see: "red box".
+Other things that may be nearby: ["red box", "red", "box", "dotar", "boss"]
+Answer only from what is visible in this image. Do not assume.
+Respond ONLY with JSON: {"target_visible": true/false, "confidence": "high"|"medium"|"low", "seen": ["things from the lists that ARE visible"], "missing": ["things from the NEARBY list that are NOT visible"], "unexpected": ["visible things not in either list"], "description": "one or two sentences"}
+2026-10-08 13:50:33 INFO  brain.vlm      [check_arrival] <- 3.4s
+2026-10-08 13:50:33 DEBUG brain.vlm      [check_arrival] raw response:
+{
+  "target_visible": true,
+  "confidence": "high",
+  "seen": ["red box", "red", "box"],
+  "missing": ["dotar", "boss"],
+  "unexpected": ["red box"],
+  "description": "a red box is visible in the image."
+}
+2026-10-08 13:50:33 INFO  brain.vlm      [bench] role=vlm stage=check_arrival provider=ollama model=qwen2.5vl:3b latency=3.377 prompt_tokens=1183 completion_tokens=64 cost_usd=
+2026-10-08 13:50:33 INFO  brain.vlm      [check_arrival] parsed: {"target_visible": true, "confidence": "high", "seen": ["red box", "red", "box"], "missing": ["dotar", "boss"], "unexpected": ["red box"], "description": "a red box is visible in the image."}
+2026-10-08 13:50:33 INFO  brain.mission  [mission 9858dca51eeb] arrival check: {"target_visible": true, "confidence": "high", "seen": ["red box", "red", "box"], "missing": ["dotar", "boss"], "unexpected": ["red box"], "description": "a red box is visible in the image."}
+2026-10-08 13:50:33 INFO  brain.mission  [mission 9858dca51eeb] approach cycle 6 (approach): arrived (fill)
+2026-10-08 13:50:34 INFO  brain.mission  [mission 9858dca51eeb] end — completed
+2026-10-08 13:50:35 INFO  brain.report   [bench] role=planner stage=spoken_summary provider=ollama model=gemma4:e2b latency=0.975 prompt_tokens=509 completion_tokens=35 cost_usd=
+2026-10-08 13:50:35 INFO  brain.mission  [mission 9858dca51eeb] run log -> C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\mission_9858dca51eeb.json
+2026-10-08 13:51:29 INFO  brain.pipeline [dlg 97b6243c33e0] stt 8.6s transcript="can you please don't find the orange box in the room"
+2026-10-08 13:51:29 INFO  brain.pipeline ====================================================================
+2026-10-08 13:51:29 INFO  brain.pipeline [dlg 97b6243c33e0] command="can you please don't find the orange box in the room"
+2026-10-08 13:51:29 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=87292 bytes)
+2026-10-08 13:51:29 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "can you please don't find the orange box in the room"
+Use the image of the robot's current view, if given, to decide.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:51:33 INFO  brain.vlm      [check_ambiguity] <- 3.5s
+2026-10-08 13:51:33 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image shows a floor with a yellow line and a bright light source, but it does not provide any information about an orange box or its location.",
+  "clarifying_question": "Is there an orange box in the room?",
+  "resolved_command": null
+}
+2026-10-08 13:51:33 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.481 prompt_tokens=1221 completion_tokens=67 cost_usd=
+2026-10-08 13:51:33 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image shows a floor with a yellow line and a bright light source, but it does not provide any information about an orange box or its location.", "clarifying_question": "Is there an orange box in the room?", "resolved_command": null}
+2026-10-08 13:51:33 INFO  brain.pipeline [dlg 97b6243c33e0] clarify turn 1/5: Is there an orange box in the room?
+2026-10-08 13:51:49 INFO  brain.pipeline [dlg 97b6243c33e0] stt 8.6s transcript='yes it is on your left when you go around the black bag'
+2026-10-08 13:51:49 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=87383 bytes)
+2026-10-08 13:51:49 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "can you please don't find the orange box in the room"
+Use the image of the robot's current view, if given, to decide.
+Clarifications already exchanged:
+  Q: Is there an orange box in the room?
+  A: yes it is on your left when you go around the black bag
+Do NOT repeat a question that was already answered. If you now have enough information to act, set ambiguous to false.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:51:52 INFO  brain.vlm      [check_ambiguity] <- 3.5s
+2026-10-08 13:51:52 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image does not provide enough information to determine the location of the orange box.",
+  "clarifying_question": "Is there an orange box in the room?",
+  "resolved_command": null
+}
+2026-10-08 13:51:52 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.464 prompt_tokens=1279 completion_tokens=53 cost_usd=
+2026-10-08 13:51:52 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image does not provide enough information to determine the location of the orange box.", "clarifying_question": "Is there an orange box in the room?", "resolved_command": null}
+2026-10-08 13:51:52 WARNING brain.pipeline [dlg 97b6243c33e0] clarification cap hit after 1 turn(s) — command="can you please don't find the orange box in the room" reason='The image does not provide enough information to determine the location of the orange box.'
+2026-10-08 13:51:52 INFO  brain.planner  [plan] -> ollama/gemma4:e2b command="can you please don't find the orange box in the room"
+2026-10-08 13:51:52 DEBUG brain.planner  [plan] prompt:
+You are a mission planner for an indoor rover. Break the command into a sequence of discrete, executable steps.
+The rover can ONLY perform these actions:
+  "follow_line" - follow the floor line to its end marker — the only way to travel more than a short distance
+  "move" - drive forward or backward
+  "turn" - rotate on the spot
+  "approach" - find a visible object and drive up to it (searches by turning if it is not in view)
+  "scan" - sweep the camera around without moving the base
+  "observe" - hold still and look at a named target
+  "stop" - halt
+  "report" - say what was found
+It has no arm. It cannot pick up, carry, open, push, or touch anything.
+To go to an object without a floor line, use approach with the object as target, then observe it, then report. Never use move to reach an object or place: move is only a short hop forward or backward.
+Every step's "action" must be exactly one of those verbs.
+Command: "can you please don't find the orange box in the room"
+Respond ONLY with JSON: {"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}
+2026-10-08 13:51:54 INFO  brain.planner  [plan] <- 2.2s
+2026-10-08 13:51:54 DEBUG brain.planner  [plan] raw response:
+{"steps": [{"id": 1, "action": "scan", "target": "room"}, {"id": 2, "action": "follow_line", "target": "start_line"}, {"id": 3, "action": "move", "target": "forward"}, {"id": 4, "action": "scan", "target": "area"}, {"id": 5, "action": "approach", "target": "orange box"}, {"id": 6, "action": "observe", "target": "orange box"}, {"id": 7, "action": "report", "target": "orange box found"}]}
+2026-10-08 13:51:54 INFO  brain.planner  [bench] role=planner stage=generate_plan provider=ollama model=gemma4:e2b latency=2.199 prompt_tokens=292 completion_tokens=139 cost_usd=
+2026-10-08 13:51:54 INFO  brain.planner  [plan] 7 step(s)
+2026-10-08 13:51:54 INFO  brain.planner         1. scan -> room
+2026-10-08 13:51:54 INFO  brain.planner         2. follow_line -> start_line
+2026-10-08 13:51:54 INFO  brain.planner         3. move -> forward
+2026-10-08 13:51:54 INFO  brain.planner         4. scan -> area
+2026-10-08 13:51:54 INFO  brain.planner         5. approach -> orange box
+2026-10-08 13:51:54 INFO  brain.planner         6. observe -> orange box
+2026-10-08 13:51:54 INFO  brain.planner         7. report -> orange box found
+2026-10-08 13:51:54 INFO  brain.vlm      [verify_plan] -> ollama/qwen2.5vl:3b (image=87383 bytes)
+2026-10-08 13:51:54 DEBUG brain.vlm      [verify_plan] prompt:
+You are verifying a robot's mission plan before it departs.
+The robot can only drive and look. It cannot pick up or touch anything.
+Plan: {"steps": [{"id": 1, "action": "scan", "target": "room"}, {"id": 2, "action": "follow_line", "target": "start_line"}, {"id": 3, "action": "move", "target": "forward"}, {"id": 4, "action": "scan", "target": "area"}, {"id": 5, "action": "approach", "target": "orange box"}, {"id": 6, "action": "observe", "target": "orange box"}, {"id": 7, "action": "report", "target": "orange box found"}]}
+Respond ONLY with JSON: {"verified": true/false, "concerns": "..." or null}
+2026-10-08 13:51:55 INFO  brain.vlm      [verify_plan] <- 0.4s
+2026-10-08 13:51:55 DEBUG brain.vlm      [verify_plan] raw response:
+{
+  "verified": true,
+  "concerns": null
+}
+2026-10-08 13:51:55 INFO  brain.vlm      [bench] role=vlm stage=verify_plan provider=ollama model=qwen2.5vl:3b latency=0.375 prompt_tokens=1246 completion_tokens=17 cost_usd=
+2026-10-08 13:51:55 INFO  brain.vlm      [verify_plan] parsed: {"verified": true, "concerns": null}
+2026-10-08 13:51:55 INFO  brain.pipeline [dlg 97b6243c33e0] plan ready, awaiting voice confirmation
+2026-10-08 13:52:24 INFO  brain.pipeline [dlg 7149348415d5] stt 8.4s transcript='what is your plan'
+2026-10-08 13:52:24 INFO  brain.pipeline ====================================================================
+2026-10-08 13:52:24 INFO  brain.pipeline [dlg 7149348415d5] command='what is your plan'
+2026-10-08 13:52:24 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=86206 bytes)
+2026-10-08 13:52:24 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "what is your plan"
+Use the image of the robot's current view, if given, to decide.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:52:27 INFO  brain.vlm      [check_ambiguity] <- 3.2s
+2026-10-08 13:52:27 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image does not provide enough context to determine the robot's plan.",
+  "clarifying_question": "What is the robot's current position?",
+  "resolved_command": null
+}
+2026-10-08 13:52:27 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.200 prompt_tokens=1213 completion_tokens=50 cost_usd=
+2026-10-08 13:52:27 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image does not provide enough context to determine the robot's plan.", "clarifying_question": "What is the robot's current position?", "resolved_command": null}
+2026-10-08 13:52:27 INFO  brain.pipeline [dlg 7149348415d5] clarify turn 1/5: What is the robot's current position?
+2026-10-08 13:53:02 INFO  brain.pipeline [dlg 7149348415d5] stt 18.5s transcript="I don't know if I'm going to make it a little bit better."
+2026-10-08 13:53:02 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=88023 bytes)
+2026-10-08 13:53:02 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "what is your plan"
+Use the image of the robot's current view, if given, to decide.
+Clarifications already exchanged:
+  Q: What is the robot's current position?
+  A: I don't know if I'm going to make it a little bit better.
+Do NOT repeat a question that was already answered. If you now have enough information to act, set ambiguous to false.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:53:05 INFO  brain.vlm      [check_ambiguity] <- 3.4s
+2026-10-08 13:53:05 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image does not provide enough information to determine the robot's current position or plan.",
+  "clarifying_question": "What is the robot's current position?",
+  "resolved_command": null
+}
+2026-10-08 13:53:05 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.422 prompt_tokens=1272 completion_tokens=53 cost_usd=
+2026-10-08 13:53:05 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image does not provide enough information to determine the robot's current position or plan.", "clarifying_question": "What is the robot's current position?", "resolved_command": null}
+2026-10-08 13:53:05 WARNING brain.pipeline [dlg 7149348415d5] clarification cap hit after 1 turn(s) — command='what is your plan' reason="The image does not provide enough information to determine the robot's current position or plan."
+2026-10-08 13:53:05 INFO  brain.planner  [plan] -> ollama/gemma4:e2b command='what is your plan'
+2026-10-08 13:53:05 DEBUG brain.planner  [plan] prompt:
+You are a mission planner for an indoor rover. Break the command into a sequence of discrete, executable steps.
+The rover can ONLY perform these actions:
+  "follow_line" - follow the floor line to its end marker — the only way to travel more than a short distance
+  "move" - drive forward or backward
+  "turn" - rotate on the spot
+  "approach" - find a visible object and drive up to it (searches by turning if it is not in view)
+  "scan" - sweep the camera around without moving the base
+  "observe" - hold still and look at a named target
+  "stop" - halt
+  "report" - say what was found
+It has no arm. It cannot pick up, carry, open, push, or touch anything.
+To go to an object without a floor line, use approach with the object as target, then observe it, then report. Never use move to reach an object or place: move is only a short hop forward or backward.
+Every step's "action" must be exactly one of those verbs.
+Command: "what is your plan"
+Respond ONLY with JSON: {"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}
+2026-10-08 13:53:07 INFO  brain.planner  [plan] <- 2.1s
+2026-10-08 13:53:07 DEBUG brain.planner  [plan] raw response:
+{"steps": [{"id": 1, "action": "scan", "target": "environment"}, {"id": 2, "action": "follow_line", "target": "end_marker"}, {"id": 3, "action": "stop", "target": "at_end_marker"}, {"id": 4, "action": "report", "target": "scan_results"}], "notes": "The plan is to follow the line to the end marker, stop, and report the scan results. This assumes the goal is to use the line to navigate to a known location, or the line itself provides navigation."}
+2026-10-08 13:53:07 INFO  brain.planner  [bench] role=planner stage=generate_plan provider=ollama model=gemma4:e2b latency=2.144 prompt_tokens=283 completion_tokens=135 cost_usd=
+2026-10-08 13:53:07 INFO  brain.planner  [plan] 4 step(s)
+2026-10-08 13:53:07 INFO  brain.planner         1. scan -> environment
+2026-10-08 13:53:07 INFO  brain.planner         2. follow_line -> end_marker
+2026-10-08 13:53:07 INFO  brain.planner         3. stop -> at_end_marker
+2026-10-08 13:53:07 INFO  brain.planner         4. report -> scan_results
+2026-10-08 13:53:07 INFO  brain.vlm      [verify_plan] -> ollama/qwen2.5vl:3b (image=88023 bytes)
+2026-10-08 13:53:07 DEBUG brain.vlm      [verify_plan] prompt:
+You are verifying a robot's mission plan before it departs.
+The robot can only drive and look. It cannot pick up or touch anything.
+Plan: {"steps": [{"id": 1, "action": "scan", "target": "environment"}, {"id": 2, "action": "follow_line", "target": "end_marker"}, {"id": 3, "action": "stop", "target": "at_end_marker"}, {"id": 4, "action": "report", "target": "scan_results"}], "notes": "The plan is to follow the line to the end marker, stop, and report the scan results. This assumes the goal is to use the line to navigate to a known location, or the line itself provides navigation."}
+Respond ONLY with JSON: {"verified": true/false, "concerns": "..." or null}
+2026-10-08 13:53:08 INFO  brain.vlm      [verify_plan] <- 0.4s
+2026-10-08 13:53:08 DEBUG brain.vlm      [verify_plan] raw response:
+{
+  "verified": true,
+  "concerns": null
+}
+2026-10-08 13:53:08 INFO  brain.vlm      [bench] role=vlm stage=verify_plan provider=ollama model=qwen2.5vl:3b latency=0.374 prompt_tokens=1238 completion_tokens=17 cost_usd=
+2026-10-08 13:53:08 INFO  brain.vlm      [verify_plan] parsed: {"verified": true, "concerns": null}
+2026-10-08 13:53:08 INFO  brain.pipeline [dlg 7149348415d5] plan ready, awaiting voice confirmation
+2026-10-08 13:53:42 INFO  brain.pipeline [dlg 7149348415d5] confirmation transcript='years to go'
+2026-10-08 13:53:42 INFO  brain.confirm  [confirm] keyword CONFIRM on 'go' (transcript='years to go')
+2026-10-08 13:53:42 INFO  brain.pipeline [dlg 7149348415d5] CONFIRMED — handing off to execution
+2026-10-08 13:53:43 INFO  brain.mission  ====================================================================
+2026-10-08 13:53:43 INFO  brain.mission  [mission 7149348415d5] start — 4 step(s)
+2026-10-08 13:53:45 INFO  brain.mission  [mission 7149348415d5] keyframe monitor: every 6.5s, look-left at 5.2s, target='end_marker', room catalogue=0 item(s)
+2026-10-08 13:53:45 INFO  brain.mission  [mission 7149348415d5] no room video loaded — checks run ungrounded
+2026-10-08 13:53:45 ERROR brain.rover_pi [pi] lf cmd STOP_NEXT_ROAD failed: Service /line_follow/cmd does not exist
+2026-10-08 13:53:45 ERROR brain.rover_pi [pi] lf set_running True failed: Service /line_follow/set_running does not exist
+2026-10-08 13:53:45 INFO  brain.rover_pi [pi] follow_line -> blocked {'arrived': False, 'elapsed_s': 0.0, 'stopped_s': 0.0, 'obstacle_events': 0, 'reason': 'line_follow_unavailable'}
+2026-10-08 13:53:45 WARNING brain.mission  [mission 7149348415d5] look-left never happened (look_left_not_due_before_end_of_drive)
+2026-10-08 13:54:00 INFO  brain.mission  [mission 7149348415d5] guidance reply 'please drive forward'
+2026-10-08 13:54:00 INFO  brain.mission  [mission 7149348415d5] guidance turn 1 (line_follow_unavailable): 'please drive forward'
+2026-10-08 13:54:02 INFO  brain.planner  [replan] <- 1.5s
+2026-10-08 13:54:02 INFO  brain.planner  [bench] role=planner stage=replan_from_state provider=ollama model=gemma4:e2b latency=1.463 prompt_tokens=463 completion_tokens=58 cost_usd=
+2026-10-08 13:54:03 INFO  brain.mission  [mission 7149348415d5] end — completed
+2026-10-08 13:54:04 INFO  brain.report   [bench] role=planner stage=spoken_summary provider=ollama model=gemma4:e2b latency=0.814 prompt_tokens=279 completion_tokens=39 cost_usd=
+2026-10-08 13:54:04 INFO  brain.mission  [mission 7149348415d5] run log -> C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\mission_7149348415d5.json
+2026-10-08 13:54:45 INFO  brain.pipeline [dlg 0550be785473] stt 8.7s transcript='Can you please look for the orange box in the corner of the room'
+2026-10-08 13:54:45 INFO  brain.pipeline ====================================================================
+2026-10-08 13:54:45 INFO  brain.pipeline [dlg 0550be785473] command='Can you please look for the orange box in the corner of the room'
+2026-10-08 13:54:45 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=94348 bytes)
+2026-10-08 13:54:45 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "Can you please look for the orange box in the corner of the room"
+Use the image of the robot's current view, if given, to decide.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:54:49 INFO  brain.vlm      [check_ambiguity] <- 3.5s
+2026-10-08 13:54:49 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image does not provide enough information to determine the location of the orange box.",
+  "clarifying_question": "Is the orange box in the corner of the room?",
+  "resolved_command": null
+}
+2026-10-08 13:54:49 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.453 prompt_tokens=1223 completion_tokens=55 cost_usd=
+2026-10-08 13:54:49 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image does not provide enough information to determine the location of the orange box.", "clarifying_question": "Is the orange box in the corner of the room?", "resolved_command": null}
+2026-10-08 13:54:49 INFO  brain.pipeline [dlg 0550be785473] clarify turn 1/5: Is the orange box in the corner of the room?
+2026-10-08 13:55:20 INFO  brain.pipeline [dlg 0550be785473] stt 11.5s transcript='Thank you.'
+2026-10-08 13:55:20 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=96457 bytes)
+2026-10-08 13:55:20 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "Can you please look for the orange box in the corner of the room"
+Use the image of the robot's current view, if given, to decide.
+Clarifications already exchanged:
+  Q: Is the orange box in the corner of the room?
+  A: Thank you.
+Do NOT repeat a question that was already answered. If you now have enough information to act, set ambiguous to false.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:55:23 INFO  brain.vlm      [check_ambiguity] <- 3.5s
+2026-10-08 13:55:23 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image does not show the orange box in the corner of the room.",
+  "clarifying_question": "Is the orange box in the corner of the room?",
+  "resolved_command": null
+}
+2026-10-08 13:55:23 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.470 prompt_tokens=1272 completion_tokens=54 cost_usd=
+2026-10-08 13:55:23 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image does not show the orange box in the corner of the room.", "clarifying_question": "Is the orange box in the corner of the room?", "resolved_command": null}
+2026-10-08 13:55:23 WARNING brain.pipeline [dlg 0550be785473] clarification cap hit after 1 turn(s) — command='Can you please look for the orange box in the corner of the room' reason='The image does not show the orange box in the corner of the room.'
+2026-10-08 13:55:23 INFO  brain.planner  [plan] -> ollama/gemma4:e2b command='Can you please look for the orange box in the corner of the room'
+2026-10-08 13:55:23 DEBUG brain.planner  [plan] prompt:
+You are a mission planner for an indoor rover. Break the command into a sequence of discrete, executable steps.
+The rover can ONLY perform these actions:
+  "follow_line" - follow the floor line to its end marker — the only way to travel more than a short distance
+  "move" - drive forward or backward
+  "turn" - rotate on the spot
+  "approach" - find a visible object and drive up to it (searches by turning if it is not in view)
+  "scan" - sweep the camera around without moving the base
+  "observe" - hold still and look at a named target
+  "stop" - halt
+  "report" - say what was found
+It has no arm. It cannot pick up, carry, open, push, or touch anything.
+To go to an object without a floor line, use approach with the object as target, then observe it, then report. Never use move to reach an object or place: move is only a short hop forward or backward.
+Every step's "action" must be exactly one of those verbs.
+Command: "Can you please look for the orange box in the corner of the room"
+Respond ONLY with JSON: {"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}
+2026-10-08 13:55:26 INFO  brain.planner  [plan] <- 2.4s
+2026-10-08 13:55:26 DEBUG brain.planner  [plan] raw response:
+{"steps": [{"id": 1, "action": "scan", "target": "room"}, {"id": 2, "action": "approach", "target": "orange box"}, {"id": 3, "action": "observe", "target": "orange box"}, {"id": 4, "action": "report", "target": "orange box is in the corner of the room"}], "notes": "The rover first scans the room to orient itself. Then, it attempts to approach and observe the 'orange box'. If the box is not immediately visible, 'approach' will handle the searching mechanism, and 'observe' confirms the finding. Finally, it reports the location."}
+2026-10-08 13:55:26 INFO  brain.planner  [bench] role=planner stage=generate_plan provider=ollama model=gemma4:e2b latency=2.361 prompt_tokens=293 completion_tokens=147 cost_usd=
+2026-10-08 13:55:26 INFO  brain.planner  [plan] 4 step(s)
+2026-10-08 13:55:26 INFO  brain.planner         1. scan -> room
+2026-10-08 13:55:26 INFO  brain.planner         2. approach -> orange box
+2026-10-08 13:55:26 INFO  brain.planner         3. observe -> orange box
+2026-10-08 13:55:26 INFO  brain.planner         4. report -> orange box is in the corner of the room
+2026-10-08 13:55:26 INFO  brain.vlm      [verify_plan] -> ollama/qwen2.5vl:3b (image=96457 bytes)
+2026-10-08 13:55:26 DEBUG brain.vlm      [verify_plan] prompt:
+You are verifying a robot's mission plan before it departs.
+The robot can only drive and look. It cannot pick up or touch anything.
+Plan: {"steps": [{"id": 1, "action": "scan", "target": "room"}, {"id": 2, "action": "approach", "target": "orange box"}, {"id": 3, "action": "observe", "target": "orange box"}, {"id": 4, "action": "report", "target": "orange box is in the corner of the room"}], "notes": "The rover first scans the room to orient itself. Then, it attempts to approach and observe the 'orange box'. If the box is not immediately visible, 'approach' will handle the searching mechanism, and 'observe' confirms the finding. Finally, it reports the location."}
+Respond ONLY with JSON: {"verified": true/false, "concerns": "..." or null}
+2026-10-08 13:55:26 INFO  brain.vlm      [verify_plan] <- 0.4s
+2026-10-08 13:55:26 DEBUG brain.vlm      [verify_plan] raw response:
+{
+  "verified": true,
+  "concerns": null
+}
+2026-10-08 13:55:26 INFO  brain.vlm      [bench] role=vlm stage=verify_plan provider=ollama model=qwen2.5vl:3b latency=0.399 prompt_tokens=1257 completion_tokens=17 cost_usd=
+2026-10-08 13:55:26 INFO  brain.vlm      [verify_plan] parsed: {"verified": true, "concerns": null}
+2026-10-08 13:55:26 INFO  brain.pipeline [dlg 0550be785473] plan ready, awaiting voice confirmation
+2026-10-08 13:56:00 INFO  brain.pipeline [dlg 0550be785473] confirmation transcript='Thank you.'
+2026-10-08 13:56:01 INFO  brain.confirm  [bench] role=planner stage=confirm_classify provider=ollama model=gemma4:e2b latency=0.268 prompt_tokens=89 completion_tokens=9 cost_usd=
+2026-10-08 13:56:01 INFO  brain.confirm  [confirm] model UNCLEAR (transcript='Thank you.')
+2026-10-08 13:56:01 INFO  brain.pipeline [dlg 0550be785473] UNCLEAR (1/2) — re-prompting
+2026-10-08 13:56:19 INFO  brain.pipeline [dlg 0550be785473] confirmation transcript='Thank you.'
+2026-10-08 13:56:19 INFO  brain.confirm  [bench] role=planner stage=confirm_classify provider=ollama model=gemma4:e2b latency=0.343 prompt_tokens=89 completion_tokens=9 cost_usd=
+2026-10-08 13:56:19 INFO  brain.confirm  [confirm] model UNCLEAR (transcript='Thank you.')
+2026-10-08 13:56:19 INFO  brain.pipeline [dlg 0550be785473] UNCLEAR (2/2) — re-prompting
+2026-10-08 13:56:46 INFO  brain.pipeline [dlg 0550be785473] confirmation transcript='so'
+2026-10-08 13:56:47 INFO  brain.confirm  [bench] role=planner stage=confirm_classify provider=ollama model=gemma4:e2b latency=0.271 prompt_tokens=88 completion_tokens=9 cost_usd=
+2026-10-08 13:56:47 INFO  brain.confirm  [confirm] model UNCLEAR (transcript='so')
+2026-10-08 13:56:47 WARNING brain.pipeline [dlg 0550be785473] CANCELLED — no clear confirmation
+2026-10-08 13:57:42 INFO  brain.pipeline [dlg 4f108a8a4a50] stt 10.5s transcript='This is so confusing'
+2026-10-08 13:57:42 INFO  brain.pipeline ====================================================================
+2026-10-08 13:57:42 INFO  brain.pipeline [dlg 4f108a8a4a50] command='This is so confusing'
+2026-10-08 13:57:42 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=91760 bytes)
+2026-10-08 13:57:42 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "This is so confusing"
+Use the image of the robot's current view, if given, to decide.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:57:45 INFO  brain.vlm      [check_ambiguity] <- 3.7s
+2026-10-08 13:57:45 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image shows a yellow object on a floor, but it is not clear what the object is or where it is located. The robot cannot determine the exact position or purpose of the object.",
+  "clarifying_question": "What is the yellow object and where is it located?",
+  "resolved_command": null
+}
+2026-10-08 13:57:45 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.702 prompt_tokens=1213 completion_tokens=77 cost_usd=
+2026-10-08 13:57:45 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image shows a yellow object on a floor, but it is not clear what the object is or where it is located. The robot cannot determine the exact position or purpose of the object.", "clarifying_question": "What is the yellow object and where is it located?", "resolved_c
+2026-10-08 13:57:45 INFO  brain.pipeline [dlg 4f108a8a4a50] clarify turn 1/5: What is the yellow object and where is it located?
+2026-10-08 13:57:54 INFO  brain.pipeline [dlg ebbb2d77e698] stt 8.7s transcript='can you please go to the orange box in the room scan and find out where it is  it is on the left of your view'
+2026-10-08 13:57:54 INFO  brain.pipeline ====================================================================
+2026-10-08 13:57:54 INFO  brain.pipeline [dlg ebbb2d77e698] command='can you please go to the orange box in the room scan and find out where it is  it is on the left of your view'
+2026-10-08 13:57:54 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=84686 bytes)
+2026-10-08 13:57:54 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "can you please go to the orange box in the room scan and find out where it is  it is on the left of your view"
+Use the image of the robot's current view, if given, to decide.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:57:58 INFO  brain.vlm      [check_ambiguity] <- 3.5s
+2026-10-08 13:57:58 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image does not provide enough information to determine the position of the orange box relative to the robot's view.",
+  "clarifying_question": "Is the orange box on the left side of the robot's view?",
+  "resolved_command": null
+}
+2026-10-08 13:57:58 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.473 prompt_tokens=1236 completion_tokens=64 cost_usd=
+2026-10-08 13:57:58 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image does not provide enough information to determine the position of the orange box relative to the robot's view.", "clarifying_question": "Is the orange box on the left side of the robot's view?", "resolved_command": null}
+2026-10-08 13:57:58 INFO  brain.pipeline [dlg ebbb2d77e698] clarify turn 1/5: Is the orange box on the left side of the robot's view?
+2026-10-08 13:58:14 INFO  brain.pipeline [dlg ebbb2d77e698] stt 8.5s transcript="yes it is on the left side of the robot's view"
+2026-10-08 13:58:14 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=91946 bytes)
+2026-10-08 13:58:14 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "can you please go to the orange box in the room scan and find out where it is  it is on the left of your view"
+Use the image of the robot's current view, if given, to decide.
+Clarifications already exchanged:
+  Q: Is the orange box on the left side of the robot's view?
+  A: yes it is on the left side of the robot's view
+Do NOT repeat a question that was already answered. If you now have enough information to act, set ambiguous to false.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 13:58:17 INFO  brain.vlm      [check_ambiguity] <- 3.4s
+2026-10-08 13:58:17 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image does not provide enough information to determine the position of the orange box relative to the robot's view.",
+  "clarifying_question": "Is the orange box on the left side of the robot's view?",
+  "resolved_command": null
+}
+2026-10-08 13:58:17 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.393 prompt_tokens=1298 completion_tokens=64 cost_usd=
+2026-10-08 13:58:17 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image does not provide enough information to determine the position of the orange box relative to the robot's view.", "clarifying_question": "Is the orange box on the left side of the robot's view?", "resolved_command": null}
+2026-10-08 13:58:17 WARNING brain.pipeline [dlg ebbb2d77e698] clarification cap hit after 1 turn(s) — command='can you please go to the orange box in the room scan and find out where it is  it is on the left of your view' reason="The image does not provide enough information to determine the position of the orange box relative to the robot's view."
+2026-10-08 13:58:17 INFO  brain.planner  [plan] -> ollama/gemma4:e2b command='can you please go to the orange box in the room scan and find out where it is  it is on the left of your view'
+2026-10-08 13:58:17 DEBUG brain.planner  [plan] prompt:
+You are a mission planner for an indoor rover. Break the command into a sequence of discrete, executable steps.
+The rover can ONLY perform these actions:
+  "follow_line" - follow the floor line to its end marker — the only way to travel more than a short distance
+  "move" - drive forward or backward
+  "turn" - rotate on the spot
+  "approach" - find a visible object and drive up to it (searches by turning if it is not in view)
+  "scan" - sweep the camera around without moving the base
+  "observe" - hold still and look at a named target
+  "stop" - halt
+  "report" - say what was found
+It has no arm. It cannot pick up, carry, open, push, or touch anything.
+To go to an object without a floor line, use approach with the object as target, then observe it, then report. Never use move to reach an object or place: move is only a short hop forward or backward.
+Every step's "action" must be exactly one of those verbs.
+Command: "can you please go to the orange box in the room scan and find out where it is  it is on the left of your view"
+Respond ONLY with JSON: {"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}
+2026-10-08 13:58:19 INFO  brain.planner  [plan] <- 1.9s
+2026-10-08 13:58:19 DEBUG brain.planner  [plan] raw response:
+{"steps": [{"id": 1, "action": "scan", "target": "orange box"}, {"id": 2, "action": "report", "target": "orange box is on the left of your view"}], "notes": "The command asks to 'scan and find out where it is', and the subsequent part gives the location. Since the rover has no direct way to navigate complex spatial reasoning without line following or approach, the 'scan' action is the most direct way to gather information about the location, and 'report' delivers the finding."}
+2026-10-08 13:58:19 INFO  brain.planner  [bench] role=planner stage=generate_plan provider=ollama model=gemma4:e2b latency=1.918 prompt_tokens=306 completion_tokens=119 cost_usd=
+2026-10-08 13:58:19 INFO  brain.planner  [plan] 2 step(s)
+2026-10-08 13:58:19 INFO  brain.planner         1. scan -> orange box
+2026-10-08 13:58:19 INFO  brain.planner         2. report -> orange box is on the left of your view
+2026-10-08 13:58:19 INFO  brain.vlm      [verify_plan] -> ollama/qwen2.5vl:3b (image=91946 bytes)
+2026-10-08 13:58:19 DEBUG brain.vlm      [verify_plan] prompt:
+You are verifying a robot's mission plan before it departs.
+The robot can only drive and look. It cannot pick up or touch anything.
+Plan: {"steps": [{"id": 1, "action": "scan", "target": "orange box"}, {"id": 2, "action": "report", "target": "orange box is on the left of your view"}], "notes": "The command asks to 'scan and find out where it is', and the subsequent part gives the location. Since the rover has no direct way to navigate complex spatial reasoning without line following or approach, the 'scan' action is the most direct way to gather information about the location, and 'report' delivers the finding."}
+Respond ONLY with JSON: {"verified": true/false, "concerns": "..." or null}
+2026-10-08 13:58:19 INFO  brain.vlm      [verify_plan] <- 0.4s
+2026-10-08 13:58:19 DEBUG brain.vlm      [verify_plan] raw response:
+{
+  "verified": true,
+  "concerns": null
+}
+2026-10-08 13:58:19 INFO  brain.vlm      [bench] role=vlm stage=verify_plan provider=ollama model=qwen2.5vl:3b latency=0.384 prompt_tokens=1227 completion_tokens=17 cost_usd=
+2026-10-08 13:58:19 INFO  brain.vlm      [verify_plan] parsed: {"verified": true, "concerns": null}
+2026-10-08 13:58:19 INFO  brain.pipeline [dlg ebbb2d77e698] plan ready, awaiting voice confirmation
+2026-10-08 13:58:45 INFO  brain.pipeline [dlg ebbb2d77e698] confirmation transcript='years to go'
+2026-10-08 13:58:45 INFO  brain.confirm  [confirm] keyword CONFIRM on 'go' (transcript='years to go')
+2026-10-08 13:58:45 INFO  brain.pipeline [dlg ebbb2d77e698] CONFIRMED — handing off to execution
+2026-10-08 13:58:47 INFO  brain.mission  ====================================================================
+2026-10-08 13:58:47 INFO  brain.mission  [mission ebbb2d77e698] start — 2 step(s)
+2026-10-08 13:58:48 INFO  brain.mission  [mission ebbb2d77e698] end — completed
+2026-10-08 13:58:49 INFO  brain.report   [bench] role=planner stage=spoken_summary provider=ollama model=gemma4:e2b latency=0.806 prompt_tokens=312 completion_tokens=34 cost_usd=
+2026-10-08 13:58:49 INFO  brain.mission  [mission ebbb2d77e698] run log -> C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\mission_ebbb2d77e698.json
+2026-10-08 14:02:32 INFO  brain.pipeline [dlg 3be827a3bb52] stt 8.6s transcript='go to the orange box'
+2026-10-08 14:02:32 INFO  brain.pipeline ====================================================================
+2026-10-08 14:02:32 INFO  brain.pipeline [dlg 3be827a3bb52] command='go to the orange box'
+2026-10-08 14:02:32 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=94465 bytes)
+2026-10-08 14:02:32 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "go to the orange box"
+Use the image of the robot's current view, if given, to decide.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 14:02:36 INFO  brain.vlm      [check_ambiguity] <- 3.6s
+2026-10-08 14:02:36 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image shows a yellow object on the floor, but it is not clear if it is an orange box or another object. The robot needs more information to determine the exact object.",
+  "clarifying_question": "Is the yellow object an orange box?",
+  "resolved_command": null
+}
+2026-10-08 14:02:36 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.649 prompt_tokens=1214 completion_tokens=72 cost_usd=
+2026-10-08 14:02:36 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image shows a yellow object on the floor, but it is not clear if it is an orange box or another object. The robot needs more information to determine the exact object.", "clarifying_question": "Is the yellow object an orange box?", "resolved_command": null}
+2026-10-08 14:02:36 INFO  brain.pipeline [dlg 3be827a3bb52] clarify turn 1/5: Is the yellow object an orange box?
+2026-10-08 14:02:54 INFO  brain.pipeline [dlg 3be827a3bb52] stt 11.7s transcript="I'll see you next time."
+2026-10-08 14:02:54 INFO  brain.vlm      [check_ambiguity] -> ollama/qwen2.5vl:3b (image=94701 bytes)
+2026-10-08 14:02:54 DEBUG brain.vlm      [check_ambiguity] prompt:
+You are checking whether a robot command is unambiguous enough to execute.
+The robot can only drive around and look at things. It has no arm.
+Original command: "go to the orange box"
+Use the image of the robot's current view, if given, to decide.
+Clarifications already exchanged:
+  Q: Is the yellow object an orange box?
+  A: I'll see you next time.
+Do NOT repeat a question that was already answered. If you now have enough information to act, set ambiguous to false.
+resolved_command must name the object only (e.g. "go to the cardboard box"). NEVER include where it appears in the image or camera view (left, right, centre, edge, foreground, partially visible, in view) — the robot turns, so view-relative positions are wrong a moment later.
+Respond ONLY with JSON: {"ambiguous": true/false, "reason": "...", "clarifying_question": "..." or null, "resolved_command": "the full unambiguous command" or null}
+2026-10-08 14:02:57 INFO  brain.vlm      [check_ambiguity] <- 3.5s
+2026-10-08 14:02:57 DEBUG brain.vlm      [check_ambiguity] raw response:
+{
+  "ambiguous": true,
+  "reason": "The image does not provide enough information to determine if the yellow object is an orange box.",
+  "clarifying_question": "Is the yellow object an orange box?",
+  "resolved_command": null
+}
+2026-10-08 14:02:57 INFO  brain.vlm      [bench] role=vlm stage=check_ambiguity provider=ollama model=qwen2.5vl:3b latency=3.482 prompt_tokens=1264 completion_tokens=54 cost_usd=
+2026-10-08 14:02:57 INFO  brain.vlm      [check_ambiguity] parsed: {"ambiguous": true, "reason": "The image does not provide enough information to determine if the yellow object is an orange box.", "clarifying_question": "Is the yellow object an orange box?", "resolved_command": null}
+2026-10-08 14:02:57 WARNING brain.pipeline [dlg 3be827a3bb52] clarification cap hit after 1 turn(s) — command='go to the orange box' reason='The image does not provide enough information to determine if the yellow object is an orange box.'
+2026-10-08 14:02:57 INFO  brain.planner  [plan] -> ollama/gemma4:e2b command='go to the orange box'
+2026-10-08 14:02:57 DEBUG brain.planner  [plan] prompt:
+You are a mission planner for an indoor rover. Break the command into a sequence of discrete, executable steps.
+The rover can ONLY perform these actions:
+  "follow_line" - follow the floor line to its end marker — the only way to travel more than a short distance
+  "move" - drive forward or backward
+  "turn" - rotate on the spot
+  "approach" - find a visible object and drive up to it (searches by turning if it is not in view)
+  "scan" - sweep the camera around without moving the base
+  "observe" - hold still and look at a named target
+  "stop" - halt
+  "report" - say what was found
+It has no arm. It cannot pick up, carry, open, push, or touch anything.
+To go to an object without a floor line, use approach with the object as target, then observe it, then report. Never use move to reach an object or place: move is only a short hop forward or backward.
+Every step's "action" must be exactly one of those verbs.
+Command: "go to the orange box"
+Respond ONLY with JSON: {"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}
+2026-10-08 14:02:59 INFO  brain.planner  [plan] <- 1.6s
+2026-10-08 14:02:59 DEBUG brain.planner  [plan] raw response:
+{"steps": [{"id": 1, "action": "approach", "target": "orange box"}, {"id": 2, "action": "observe", "target": "orange box"}, {"id": 3, "action": "report", "target": "orange box"}], "notes": "The rover attempts to find and observe the 'orange box' using the 'approach' and 'observe' commands, as it cannot physically interact with objects directly."}
+2026-10-08 14:02:59 INFO  brain.planner  [bench] role=planner stage=generate_plan provider=ollama model=gemma4:e2b latency=1.632 prompt_tokens=284 completion_tokens=99 cost_usd=
+2026-10-08 14:02:59 INFO  brain.planner  [plan] 3 step(s)
+2026-10-08 14:02:59 INFO  brain.planner         1. approach -> orange box
+2026-10-08 14:02:59 INFO  brain.planner         2. observe -> orange box
+2026-10-08 14:02:59 INFO  brain.planner         3. report -> orange box
+2026-10-08 14:02:59 INFO  brain.vlm      [verify_plan] -> ollama/qwen2.5vl:3b (image=94701 bytes)
+2026-10-08 14:02:59 DEBUG brain.vlm      [verify_plan] prompt:
+You are verifying a robot's mission plan before it departs.
+The robot can only drive and look. It cannot pick up or touch anything.
+Plan: {"steps": [{"id": 1, "action": "approach", "target": "orange box"}, {"id": 2, "action": "observe", "target": "orange box"}, {"id": 3, "action": "report", "target": "orange box"}], "notes": "The rover attempts to find and observe the 'orange box' using the 'approach' and 'observe' commands, as it cannot physically interact with objects directly."}
+Respond ONLY with JSON: {"verified": true/false, "concerns": "..." or null}
+2026-10-08 14:02:59 INFO  brain.vlm      [verify_plan] <- 0.4s
+2026-10-08 14:02:59 DEBUG brain.vlm      [verify_plan] raw response:
+{
+  "verified": true,
+  "concerns": null
+}
+2026-10-08 14:02:59 INFO  brain.vlm      [bench] role=vlm stage=verify_plan provider=ollama model=qwen2.5vl:3b latency=0.374 prompt_tokens=1209 completion_tokens=17 cost_usd=
+2026-10-08 14:02:59 INFO  brain.vlm      [verify_plan] parsed: {"verified": true, "concerns": null}
+2026-10-08 14:02:59 INFO  brain.pipeline [dlg 3be827a3bb52] plan ready, awaiting voice confirmation
+2026-10-08 14:03:39 INFO  brain.pipeline [dlg 3be827a3bb52] confirmation transcript='yes to go  yes to go  yes to go'
+2026-10-08 14:03:39 INFO  brain.confirm  [confirm] keyword CONFIRM on 'yes' (transcript='yes to go  yes to go  yes to go')
+2026-10-08 14:03:39 INFO  brain.pipeline [dlg 3be827a3bb52] CONFIRMED — handing off to execution
+2026-10-08 14:03:41 INFO  brain.mission  ====================================================================
+2026-10-08 14:03:41 INFO  brain.mission  [mission 3be827a3bb52] start — 3 step(s)
+2026-10-08 14:03:43 INFO  brain.vlm      [locate_target] -> ollama/qwen2.5vl:3b (image=92057 bytes)
+2026-10-08 14:03:43 DEBUG brain.vlm      [locate_target] prompt:
+Find "orange box" in this image from a small floor robot's camera.
+If it is visible, give its bounding box in pixel coordinates.
+Also give distance_m: your best estimate, in metres, of the horizontal distance from the camera to the point where the object touches the floor, or null if you cannot tell.
+Respond ONLY with JSON: {"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, "confidence": "high"|"medium"|"low", "distance_m": number or null, "description": "one short sentence"}
+2026-10-08 14:03:46 INFO  brain.vlm      [locate_target] <- 3.1s
+2026-10-08 14:03:46 DEBUG brain.vlm      [locate_target] raw response:
+{"visible": false, "bbox_2d": null, "confidence": "low", "distance_m": null, "description": "no orange box visible in the image"}
+2026-10-08 14:03:46 INFO  brain.vlm      [bench] role=vlm stage=locate_target provider=ollama model=qwen2.5vl:3b latency=3.145 prompt_tokens=1183 completion_tokens=38 cost_usd=
+2026-10-08 14:03:46 INFO  brain.vlm      [locate_target] parsed: {"visible": false, "bbox_2d": null, "confidence": "low", "distance_m": null, "description": "no orange box visible in the image"}
+2026-10-08 14:03:46 INFO  brain.mission  [mission 3be827a3bb52] approach cycle 1 (search): look pan=0 gate=not_visible
+2026-10-08 14:03:47 INFO  brain.vlm      [locate_target] -> ollama/qwen2.5vl:3b (image=98949 bytes)
+2026-10-08 14:03:47 DEBUG brain.vlm      [locate_target] prompt:
+Find "orange box" in this image from a small floor robot's camera.
+If it is visible, give its bounding box in pixel coordinates.
+Also give distance_m: your best estimate, in metres, of the horizontal distance from the camera to the point where the object touches the floor, or null if you cannot tell.
+Respond ONLY with JSON: {"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, "confidence": "high"|"medium"|"low", "distance_m": number or null, "description": "one short sentence"}
+2026-10-08 14:03:51 INFO  brain.vlm      [locate_target] <- 3.0s
+2026-10-08 14:03:51 DEBUG brain.vlm      [locate_target] raw response:
+{"visible": false, "bbox_2d": null, "confidence": "low", "distance_m": null, "description": "no orange box visible in the image"}
+2026-10-08 14:03:51 INFO  brain.vlm      [bench] role=vlm stage=locate_target provider=ollama model=qwen2.5vl:3b latency=3.007 prompt_tokens=1183 completion_tokens=38 cost_usd=
+2026-10-08 14:03:51 INFO  brain.vlm      [locate_target] parsed: {"visible": false, "bbox_2d": null, "confidence": "low", "distance_m": null, "description": "no orange box visible in the image"}
+2026-10-08 14:03:51 INFO  brain.mission  [mission 3be827a3bb52] approach cycle 2 (search): look pan=-290 gate=not_visible
+2026-10-08 14:03:52 INFO  brain.vlm      [locate_target] -> ollama/qwen2.5vl:3b (image=89509 bytes)
+2026-10-08 14:03:52 DEBUG brain.vlm      [locate_target] prompt:
+Find "orange box" in this image from a small floor robot's camera.
+If it is visible, give its bounding box in pixel coordinates.
+Also give distance_m: your best estimate, in metres, of the horizontal distance from the camera to the point where the object touches the floor, or null if you cannot tell.
+Respond ONLY with JSON: {"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, "confidence": "high"|"medium"|"low", "distance_m": number or null, "description": "one short sentence"}
+2026-10-08 14:03:55 INFO  brain.vlm      [locate_target] <- 3.4s
+2026-10-08 14:03:55 DEBUG brain.vlm      [locate_target] raw response:
+{
+  "visible": true,
+  "bbox_2d": [219, 108, 272, 178],
+  "confidence": "high",
+  "distance_m": 0.5,
+  "description": "an orange box is visible in the image."
+}
+2026-10-08 14:03:55 INFO  brain.vlm      [bench] role=vlm stage=locate_target provider=ollama model=qwen2.5vl:3b latency=3.367 prompt_tokens=1183 completion_tokens=67 cost_usd=
+2026-10-08 14:03:55 INFO  brain.vlm      [locate_target] parsed: {"visible": true, "bbox_2d": [219, 108, 272, 178], "confidence": "high", "distance_m": 0.5, "description": "an orange box is visible in the image."}
+2026-10-08 14:03:55 INFO  brain.mission  [mission 3be827a3bb52] approach cycle 3 (search): look pan=290 gate=confirmed
+2026-10-08 14:03:56 ERROR brain.rover_pi [pi] lf cmd STOP failed: Service /line_follow/cmd does not exist
+2026-10-08 14:03:58 INFO  brain.vlm      [locate_target] -> ollama/qwen2.5vl:3b (image=91908 bytes)
+2026-10-08 14:03:58 DEBUG brain.vlm      [locate_target] prompt:
+Find "orange box" in this image from a small floor robot's camera.
+If it is visible, give its bounding box in pixel coordinates.
+Also give distance_m: your best estimate, in metres, of the horizontal distance from the camera to the point where the object touches the floor, or null if you cannot tell.
+Respond ONLY with JSON: {"visible": true/false, "bbox_2d": [x1, y1, x2, y2] or null, "confidence": "high"|"medium"|"low", "distance_m": number or null, "description": "one short sentence"}
+2026-10-08 14:04:02 INFO  brain.vlm      [locate_target] <- 3.4s
+2026-10-08 14:04:02 DEBUG brain.vlm      [locate_target] raw response:
+{
+  "visible": true,
+  "bbox_2d": [339, 132, 358, 147],
+  "confidence": "high",
+  "distance_m": 0.5,
+  "description": "the red light on the floor robot"
+}
+2026-10-08 14:04:02 INFO  brain.vlm      [bench] role=vlm stage=locate_target provider=ollama model=qwen2.5vl:3b latency=3.356 prompt_tokens=1183 completion_tokens=66 cost_usd=
+2026-10-08 14:04:02 INFO  brain.vlm      [locate_target] parsed: {"visible": true, "bbox_2d": [339, 132, 358, 147], "confidence": "high", "distance_m": 0.5, "description": "the red light on the floor robot"}
+2026-10-08 14:04:02 INFO  brain.mission  [mission 3be827a3bb52] approach cycle 4 (lock): verify pivot_dir=1 pivot_s=0.12 gate=degenerate_tiny
+2026-10-08 14:04:02 ERROR brain.rover_pi [pi] lf cmd STOP failed: Service /line_follow/cmd does not exist
+2026-10-08 14:04:06 WARNING brain.rover_pi [pi] snapshot failed: timed out
+2026-10-08 14:04:08 WARNING brain.rover_pi [pi] snapshot failed: timed out
+2026-10-08 14:04:11 WARNING brain.rover_pi [pi] snapshot failed: timed out
+2026-10-08 14:04:11 INFO  brain.mission  [mission 3be827a3bb52] approach cycle 5 (approach): pivot L 0.08s hop 20 gate=skipped_blurry
+2026-10-08 14:04:15 WARNING brain.rover_pi [pi] snapshot failed: timed out
+2026-10-08 14:04:17 WARNING brain.rover_pi [pi] snapshot failed: timed out
+2026-10-08 14:04:20 WARNING brain.rover_pi [pi] snapshot failed: timed out
+2026-10-08 14:04:20 INFO  brain.mission  [mission 3be827a3bb52] approach cycle 6 (approach): hop_back 0.6s gate=skipped_blurry
+2026-10-08 14:04:23 WARNING brain.rover_pi [pi] snapshot failed: timed out
+2026-10-08 14:04:26 WARNING brain.rover_pi [pi] snapshot failed: timed out
+2026-10-08 14:04:29 WARNING brain.rover_pi [pi] snapshot failed: timed out
+2026-10-08 14:04:29 INFO  brain.mission  [mission 3be827a3bb52] approach cycle 7 (approach): relocate_look gate=skipped_blurry
+2026-10-08 14:04:30 WARNING brain.rover_pi [pi] HALT
+2026-10-08 14:04:30 INFO  brain.mission  [mission 3be827a3bb52] run log -> C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\mission_3be827a3bb52.json
+2026-10-08 14:04:30 INFO  brain.mission  [mission 3be827a3bb52] end — aborted
+2026-10-08 14:04:30 ERROR brain.main     [mission 3be827a3bb52] run_mission crashed
+Traceback (most recent call last):
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\mission.py", line 1540, in run_mission
+    result = await approach_controller(mission, rover, step, emit)
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\mission.py", line 1141, in approach_controller
+    found, bearing = await search_sweep(RELOCATE_MAX_VLM_CALLS, 1, "re")
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\mission.py", line 1037, in search_sweep
+    loc = await grab_and_locate("ap_%s%d_p%d.jpg" % (label, sweep, pan_offset))
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\mission.py", line 945, in grab_and_locate
+    grabbed = await _grab_sharp(mission, rover, filename)
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\mission.py", line 865, in _grab_sharp
+    frame = await asyncio.to_thread(rover.get_frame)
+  File "C:\Users\Utroff\AppData\Local\Programs\Python\Python39\lib\asyncio\threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\mission.py", line 1606, in run_mission
+    await emit({"type": "mission_ended", "session_id": mission.session_id,
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\main.py", line 354, in emit
+    await websocket.send_json(event)
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\venv\lib\site-packages\starlette\websockets.py", line 176, in send_json
+    await self.send({"type": "websocket.send", "text": text})
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\venv\lib\site-packages\starlette\websockets.py", line 86, in send
+    await self._send(message)
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\venv\lib\site-packages\starlette\_exception_handler.py", line 39, in sender
+    await send(message)
+  File "C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\venv\lib\site-packages\uvicorn\protocols\websockets\websockets_impl.py", line 357, in asgi_send
+    raise RuntimeError(msg % message_type)
+RuntimeError: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2026-10-08 14:04:32 WARNING brain.rover_pi [pi] snapshot failed: timed out

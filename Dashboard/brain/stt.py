@@ -1,13 +1,13 @@
 import io
 import os
 from typing import Optional, Union
-
+import re
 import numpy as np
 from faster_whisper import WhisperModel
 
 MODEL_NAME = os.getenv("WHISPER_MODEL", "digiphyte/fluister-turbo")
 LANGUAGE = os.getenv("WHISPER_LANGUAGE", "en")
-
+_HALLUCINATIONS = {"thank you so much for watching", "thanks for watching", "thank you for watching"}
 _model = None
 
 
@@ -35,4 +35,8 @@ def transcribe_audio(
         language=language or LANGUAGE,
         beam_size=5,
     )
-    return " ".join(segment.text for segment in segments).strip()
+    text = " ".join(segment.text for segment in segments).strip()
+    if re.sub(r"[^a-z ]", "",text.lower()).strip() in _HALLUCINATIONS:
+        return ""
+
+    return text

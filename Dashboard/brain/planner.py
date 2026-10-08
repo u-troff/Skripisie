@@ -196,6 +196,13 @@ def revise_plan(confirmed_plan: dict, remaining_steps: list, digest: list, comma
         return {"change": False, "reason": "unparseable revision output", "steps": []}
 
 
+def _allowed_actions(profile) -> dict:
+    """No floor-line node in free-roam Pi mode, so follow_line is not offered on a replan."""
+    actions = dict(profile.ACTIONS)
+    if profile is planner_pi and config.get("NAV_MODE", "free").strip().lower() == "free":
+        actions.pop("follow_line", None)
+    return actions
+
 
 
 # -- failure recovery (spec-supervisor-feedback-2026-10-05.md section D) -----
@@ -212,7 +219,7 @@ def validate_steps(steps) -> Optional[str]:
         if not isinstance(step, dict):
             return "a step is not an object"
         action = str(step.get("action") or "").strip().lower()
-        if action not in profile.ACTIONS:
+        if action not in _allowed_actions(profile):
             return "action %r is not in the rover's vocabulary" % action
     return None
 
@@ -221,7 +228,7 @@ def build_replan_prompt(command: str, done_steps: list, failed_step: dict, reaso
                         guidance_log: list, digest: list, scene: str = "") -> str:
     """Pure prompt builder (tools/context_budget.py counts it for per_guidance_turn)."""
     profile = _profile()
-    vocabulary = _build_vocabulary(profile.ACTIONS, _guidance_for(profile))
+    vocabulary = _build_vocabulary(_allowed_actions(profile), _guidance_for(profile))
     keep = config.get_int("PERCEPTION_DIGEST_KEEP", 6)
     lines = [
         "You are a mission planner for an indoor rover. The rover stopped partway through a "
@@ -241,11 +248,15 @@ def build_replan_prompt(command: str, done_steps: list, failed_step: dict, reaso
     for turn in guidance_log:
         lines.append("  Rover: " + str(turn.get("question") or ""))
         lines.append("  Person: " + str(turn.get("answer") or "(no answer yet)"))
+    
     lines.append(
         "Write a new plan for ONLY what is still left to do, starting from where the rover is "
-        "now. Keep the original goal. Use the person's answer to decide how to find or reach the "
-        "target; do not repeat the step that just failed unless the answer gives a reason to "
-        "expect it to work now.")
+        "now. Keep the original goal. Use the person's answer to decide where to look or what to "
+        "reach instead: if they say where the target is, turn that way and then use approach on "
+        "the target again, because their answer is the reason to expect it to work now. Do not "
+        "repeat the failed step unchanged without using their answer. The plan must still end by "
+        "reaching the target (approach, then observe or report).")
+
     lines.append("Respond ONLY with JSON: " + profile.STEP_SCHEMA)
     return "\n".join(lines)
 
@@ -274,6 +285,9 @@ def replan_from_state(command: str, done_steps: list, failed_step: dict, reason:
         return {"steps": [], "notes": "replan returned no steps"}
     _promote_moves_to_approach(steps)
     problem = validate_steps(steps)
+    if (not problem and str(failed_step.get("action") or "").lower() == "approach"
+        and not any(str(s.get("action") or "").strip().lower() == "approach" for s in steps)):
+        problem = "the plan never approaches anything, so the failed step is not retried"
     if problem:
         log.warning("[replan] rejected: %s", problem)
         return {"steps": [], "notes": "replan rejected: " + problem}

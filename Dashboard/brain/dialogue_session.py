@@ -64,6 +64,8 @@ class DialogueSession:
         """What the planner actually plans against."""
         if self.resolved_command:
             return self.resolved_command
+        if self.capped:
+            return self.command
         parts = [self.command]
         for turn in self.turns:
             if turn.answer:

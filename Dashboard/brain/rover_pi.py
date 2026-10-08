@@ -201,6 +201,7 @@ class PiRoverController(RoverController):
 
         self._halted = threading.Event()
         self._arrived = threading.Event()
+        self._lf_unavailable = threading.Event()
         self._pause_req = threading.Event()
         self._resume_req = threading.Event()
         self._halted = threading.Event()
@@ -438,9 +439,13 @@ class PiRoverController(RoverController):
 
         # The route must land BEFORE set_running(True): in `default` mode the
         # node turns RIGHT at every crossroad instead of parking on it.
+        self._lf_unavailable.clear()
         self._lf(self.line_route)
         time.sleep(0.25)
         self._lf_run(True)
+        time.sleep(0.3)
+        if self._lf_unavailable.is_set():
+            return self._lf_result("blocked", "line_follow_unavailable", time.time(), 0.0)
 
         t_start = time.time()
         with self._tlock:
@@ -743,6 +748,7 @@ class PiRoverController(RoverController):
 
         def _err(error):
             log.error("[pi] lf cmd %s failed: %s", cmd, error)
+            self._lf_unavailable.set()
 
         try:
             self._lf_cmd.call(roslibpy.ServiceRequest({"data": cmd}), _ok, _err)
@@ -755,6 +761,7 @@ class PiRoverController(RoverController):
 
         def _err(error):
             log.error("[pi] lf set_running %s failed: %s", flag, error)
+            self._lf_unavailable.set()
 
         try:
             self._lf_running.call(roslibpy.ServiceRequest({"data": bool(flag)}), _ok, _err)
