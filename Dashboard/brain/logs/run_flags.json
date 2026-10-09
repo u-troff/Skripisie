@@ -28,5 +28,35 @@
   "flag": "bad",
   "note": "It went to th eblack bag then went to the orange box successfully but again in the darkness of the room saw that it could not actually se the orange box and kept on saying that the box was blurry but then I moved it into the light and it could see it better. One thing to note I used qwen2.5vl here and it is so much better and vision model recognisition than gemma4",
   "flagged_at": "2026-10-08T23:52:48"
+ },
+ "946882d86074": {
+  "flag": "good",
+  "note": "This was a L0 test, It passed sort of as it was in open space and scaned around itself. It saw nothing significant as there was nothing significatnt around it. ",
+  "flagged_at": "2026-10-09T14:48:00"
+ },
+ "be176d85a012": {
+  "flag": "good",
+  "note": "It did exactly as intended it turned left adn then moved forward. It then completed after doing that. IUt made a 118 degree turn and no 90 degree exactly. the vision model used is qwen and planner is gemma4:e4b. It followed as expected",
+  "flagged_at": "2026-10-09T14:50:00"
+ },
+ "e9b25e8fad76": {
+  "flag": "good",
+  "note": "This was the L2 test, passed with flying colours, The only problem is the rover turns by 118 degreen instead of 90 degrees. even though I calibrated it it overshoot sits turning. The rover also always wants to actually execute a plan involving going somewhere rather than just following basic move forward instructions",
+  "flagged_at": "2026-10-09T14:54:52"
+ },
+ "c2082a0f379c": {
+  "flag": "good",
+  "note": "It did approach and find the black bag as intended it did not fail at that. Kept going and confirmed the black bag with vision. It filed the entire screen. If it was to go to a bed for instance the whole bed could take up more than th eentire camera frame and this can cuas eissues. this is why objects need to fit in the camera frame or they end up being to big.",
+  "flagged_at": "2026-10-09T14:59:06"
+ },
+ "1dddfd8d1f6a": {
+  "flag": "bad",
+  "note": "When to the wrong object and thought a jersey was the black bag it was suppose to go to the bag in the first few frames. I am going to go on with gemm4:e4b and try it once more",
+  "flagged_at": "2026-10-09T15:05:13"
+ },
+ "dc20d19ce6d7": {
+  "flag": "good",
+  "note": "Seems like conditional logic is alright need to refine condictional logic but what we can see is that is is sortof possible to get conditional logic workingh> IT did try its best to go to both but becuase both objects were not visible in the final frame it could not difitively say that it saw both. this was with gemma4 E4b for both models. This configuration seems to work th ebest as it only keeos context on 1 model throughout",
+  "flagged_at": "2026-10-09T15:10:46"
  }
 }

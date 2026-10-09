@@ -1,0 +1,194 @@
+{
+  "session_id": "2d9a17236f51",
+  "outcome": "halted_after_guidance",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/qwen2.5vl:3b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L0",
+  "command": "so tell me what you can see",
+  "resolved_command": "go to the floor",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "floor"
+      }
+    ],
+    "notes": "Assuming 'the floor' refers to the marked path the rover needs to follow to traverse a section."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "floor"
+      }
+    ],
+    "notes": "Assuming 'the floor' refers to the marked path the rover needs to follow to traverse a section."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "floor",
+      "status": "blocked",
+      "detail": {
+        "arrived": false,
+        "elapsed_s": 0.0,
+        "stopped_s": 0.0,
+        "obstacle_events": 0,
+        "reason": "line_follow_unavailable"
+      },
+      "elapsed_s": 0.58
+    }
+  ],
+  "checks": [
+    {
+      "kind": "skipped",
+      "reason": "look_left_not_due_before_end_of_drive",
+      "t_rel_s": 0.57
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 1536,
+    "t_start": null,
+    "obstacle_events": 0,
+    "bends": []
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 28.99,
+    "per_step_s": [
+      0.58
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 1,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "qwen2.5vl:3b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "ca5142c0c6d6",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 2,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 1
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 5,
+      "latency_total_s": 8.886,
+      "latency_mean_s": 1.777,
+      "prompt_tokens_total": 6146,
+      "completion_tokens_total": 216,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 45.675,
+      "latency_mean_s": 22.837,
+      "prompt_tokens_total": 566,
+      "completion_tokens_total": 131,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 1,
+  "guidance_log": [
+    {
+      "reason": "line_follow_unavailable",
+      "question": "I stopped because I could not complete the step. What should I do next?",
+      "answer": "cancel the plan stop",
+      "t_rel_s": 0.58,
+      "replanned": false
+    }
+  ],
+  "halt_reason": "guidance_declined",
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 0.58,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 28.85,
+      "state": "blocked"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "no_arrival_check",
+      "detail": "the mission never reached an arrival check, so nothing confirms what the rover was looking at when it stopped"
+    },
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (line_follow_unavailable)"
+    },
+    {
+      "code": "thin_evidence",
+      "detail": "only 0 progress check(s) completed during the drive \u2014 too few to say much about what was passed on the way"
+    },
+    {
+      "code": "ungrounded_checks",
+      "detail": "no room video was loaded, so the camera checks had nothing to be scored against \u2014 an empty 'unexpected' here is not evidence that nothing was hallucinated"
+    }
+  ],
+  "spoken_summary": "The rover halted after guidance to go to the floor. The mission stopped before finishing, with one check skipped. The most important uncertainty is no arrival check occurred."
+}
