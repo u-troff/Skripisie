@@ -21,13 +21,27 @@ ACTIONS = {
     "scan": "sweep the camera around without moving the base",
     "observe": "hold still and look at a named target",
     "stop": "halt",
-    "report": "say what was found",
+    "report": "say what was found, and is around the object",    
+    "check": ("look once and decide whether a stated condition is true (yes or no); "
+              "steps tagged \"when\" run only for the matching answer"),
+
 }
 
 GUIDANCE = (
     "To go somewhere, use one follow_line step whose target is what should be "
     "visible at the end, then observe that target, then report."
 )
+CONDITIONAL_GUIDANCE = (
+    'The command contains a condition. First add one "check" step whose target is the condition '
+    'as a short statement, e.g. "the orange box is visible". Then give the steps for the yes case, '
+    'each with "when": "yes", and the steps for the no case, each with "when": "no". Steps that '
+    'always run have no "when". Example: [{"id": 1, "action": "check", "target": "the orange box is visible"}, '
+    '{"id": 2, "action": "approach", "target": "orange box", "when": "yes"}, '
+    '{"id": 3, "action": "report", "target": "orange box", "when": "yes"}, '
+    '{"id": 4, "action": "turn", "target": "left", "when": "no"}, '
+    '{"id": 5, "action": "stop", "target": null, "when": "no"}].'
+)
+
 FREE_GUIDANCE = ("To go to an object without a floor line, use approach with the object as target, then observe it, then report. "
                  "Never use move to reach an object or place: move is only a short hop forward or backward.")
 STEP_SCHEMA = '{"steps": [{"id": 1, "action": "...", "target": "..."}], "notes": "..."}'

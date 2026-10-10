@@ -27,7 +27,7 @@ from planner import revise_plan,replan_from_state
 from providers import usage
 from rover import RoverController
 from stt import transcribe_audio
-from vlm import KNOWN_MAX, VLM_DIST_MAX_CM, bbox_format,check_arrival, check_progress, check_side_look, describe_frame, distance_cm_from, locate_target
+from vlm import KNOWN_MAX, VLM_DIST_MAX_CM,check_condition, survey_frame, bbox_format,check_arrival, check_progress, check_side_look, describe_frame, distance_cm_from, locate_target
 
 from vlm import failed as vlm_failed
 
@@ -138,6 +138,7 @@ _STOPWORDS = {
     "tell", "see", "check", "find", "get", "got", "please", "rover", "robot",
     "along", "toward", "towards", "until", "when", "what", "where", "whether",
     "can", "will", "would", "should", "not", "any", "all", "out",
+    "observe", "everything", "near", "nearby", "around", "report", "scan",
 }
 
 
@@ -707,6 +708,86 @@ async def _arrival_check(mission: MissionSession, rover, target: str, emit: Emit
              json.dumps(result)[:300])
     await _emit_check(mission, record, emit)
 
+
+_SURROUNDINGS = re.compile(
+    r"\b(near|nearby|around|beside|next to|vicinity|surround\w*|everything|what is there)\b",
+    re.IGNORECASE)
+
+
+def _wants_surroundings(mission: MissionSession) -> bool:
+    """L5: "what is near the orange box" asks about the area, not just the target. Once per run."""
+    text = "%s %s" % (getattr(mission, "original_command", "") or "", mission.command or "")
+    if not _SURROUNDINGS.search(text):
+        return False
+    return not any(c.get("kind") == "scan_look" for c in mission.checks)
+
+
+async def _scan_look(mission: MissionSession, rover, emit: Emit, survey: bool = False) -> None:
+    """A `scan` step only moves the gimbal; on its own it sees nothing. Stop at
+    each pan position, grab a frame and describe it, so "tell me what you see"
+    has an answer in the run log. Stationary, so it respects the control split
+    (the VLM never runs while the rover is moving). survey=True lists every
+    object per direction (vlm.survey_frame) instead of one sentence."""
+    if not all(hasattr(rover, name) for name in ("set_gimbal", "get_frame")):
+        return
+    swing = int(getattr(rover, "look_offset", 400))
+    # logical offsets: negative pan = left. End on centre so the gimbal is left forward.
+    for aimed, pan in (("left", -swing), ("right", swing), ("centre", 0)):
+        t_rel = time.time() - mission.started_at
+        await asyncio.to_thread(rover.set_gimbal, pan)
+        await asyncio.sleep(0.1)  # pans and stops for 100ms before grabbing the image
+        frame = await asyncio.to_thread(rover.get_frame)
+        if frame is None:
+            result = {"_error": "no frame from the camera"}
+            frame_path, latency = None, None
+        else:
+            frame_path = _save_frame(mission, "scan_%s.jpg" % aimed, frame)
+            started = time.perf_counter()
+            if survey:
+                out = await asyncio.to_thread(survey_frame, frame)
+                objects = out.get("objects") if isinstance(out.get("objects"), list) else []
+                description = str(out.get("description") or "").strip()
+                result = ({"description": description, "objects": objects}
+                          if (objects or description) else {"_error": out.get("_error") or "no description returned"})
+            else:
+                description = await asyncio.to_thread(describe_frame, frame)
+                result = {"description": description} if description else {"_error": "no description returned"}
+            latency = round(time.perf_counter() - started, 2)
+        record = {"kind": "scan_look", "aimed": aimed, "t_rel_s": round(t_rel, 2),
+                  "latency_s": latency, "frame_path": frame_path, "result": result}
+        mission.checks.append(record)
+        mission.touch()
+        await _emit_check(mission, record, emit)
+
+async def _run_check(mission: MissionSession, rover, step: dict, emit: Emit) -> dict:
+    """`check` step (L4): look once, centred, and answer yes/no about the condition.
+    An unclear answer is a blocked step, so the existing guidance loop asks the operator
+    instead of the rover guessing a branch."""
+    condition = str(step.get("target") or "").strip()
+    if not condition or not hasattr(rover, "get_frame"):
+        return {"status": "blocked", "detail": {"reason": "cannot check: no condition or no camera"}}
+    if hasattr(rover, "center_gimbal"):
+        await asyncio.to_thread(rover.center_gimbal)
+        await asyncio.sleep(0.5)
+    frame = await asyncio.to_thread(rover.get_frame)
+    if frame is None:
+        return {"status": "blocked", "detail": {"reason": "no frame from the camera"}}
+    t_rel = time.time() - mission.started_at
+    frame_path = _save_frame(mission, "check_%d.jpg" % mission.cursor, frame)
+    started = time.perf_counter()
+    result = await asyncio.to_thread(check_condition, frame, condition)
+    answer = str(result.get("answer") or "").strip().lower()
+    record = {"kind": "condition_check", "condition": condition, "answer": answer or None,
+              "aimed": "centre", "t_rel_s": round(t_rel, 2),
+              "latency_s": round(time.perf_counter() - started, 2),
+              "frame_path": frame_path, "result": result}
+    mission.checks.append(record)
+    mission.touch()
+    await _emit_check(mission, record, emit)
+    if "_error" in result or answer not in ("yes", "no"):
+        return {"status": "blocked",
+                "detail": {"reason": "condition_unsure", "condition": condition, "answer": answer or None}}
+    return {"status": "ok", "detail": {"condition": condition, "answer": answer}}
 
 async def _maybe_arrival_check(mission: MissionSession, rover, step: dict,
                                result: dict, emit: Emit) -> None:
@@ -1500,7 +1581,7 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
     log.info("[mission %s] start — %d step(s)", mission.session_id, len(mission.steps()))
     await emit({"type": "mission_started", "session_id": mission.session_id,
                 "plan": mission.confirmed_plan})
-
+    branch: Optional[str] = None
     try:
         while mission.phase not in TERMINAL and mission.cursor < len(mission.steps()):
             if mission.phase is MissionPhase.AWAITING_REVISION_CONFIRMATION:
@@ -1511,12 +1592,20 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
                 mission.active_plan = mission.pending_swap
                 mission.pending_swap = None
                 mission.cursor = 0
+                branch = None
                 await emit({"type": "plan_revised", "session_id": mission.session_id,
                             "plan": mission.active_plan})
 
             step = mission.steps()[mission.cursor]
             action = str(step.get("action") or "").strip().lower()
             _light(mission, rover, "executing")
+            when = str(step.get("when") or "").strip().lower()
+            if when in ("yes", "no") and branch is not None and when != branch:
+                mission.results.append({"step": step, "elapsed_s": 0.0, "status": "skipped",
+                                        "detail": "branch %s not taken" % branch})
+                mission.cursor += 1
+                continue
+
             await emit({"type": "step_started", "session_id": mission.session_id,
                         "index": mission.cursor, "step": step})
 
@@ -1536,7 +1625,9 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
             )
 
             try:
-                if use_free_approach:
+                if action == "check":
+                    result = await _run_check(mission, rover, step, emit)
+                elif use_free_approach:
                     result = await approach_controller(mission, rover, step, emit)
                 else:
                     result = await asyncio.to_thread(rover.execute_step, step)
@@ -1566,7 +1657,13 @@ async def run_mission(mission: MissionSession, rover: RoverController, emit: Emi
                             "state": rover.state_snapshot()})
 
             if result.get("status") == "ok":
+                if action == "check":
+                    branch = (result.get("detail") or {}).get("answer")
                 await _maybe_arrival_check(mission, rover, step, result, emit)
+                if action == "scan":
+                    await _scan_look(mission, rover, emit)
+                elif action in ("observe", "report") and _wants_surroundings(mission):
+                    await _scan_look(mission, rover, emit, survey=True)
 
             if result.get("status") == "blocked":
                 if await _guidance_loop(mission,rover,step,result,emit):

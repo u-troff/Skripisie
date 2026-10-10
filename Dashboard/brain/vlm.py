@@ -11,7 +11,7 @@ log = get_logger("vlm")
 # ImageSource is re-exported so pipeline.py's existing import keeps working.
 __all__ = ["ImageSource", "check_ambiguity", "verify_plan", "describe_frame",
            "inventory_frame", "check_progress", "check_side_look",
-           "check_arrival", "failed", "KNOWN_MAX", "locate_target", "distance_cm_from", "VLM_DIST_MAX_CM"]
+           "check_arrival", "failed", "KNOWN_MAX", "locate_target", "distance_cm_from", "VLM_DIST_MAX_CM", "check_condition", "survey_frame"]
 
 
 # -- distance estimate (spec-supervisor-feedback-2026-10-05.md C2) ----------------
@@ -284,6 +284,30 @@ def check_side_look(image: ImageSource, target: str,
     return _ask("check_side_look", prompt, image)
 
 # 0 = the model returns pixels; N>0 = it returns 0..N normalised (gemma4: 1000).
+
+def survey_frame(image: ImageSource) -> dict:
+    """L5: what is around the rover now. Unlike describe_frame (one sentence) this lists
+    every object, so "what is near the X" gets an inventory instead of a summary."""
+    prompt = (
+        "A rover has arrived at its target and is looking around it. List EVERY distinct object "
+        "you can see in this image, including small ones and anything on the floor. List each "
+        "object ONCE, at most 10. For each give its colour and where it is in the frame. "
+        "Do not summarise and do not guess.\n"
+        'Respond ONLY with JSON: {"objects": ["colour name, position in frame"], '
+        '"description": "one short sentence"}'
+    )
+    return _ask("survey_frame", prompt, image, salvage=True)
+
+
+def check_condition(image: ImageSource, condition: str) -> dict:
+    """L4: is this statement true of what the camera sees? Answers "unsure" rather than guess."""
+    prompt = (
+        "A rover's camera took this image. Decide whether this statement is true of what is visible: "
+        f'"{condition}"\n'
+        'Answer only from what is visible. If you cannot tell, answer "unsure". Do not assume.\n'
+        'Respond ONLY with JSON: {"answer": "yes"|"no"|"unsure", "reason": "one short sentence"}'
+    )
+    return _ask("check_condition", prompt, image)
 
 
 

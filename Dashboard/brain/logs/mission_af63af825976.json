@@ -1,0 +1,488 @@
+{
+  "session_id": "af63af825976",
+  "outcome": "completed_after_guidance",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L3",
+  "command": "please drive forward until you see a black bag and you stop",
+  "resolved_command": "drive forward until you see a black bag and you stop",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "black bag"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "black bag"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "black bag"
+      }
+    ],
+    "notes": "The original goal was to drive forward until a black bag is seen and stop. Since line following failed, and the instruction is to keep driving forward until the black bag is seen, the most logical next step given the rover's limitations (no long-range 'move' beyond small hops) is to actively search for the target using 'approach'. Once approached, we observe and report to complete the mission goal of reaching and identifying the target."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": null
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "black bag"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "black bag"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "black bag"
+      },
+      {
+        "id": 5,
+        "action": "stop",
+        "target": null
+      }
+    ],
+    "notes": "Since the command implies a sequence starting from the current location, I first assume following any available line is the initial travel method if no direct target is specified for movement. If the rover starts without a line, step 1 would be omitted, and step 2 would be executed immediately. The 'drive forward until you see' is best modeled as approach until the target is found, followed by observation and stopping."
+  },
+  "plan_was_revised": true,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": null,
+      "status": "blocked",
+      "detail": {
+        "arrived": false,
+        "elapsed_s": 0.0,
+        "stopped_s": 0.0,
+        "obstacle_events": 0,
+        "reason": "line_follow_unavailable"
+      },
+      "elapsed_s": 0.57
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "black bag",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 5,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 16.57
+    },
+    {
+      "index": 2,
+      "action": "observe",
+      "target": "black bag",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 3,
+      "action": "report",
+      "target": "black bag",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "skipped",
+      "reason": "look_left_not_due_before_end_of_drive",
+      "t_rel_s": 0.57
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.52,
+      "bbox": [
+        248,
+        115,
+        457,
+        388
+      ],
+      "x_center": 0.551,
+      "fill": 0.185,
+      "bottom": 0.808,
+      "confidence": "high",
+      "sharpness": 300.43902587890625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.45,
+      "frame_path": "logs/frames/af63af825976/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 8.11,
+      "bbox": [
+        247,
+        144,
+        458,
+        386
+      ],
+      "x_center": 0.551,
+      "fill": 0.166,
+      "bottom": 0.804,
+      "confidence": "high",
+      "sharpness": 299.92169189453125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=0 pivot_s=0.00 gate=confirmed",
+      "vlm_latency_s": 1.8,
+      "frame_path": "logs/frames/af63af825976/ap_lock_verify.jpg",
+      "bearing_deg": 2.86,
+      "pivot_requested_deg": 2.86,
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "residual_e": 0.051,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 11.26,
+      "bbox": [
+        237,
+        138,
+        475,
+        412
+      ],
+      "x_center": 0.556,
+      "fill": 0.212,
+      "bottom": 0.858,
+      "confidence": "high",
+      "sharpness": 278.885986328125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.3,
+      "frame_path": "logs/frames/af63af825976/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.99,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.166,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 100.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 14.53,
+      "bbox": [
+        222,
+        73,
+        476,
+        404
+      ],
+      "x_center": 0.545,
+      "fill": 0.274,
+      "bottom": 0.842,
+      "confidence": "high",
+      "sharpness": 298.49200439453125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1795,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.36,
+      "frame_path": "logs/frames/af63af825976/ap_04_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.99,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.212,
+      "reject_reason": null,
+      "arrival_block": "vision_arrival_sonar_contradicted",
+      "hop_src": "fixed",
+      "d_vlm_cm": 60.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 16.57,
+      "bbox": [
+        222,
+        73,
+        476,
+        404
+      ],
+      "x_center": 0.545,
+      "fill": 0.274,
+      "bottom": 0.842,
+      "confidence": "high",
+      "sharpness": 298.49200439453125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 766,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 1.36,
+      "frame_path": "logs/frames/af63af825976/ap_04_check.jpg",
+      "hops_done": 2,
+      "fill_prev": 0.212,
+      "arrival_block": null,
+      "d_vlm_cm": 30.0
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "black bag",
+    "expected": [
+      "black bag",
+      "forward",
+      "black",
+      "bag",
+      "stop"
+    ],
+    "known": [],
+    "t_rel_s": 35.67,
+    "latency_s": 1.34,
+    "frame_path": "logs/frames/af63af825976/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "black bag"
+      ],
+      "missing": [
+        "forward",
+        "black",
+        "bag",
+        "stop"
+      ],
+      "unexpected": [
+        "orange box"
+      ],
+      "description": "A black bag is visible in the image next to an orange box."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 5,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 0,
+    "chassis_spin_deg_total": 2.9,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": 2.86,
+    "residual_e_at_lock": 0.051,
+    "hops_done": 2,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 278.9,
+    "sharpness_median": 298.5,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 7.27,
+    "motion_time_s": 1.98,
+    "wall_time_s": 5.78,
+    "sonar_stops": 0,
+    "arrival_reason": "fill",
+    "vlm_calls": 5,
+    "approach_wall_time_s": 13.05,
+    "hop_src_counts": {
+      "fixed": 2
+    }
+  },
+  "looked": {
+    "centre": 6
+  },
+  "scan_looks": [],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "black bag",
+      "orange box"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": null,
+    "t_start": null,
+    "obstacle_events": 0,
+    "bends": []
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 38.24,
+    "per_step_s": [
+      0.57,
+      16.57,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 1.34,
+    "vlm_latency_max_s": 1.34,
+    "checks_completed": 0,
+    "checks_skipped": 1,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "841977849bcc",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 7,
+      "latency_total_s": 9.682,
+      "latency_mean_s": 1.383,
+      "prompt_tokens_total": 2193,
+      "completion_tokens_total": 411,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 6.579,
+      "latency_mean_s": 3.29,
+      "prompt_tokens_total": 763,
+      "completion_tokens_total": 408,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 1,
+  "guidance_log": [
+    {
+      "reason": "line_follow_unavailable",
+      "question": "I stopped because I could not complete the step. What should I do next?",
+      "answer": "keep driving forward until you see the black bag",
+      "t_rel_s": 0.57,
+      "replanned": true
+    }
+  ],
+  "halt_reason": null,
+  "recovered": true,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 0.57,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 18.09,
+      "state": "thinking"
+    },
+    {
+      "t_rel_s": 21.03,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 21.65,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 29.25,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 38.22,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: forward, black, bag, stop"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    },
+    {
+      "code": "vision_arrival_sonar_contradicted",
+      "detail": "1 time(s) vision reported the target close enough to arrive while sonar still read it as far away \u2014 vision was not trusted, the rover kept approaching"
+    }
+  ],
+  "spoken_summary": "The drive forward command completed after guidance. A black bag and an orange box were seen. The most important uncertainty was that the expected black bag was not visible at arrival."
+}

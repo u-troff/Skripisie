@@ -58,5 +58,105 @@
   "flag": "good",
   "note": "Seems like conditional logic is alright need to refine condictional logic but what we can see is that is is sortof possible to get conditional logic workingh> IT did try its best to go to both but becuase both objects were not visible in the final frame it could not difitively say that it saw both. this was with gemma4 E4b for both models. This configuration seems to work th ebest as it only keeos context on 1 model throughout",
   "flagged_at": "2026-10-09T15:10:46"
+ },
+ "c6916bff7213": {
+  "flag": "good",
+  "note": "IT looked around it, passed, one thing to note it could actaully wait like 100ms on a scan so that it can settle before scaning the next and getting the next frame\n\nL0",
+  "flagged_at": "2026-10-10T22:13:23"
+ },
+ "b5aa0e5e23f2": {
+  "flag": "good",
+  "note": "the output. It actually saw the correct shit for L0\n\nThe rover completed its command. Looking left, the rover saw a light-colored, empty room with a white wall, a white doorway on the right, a yellow tape line, and a small electronic device on the floor. Looking right, the camera saw a light-colored tiled floor with a black object in the background, and a white/light object to the right of the black one.\n\nL0",
+  "flagged_at": "2026-10-10T22:13:12"
+ },
+ "d1b930096d5d": {
+  "flag": "good",
+  "note": "The route was a single straight run. Looking left showed an empty, light-colored floor with a grey wall and a small electronic device. Looking right showed a light-colored tiled floor with dark objects in the background.\n\nIt can describe its immediate surroundings\n\nL0",
+  "flagged_at": "2026-10-10T22:13:01"
+ },
+ "eb2604807f66": {
+  "flag": "good",
+  "note": "Turned about 118 degrees adn moved forward about 25cm. Will see how the other runs are this is 1/3 for L1",
+  "flagged_at": "2026-10-10T22:17:30"
+ },
+ "98d9aca94885": {
+  "flag": "good",
+  "note": "\n[voice] speak: 'The command was to turn left and move forward fifty centimeters. The route taken was a single straight run with no bends. The task has been completed.'\n[voice] mission_ended\n\nMoved about 30cm. not to bad. I c hanged the turn time to 0.76s which translates to 90 degrees or about 100 degrees this works quite nice. ",
+  "flagged_at": "2026-10-10T22:24:43"
+ },
+ "228fed67233d": {
+  "flag": "good",
+  "note": "accidentally got it inverted but it did as I asked it to move forward and then turn left",
+  "flagged_at": "2026-10-10T22:26:33"
+ },
+ "29320a6b4694": {
+  "flag": "good",
+  "note": "The command was resolved to drive forward, turn right, and drive forward. The total mission time was 3.25 seconds. The route involved no bends.\n\nMission completed successfully it drove forward and then turned right. It did not ask me for any directions or how far forward I wanted it to drivge L2",
+  "flagged_at": "2026-10-10T22:29:55"
+ },
+ "97887cb882b4": {
+  "flag": "good",
+  "note": "successfull L2 run. Nothing out of the ordinary. It is over turning so making the turn seconds less to 0.7 so that is can match a 90 degree turn.",
+  "flagged_at": "2026-10-10T22:35:06"
+ },
+ "6783852286c6": {
+  "flag": "good",
+  "note": "rover turned successfully anjd it turns at exactly 90 degrees. successfull run L2. Gemma4 e4b seems like the playa nd the inference time is really short",
+  "flagged_at": "2026-10-10T22:41:31"
+ },
+ "af63af825976": {
+  "flag": "good",
+  "note": "\n[voice] speak: 'The drive forward command completed after guidance. A black bag and an orange box were seen. The most important uncertainty was that the expected black bag was not visible at arrival.\n\nCould not distinguish the black bag due to lighting conditions for L3 test. It did try its best with a rerpormpt when it was stopped and did not know what to do.",
+  "flagged_at": "2026-10-10T22:45:44"
+ },
+ "2824ea8048bb": {
+  "flag": "bad",
+  "note": "Failed on the initialylook  for the black bag it did not attempt to see a black bag. It then locked onto another black object since it is hard to distingush a black bag in the dark room. L3 ",
+  "flagged_at": "2026-10-10T22:49:57"
+ },
+ "9bed2e749b55": {
+  "flag": "good",
+  "note": "\"One concern: The plan includes an 'approach' action targeting the 'orange box'. Given the robot's capabilities ('drive' and 'look') and the goal being mission verification, 'approach' should typically be replaced by a movement action if the target is not immediately locatable or if the simulation requires explicit navigation. More critically, the 'report' action is likely not a valid action in the stated capabilities ('drive' and 'look'). If 'report' is intended to transmit the observation data, the action should reflect that, but 'report' itself seems non-standard for driving/looking robots unless it is a specific high-level API call. Assuming 'approach' implies driving towards the target, the main concern is the 'report' action.. Here is the plan. Step 1: approach orange box. Step 2: observe orange box. Step 3: report orange box. Say yes to go, or tell me what to change\n\n\nIt made this weird above plan but then I corrected it to the orange baox and it went successfully the reason I change to the orange box and not the black bag is due to the light in my room not being able to light it up and me seeing it L3",
+  "flagged_at": "2026-10-10T22:54:39"
+ },
+ "35586000b633": {
+  "flag": "good",
+  "note": "The target, the orange box, was visible upon arrival. The most important uncertainty was that the expected details, like 'orange', 'right', and 'hear', were not visible. The rover arrived at the orange box after 139.96 seconds.\n\nIt was a bit confused and need to be told where to go to eventually make a good decision on where the orange box was but it got there in the end L3 done",
+  "flagged_at": "2026-10-10T23:05:45"
+ },
+ "f8811861d4e0": {
+  "flag": "review",
+  "note": "It did nothing, could not view correctly",
+  "flagged_at": "2026-10-10T23:42:22"
+ },
+ "3c64208b7973": {
+  "flag": "good",
+  "note": "The orange box is next to the blue bottle. The rover arrived at the orange box with high confidence. The most important uncertainty is that the expected instructions 'next, otherwise, stay' were not visible upon arrival.\n\nWas able tyo successfully distinguish the orange box and blue bottol and see that they are next to each other. L4 successfull",
+  "flagged_at": "2026-10-10T23:45:05"
+ },
+ "c8621ad788bf": {
+  "flag": "good",
+  "note": "The blue bottle was found and visible. The orange box was seen next to the blue bottle. The rover proceeded towards the blue bottle.\n\nsuccessfull run I changed the background to be more bright so the objects are easier to identify and this helped the model make a descion and plan better. L4 done",
+  "flagged_at": "2026-10-10T23:48:16"
+ },
+ "abe08c4094f1": {
+  "flag": "bad",
+  "note": "needed to check for condition",
+  "flagged_at": "2026-10-10T23:54:04"
+ },
+ "4639abdd2909": {
+  "flag": "good",
+  "note": "'The orange box is not next to the blue bottle. The rover did not move. The total time taken was 1.52 seconds.' \n\nIt saw that the orange box was not next to the bottle so it stopped and skipped the remaining steops the goat L4 done",
+  "flagged_at": "2026-10-10T23:56:01"
+ },
+ "0df36e214a46": {
+  "flag": "review",
+  "note": "It did not report everything around the orange box and only said that it arrived there./ Need to refine it a bit more but it can do the approach easily.",
+  "flagged_at": "2026-10-11T00:01:07"
+ },
+ "e39230867caa": {
+  "flag": "good",
+  "note": "successfull it can report what it saw when it wentnear a object and reported everything it saw\n\nArrival at the orange box was successful. The most important uncertainty is expected but not visible items. Left scan showed a white wall, grey baseboard, light grey floor, black line, small rectangular object, and an orange vertical structure. Centre scan showed an orange object, white object, brown object, light grey floor front, white floor middle, and dark grey floor left. Right scan showed brown/orange and white/patterned objects on the left side, a black object in the center background, and white and black areas on the right side",
+  "flagged_at": "2026-10-11T00:06:02"
  }
 }

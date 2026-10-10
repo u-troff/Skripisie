@@ -354,6 +354,12 @@ def build_report(mission, spoken: bool = True) -> dict:
         # all centre frames saw a corridor; one that swept saw a room, and the
         # difference matters when reading what `never_seen` means.
         "looked": _looked(checks, mission.arrival),
+        "conditions": [{"condition": c.get("condition"), "answer": c.get("answer")}
+                       for c in checks if c.get("kind") == "condition_check"],
+
+        "scan_looks": [{"aimed": c.get("aimed"), "description": _result(c).get("description"),
+                        "objects": _result(c).get("objects")}
+                       for c in checks if c.get("kind") == "scan_look" and not _errored(c)],
         "scene_id": mission.scene_id,
         "room_grounding": room_grounding,
         "sonar_obstacle_events": telemetry.get("obstacle_events", 0),
@@ -636,6 +642,8 @@ _SUMMARY_PROMPT = (
     "Write at most 3 short sentences for a spoken report from a small rover.\n"
     "Use ONLY facts in this JSON. Do not add anything not present in it.\n"
     "If uncertainties is non-empty, say the most important one.\n"
+    "If scan_looks is non-empty, name every object listed in it, grouped by direction "
+    "(left, centre, right); for that you may use up to 6 short sentences.\n"
     "Report JSON:\n%s\n"
     'Respond ONLY with JSON: {"summary": "..."}'
 )
@@ -644,7 +652,7 @@ _SUMMARY_PROMPT = (
 # bulky check records; trimming keeps the prompt inside the planner's num_ctx.
 _SUMMARY_KEYS = ("outcome", "command", "resolved_command", "uncertainties",
                  "arrival", "look_left", "sonar_obstacle_events", "timings",
-                 "rover_summary", "route_summary", "room_grounding", "looked")
+                 "rover_summary", "route_summary", "room_grounding", "looked","scan_looks","conditions")
 
 
 def _spoken_summary(report: dict) -> str:

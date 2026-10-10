@@ -1,0 +1,538 @@
+{
+  "session_id": "3c64208b7973",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L4",
+  "command": "can you please check whether the orange box is next to the blue bottle and if so go towards  the orange box otherwise stay where you are",
+  "resolved_command": "if the orange box is next to the blue bottle go towards the orange box otherwise stay where you are",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "check",
+        "target": "the orange box is next to the blue bottle"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 5,
+        "action": "stop",
+        "target": null,
+        "when": "no"
+      }
+    ],
+    "notes": "The original command implies a directive to 'go towards the orange box' if the condition is met, which is handled by 'approach'. If the condition is not met, the instruction is 'otherwise stay where you are', which is handled by 'stop' (since 'stop' halts movement without changing position)."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "check",
+        "target": "the orange box is next to the blue bottle"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 5,
+        "action": "stop",
+        "target": null,
+        "when": "no"
+      }
+    ],
+    "notes": "The original command implies a directive to 'go towards the orange box' if the condition is met, which is handled by 'approach'. If the condition is not met, the instruction is 'otherwise stay where you are', which is handled by 'stop' (since 'stop' halts movement without changing position)."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "check",
+      "target": "the orange box is next to the blue bottle",
+      "status": "ok",
+      "detail": {
+        "condition": "the orange box is next to the blue bottle",
+        "answer": "yes"
+      },
+      "elapsed_s": 1.5
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "orange box",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 6,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 20.51
+    },
+    {
+      "index": 2,
+      "action": "observe",
+      "target": "orange box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 3,
+      "action": "report",
+      "target": "orange box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    },
+    {
+      "index": 4,
+      "action": "stop",
+      "target": null,
+      "status": "skipped",
+      "detail": "branch yes not taken",
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "condition_check",
+      "condition": "the orange box is next to the blue bottle",
+      "answer": "yes",
+      "aimed": "centre",
+      "t_rel_s": 0.6,
+      "latency_s": 0.9,
+      "frame_path": "logs/frames/3c64208b7973/check_0.jpg",
+      "result": {
+        "answer": "yes",
+        "reason": "The orange box is positioned immediately to the left of the blue bottle."
+      }
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.16,
+      "bbox": [
+        197,
+        218,
+        334,
+        331
+      ],
+      "x_center": 0.415,
+      "fill": 0.05,
+      "bottom": 0.689,
+      "confidence": "high",
+      "sharpness": 171.67677307128906,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.2,
+      "frame_path": "logs/frames/3c64208b7973/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 7.3,
+      "bbox": [
+        197,
+        217,
+        334,
+        330
+      ],
+      "x_center": 0.415,
+      "fill": 0.051,
+      "bottom": 0.688,
+      "confidence": "high",
+      "sharpness": 171.74440002441406,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=0 pivot_s=0.00 gate=confirmed",
+      "vlm_latency_s": 1.37,
+      "frame_path": "logs/frames/3c64208b7973/ap_lock_verify.jpg",
+      "bearing_deg": -4.76,
+      "pivot_requested_deg": -4.76,
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "residual_e": -0.085,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 12.03,
+      "bbox": [
+        132,
+        185,
+        334,
+        365
+      ],
+      "x_center": 0.365,
+      "fill": 0.118,
+      "bottom": 0.761,
+      "confidence": "high",
+      "sharpness": 134.6663055419922,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1247,
+      "action": "hop 50 gate=confirmed",
+      "vlm_latency_s": 1.31,
+      "frame_path": "logs/frames/3c64208b7973/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.43,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.051,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 220.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 15.33,
+      "bbox": [
+        222,
+        170,
+        481,
+        393
+      ],
+      "x_center": 0.549,
+      "fill": 0.187,
+      "bottom": 0.819,
+      "confidence": "high",
+      "sharpness": 133.71966552734375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 773,
+      "action": "pivot L 0.06s hop 20 gate=confirmed",
+      "vlm_latency_s": 1.25,
+      "frame_path": "logs/frames/3c64208b7973/ap_04_check.jpg",
+      "pivot_cmd_s": 0.0640677966101695,
+      "pivot_dir": -1,
+      "hop_moved_s": 0.98,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.118,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 110.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 18.46,
+      "bbox": [
+        194,
+        143,
+        539,
+        439
+      ],
+      "x_center": 0.573,
+      "fill": 0.332,
+      "bottom": 0.914,
+      "confidence": "high",
+      "sharpness": 127.96306610107422,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 628,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.18,
+      "frame_path": "logs/frames/3c64208b7973/ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.97,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.187,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 270.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 20.51,
+      "bbox": [
+        194,
+        143,
+        539,
+        439
+      ],
+      "x_center": 0.573,
+      "fill": 0.332,
+      "bottom": 0.914,
+      "confidence": "high",
+      "sharpness": 127.96306610107422,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 462,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 1.18,
+      "frame_path": "logs/frames/3c64208b7973/ap_05_check.jpg",
+      "hops_done": 3,
+      "fill_prev": 0.187,
+      "arrival_block": null,
+      "d_vlm_cm": 150.0
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "orange box",
+    "expected": [
+      "orange box",
+      "orange",
+      "box",
+      "next",
+      "blue",
+      "bottle",
+      "otherwise",
+      "stay"
+    ],
+    "known": [],
+    "t_rel_s": 19.97,
+    "latency_s": 1.49,
+    "frame_path": "logs/frames/3c64208b7973/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "orange box",
+        "orange",
+        "box",
+        "blue",
+        "bottle"
+      ],
+      "missing": [
+        "next",
+        "otherwise",
+        "stay"
+      ],
+      "unexpected": [],
+      "description": "A large, orange cardboard box is prominently visible in the center of the image. To the right, there is a dark blue object that resembles a bottle or container."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 6,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 1,
+    "chassis_spin_deg_total": -4.8,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -4.76,
+    "residual_e_at_lock": -0.085,
+    "hops_done": 3,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 128.0,
+    "sharpness_median": 134.7,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 7.49,
+    "motion_time_s": 4.44,
+    "wall_time_s": 9.86,
+    "sonar_stops": 0,
+    "arrival_reason": "fill",
+    "vlm_calls": 6,
+    "approach_wall_time_s": 17.35,
+    "hop_src_counts": {
+      "fixed": 3
+    }
+  },
+  "looked": {
+    "centre": 8
+  },
+  "conditions": [
+    {
+      "condition": "the orange box is next to the blue bottle",
+      "answer": "yes"
+    }
+  ],
+  "scan_looks": [],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "blue",
+      "bottle",
+      "box",
+      "orange",
+      "orange box"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 22.53,
+    "per_step_s": [
+      1.5,
+      20.51,
+      0.51,
+      0.0,
+      0.0
+    ],
+    "vlm_latency_mean_s": 1.2,
+    "vlm_latency_max_s": 1.49,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "a98e90bb0c71",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object",
+        "check": "look once and decide whether a stated condition is true (yes or no); steps tagged \"when\" run only for the matching answer"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The plan relies on a conditional approach ('approach' in step 2) based on the outcome of a 'check' in step 1. If the condition ('the orange box is next to the blue bottle') is 'no', the robot performs a 'stop' in step 3, which means it never attempts to locate or move towards the orange box if the initial check fails. This seems to be an incomplete logic for a mission that might require further action even if the initial condition is not met. Additionally, the instruction 'approach orange box' implies the box is visible, but there is no guarantee the robot can see it in all scenarios. The action 'approach' might move the robot into a position where it can no longer see necessary elements if the initial check was 'no' and it stops without re-orienting or scanning.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 9,
+      "latency_total_s": 13.834,
+      "latency_mean_s": 1.537,
+      "prompt_tokens_total": 2691,
+      "completion_tokens_total": 719,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 4.981,
+      "latency_mean_s": 2.491,
+      "prompt_tokens_total": 1291,
+      "completion_tokens_total": 325,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 2.02,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 8.82,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 22.53,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: next, otherwise, stay"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    }
+  ],
+  "spoken_summary": "The orange box is next to the blue bottle. The rover arrived at the orange box with high confidence. The most important uncertainty is that the expected instructions 'next, otherwise, stay' were not visible upon arrival."
+}

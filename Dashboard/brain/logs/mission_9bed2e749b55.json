@@ -1,0 +1,468 @@
+{
+  "session_id": "9bed2e749b55",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L3",
+  "command": "please go to the arif box",
+  "resolved_command": "go to the orange box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "orange box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "orange box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "orange box"
+      }
+    ],
+    "notes": "Following the explicit instructions, the sequence uses 'approach' to navigate to the target, 'observe' to confirm the target's location, and 'report' as the final step to meet the goal, despite the plan checker's cautionary advice regarding the non-standard 'report' action."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "orange box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "orange box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "orange box"
+      }
+    ],
+    "notes": "Following the explicit instructions, the sequence uses 'approach' to navigate to the target, 'observe' to confirm the target's location, and 'report' as the final step to meet the goal, despite the plan checker's cautionary advice regarding the non-standard 'report' action."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "orange box",
+      "status": "ok",
+      "detail": {
+        "reason": "bottom",
+        "cycles": 6,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 21.43
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "orange box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "orange box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.49,
+      "bbox": [
+        136,
+        240,
+        271,
+        348
+      ],
+      "x_center": 0.319,
+      "fill": 0.048,
+      "bottom": 0.725,
+      "confidence": "high",
+      "sharpness": 349.0916748046875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.54,
+      "frame_path": "logs/frames/9bed2e749b55/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 7.85,
+      "bbox": [
+        273,
+        257,
+        419,
+        380
+      ],
+      "x_center": 0.54,
+      "fill": 0.059,
+      "bottom": 0.791,
+      "confidence": "high",
+      "sharpness": 403.1888427734375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 1.44,
+      "frame_path": "logs/frames/9bed2e749b55/ap_lock_verify.jpg",
+      "bearing_deg": -10.14,
+      "pivot_requested_deg": -10.14,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": -1,
+      "residual_e": 0.04,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 12.46,
+      "bbox": [
+        214,
+        209,
+        463,
+        430
+      ],
+      "x_center": 0.529,
+      "fill": 0.179,
+      "bottom": 0.895,
+      "confidence": "high",
+      "sharpness": 417.0186462402344,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1188,
+      "action": "hop 50 gate=fill_jump",
+      "vlm_latency_s": 1.28,
+      "frame_path": "logs/frames/9bed2e749b55/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.46,
+      "gate": "fill_jump",
+      "hops_done": 1,
+      "fill_prev": 0.059,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 150.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 15.74,
+      "bbox": [
+        184,
+        184,
+        527,
+        472
+      ],
+      "x_center": 0.555,
+      "fill": 0.322,
+      "bottom": 0.984,
+      "confidence": "high",
+      "sharpness": 463.2001037597656,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 656,
+      "action": "hop 20 gate=fill_jump",
+      "vlm_latency_s": 1.36,
+      "frame_path": "logs/frames/9bed2e749b55/ap_04_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.98,
+      "gate": "fill_jump",
+      "hops_done": 2,
+      "fill_prev": 0.059,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 60.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 19.21,
+      "bbox": [
+        417,
+        313,
+        589,
+        474
+      ],
+      "x_center": 0.786,
+      "fill": 0.09,
+      "bottom": 0.987,
+      "confidence": "medium",
+      "sharpness": 556.1065673828125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 474,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.47,
+      "frame_path": "logs/frames/9bed2e749b55/ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 1.01,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.059,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 150.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 21.43,
+      "bbox": [
+        417,
+        313,
+        589,
+        474
+      ],
+      "x_center": 0.786,
+      "fill": 0.09,
+      "bottom": 0.987,
+      "confidence": "medium",
+      "sharpness": 556.1065673828125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 279,
+      "action": "arrived (bottom)",
+      "vlm_latency_s": 1.47,
+      "frame_path": "logs/frames/9bed2e749b55/ap_05_check.jpg",
+      "hops_done": 3,
+      "fill_prev": 0.059,
+      "arrival_block": null,
+      "d_vlm_cm": 80.0
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "orange box",
+    "expected": [
+      "orange box",
+      "orange",
+      "box",
+      "arif"
+    ],
+    "known": [],
+    "t_rel_s": 19.21,
+    "latency_s": 1.62,
+    "frame_path": "logs/frames/9bed2e749b55/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "orange box"
+      ],
+      "missing": [
+        "orange",
+        "box",
+        "arif"
+      ],
+      "unexpected": [
+        "TurboPi",
+        "Hiw\u00e4nder"
+      ],
+      "description": "The image displays a box labeled 'TurboPi' from 'Hiw\u00e4nder', and the prompt's described target, 'orange box', is visible on the box design."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 6,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 1,
+    "chassis_spin_deg_total": -10.1,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -10.14,
+    "residual_e_at_lock": 0.04,
+    "hops_done": 3,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 349.1,
+    "sharpness_median": 463.2,
+    "detections_rejected": {
+      "fill_jump": 2
+    },
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 8.56,
+    "motion_time_s": 4.57,
+    "wall_time_s": 9.38,
+    "sonar_stops": 0,
+    "arrival_reason": "bottom",
+    "vlm_calls": 6,
+    "approach_wall_time_s": 17.94,
+    "hop_src_counts": {
+      "fixed": 3
+    }
+  },
+  "looked": {
+    "centre": 7
+  },
+  "scan_looks": [],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "Hiw\u00e4nder",
+      "TurboPi",
+      "orange box"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 21.95,
+    "per_step_s": [
+      21.43,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 1.62,
+    "vlm_latency_max_s": 1.62,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "841977849bcc",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 2,
+    "capped": false,
+    "verified": false,
+    "concerns": "The plan includes an 'approach' action targeting the 'orange box'. Given the robot's capabilities ('drive' and 'look') and the goal being mission verification, 'approach' should typically be replaced by a movement action if the target is not immediately locatable or if the simulation requires explicit navigation. More critically, the 'report' action is likely not a valid action in the stated capabilities ('drive' and 'look'). If 'report' is intended to transmit the observation data, the action should reflect that, but 'report' itself seems non-standard for driving/looking robots unless it is a specific high-level API call. Assuming 'approach' implies driving towards the target, the main concern is the 'report' action.",
+    "replan_count": 1
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 11,
+      "latency_total_s": 17.482,
+      "latency_mean_s": 1.589,
+      "prompt_tokens_total": 3509,
+      "completion_tokens_total": 789,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 4,
+      "latency_total_s": 6.142,
+      "latency_mean_s": 1.535,
+      "prompt_tokens_total": 1171,
+      "completion_tokens_total": 387,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 0.52,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 7.85,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 21.95,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: orange, box, arif"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (bottom) \u2014 sonar did not confirm"
+    },
+    {
+      "code": "hallucinated_box_rejected",
+      "detail": "2 detection(s) were rejected as implausible (fill_jump) \u2014 counted, not believed"
+    }
+  ],
+  "spoken_summary": "The command was resolved to go to the orange box. The target was visible with high confidence. An expected object, the arif box, was not visible upon arrival."
+}

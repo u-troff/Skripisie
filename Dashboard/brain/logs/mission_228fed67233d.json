@@ -1,0 +1,166 @@
+{
+  "session_id": "228fed67233d",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L1",
+  "command": "can you please move forward and then turn left",
+  "resolved_command": "move forward and then turn left",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "target": "forward"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "left"
+      }
+    ],
+    "notes": "Executed the movement first, followed by the rotation."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "move",
+        "target": "forward"
+      },
+      {
+        "id": 2,
+        "action": "turn",
+        "target": "left"
+      }
+    ],
+    "notes": "Executed the movement first, followed by the rotation."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "move",
+      "target": "forward",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.24
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": "left",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.79
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "scan_looks": [],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 2.04,
+    "per_step_s": [
+      1.24,
+      0.79
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "841977849bcc",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 2.023,
+      "latency_mean_s": 1.011,
+      "prompt_tokens_total": 564,
+      "completion_tokens_total": 78,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 1.418,
+      "latency_mean_s": 0.709,
+      "prompt_tokens_total": 392,
+      "completion_tokens_total": 65,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 2.04,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [],
+  "spoken_summary": "Mission completed. The route was a single straight run. No obstacles were detected."
+}

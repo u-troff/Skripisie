@@ -1,0 +1,654 @@
+{
+  "session_id": "2824ea8048bb",
+  "outcome": "halted_after_guidance",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L3",
+  "command": "please don't do the black bag",
+  "resolved_command": "drive to the black bag",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "turn",
+        "target": null
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "black bag"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "black bag"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "black bag"
+      }
+    ],
+    "notes": "The original 'follow_line' failed because line following is unavailable. The person instructed to look at the black bag, which is in front of the rover. Therefore, I will turn to face it (assuming it's not already in view, to be safe), use 'approach' to reach it, and then 'observe' and 'report' to complete the mission goal."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "follow_line",
+        "target": "black bag"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "black bag"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "black bag"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "black bag"
+      }
+    ],
+    "notes": "Assumes the black bag is reachable via the floor line or is visible/discoverable by the 'approach' command if a line isn't present. If no line leads there, the approach command will handle the search/movement."
+  },
+  "plan_was_revised": true,
+  "steps": [
+    {
+      "index": 0,
+      "action": "follow_line",
+      "target": "black bag",
+      "status": "blocked",
+      "detail": {
+        "arrived": false,
+        "elapsed_s": 0.0,
+        "stopped_s": 0.0,
+        "obstacle_events": 0,
+        "reason": "line_follow_unavailable"
+      },
+      "elapsed_s": 0.57
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.72
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "black bag",
+      "status": "blocked",
+      "detail": {
+        "reason": "obstacle",
+        "sonar_mm": 67,
+        "cycles": 13
+      },
+      "elapsed_s": 31.42
+    }
+  ],
+  "checks": [
+    {
+      "kind": "skipped",
+      "reason": "look_left_not_due_before_end_of_drive",
+      "t_rel_s": 0.57
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 2.93,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 324.8502502441406,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 0.91,
+      "frame_path": "logs/frames/2824ea8048bb/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "search",
+      "t_rel_s": 5.68,
+      "bbox": [
+        0,
+        145,
+        640,
+        463
+      ],
+      "x_center": 0.5,
+      "fill": 0.662,
+      "bottom": 0.964,
+      "confidence": "high",
+      "sharpness": 182.56182861328125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=-290 gate=degenerate_fill",
+      "vlm_latency_s": 1.28,
+      "frame_path": "logs/frames/2824ea8048bb/ap_s0_p-290.jpg",
+      "sweep": 0,
+      "pan_offset": -290,
+      "pan_deg": -23.809,
+      "gate": "degenerate_fill",
+      "reject_reason": "degenerate_fill"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "search",
+      "t_rel_s": 8.1,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 581.4752197265625,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=290 gate=not_visible",
+      "vlm_latency_s": 0.99,
+      "frame_path": "logs/frames/2824ea8048bb/ap_s0_p290.jpg",
+      "sweep": 0,
+      "pan_offset": 290,
+      "pan_deg": 23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "search",
+      "t_rel_s": 9.38,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": null,
+      "frame_attempts": null,
+      "vlm_said_visible": null,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "sweep_advance_pivot",
+      "vlm_latency_s": null,
+      "frame_path": null,
+      "sweep": 0,
+      "pivot_requested_deg": 90.0,
+      "pivot_cmd_s": 0.7627118644067796,
+      "pivot_dir": 1
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "search",
+      "t_rel_s": 11.69,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 177.56704711914062,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 0.92,
+      "frame_path": "logs/frames/2824ea8048bb/ap_s1_p0.jpg",
+      "sweep": 1,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "search",
+      "t_rel_s": 14.06,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 279.4865417480469,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=-290 gate=not_visible",
+      "vlm_latency_s": 0.88,
+      "frame_path": "logs/frames/2824ea8048bb/ap_s1_p-290.jpg",
+      "sweep": 1,
+      "pan_offset": -290,
+      "pan_deg": -23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "search",
+      "t_rel_s": 16.51,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 379.3653869628906,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=290 gate=not_visible",
+      "vlm_latency_s": 0.94,
+      "frame_path": "logs/frames/2824ea8048bb/ap_s1_p290.jpg",
+      "sweep": 1,
+      "pan_offset": 290,
+      "pan_deg": 23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 8,
+      "phase": "search",
+      "t_rel_s": 17.82,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": null,
+      "frame_attempts": null,
+      "vlm_said_visible": null,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "sweep_advance_pivot",
+      "vlm_latency_s": null,
+      "frame_path": null,
+      "sweep": 1,
+      "pivot_requested_deg": 90.0,
+      "pivot_cmd_s": 0.7627118644067796,
+      "pivot_dir": 1
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 9,
+      "phase": "search",
+      "t_rel_s": 20.4,
+      "bbox": [
+        0,
+        0,
+        149,
+        298
+      ],
+      "x_center": 0.117,
+      "fill": 0.145,
+      "bottom": 0.621,
+      "confidence": "high",
+      "sharpness": 169.8873291015625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.17,
+      "frame_path": "logs/frames/2824ea8048bb/ap_s2_p0.jpg",
+      "sweep": 2,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 10,
+      "phase": "lock",
+      "t_rel_s": 24.68,
+      "bbox": [
+        201,
+        5,
+        444,
+        316
+      ],
+      "x_center": 0.504,
+      "fill": 0.246,
+      "bottom": 0.658,
+      "confidence": "high",
+      "sharpness": 514.42333984375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.18 gate=confirmed",
+      "vlm_latency_s": 1.3,
+      "frame_path": "logs/frames/2824ea8048bb/ap_lock_verify.jpg",
+      "bearing_deg": -21.45,
+      "pivot_requested_deg": -21.45,
+      "pivot_cmd_s": 0.18,
+      "pivot_dir": -1,
+      "residual_e": 0.004,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 11,
+      "phase": "approach",
+      "t_rel_s": 27.86,
+      "bbox": [
+        110,
+        0,
+        271,
+        304
+      ],
+      "x_center": 0.298,
+      "fill": 0.16,
+      "bottom": 0.633,
+      "confidence": "high",
+      "sharpness": 406.91131591796875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 325,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.3,
+      "frame_path": "logs/frames/2824ea8048bb/ap_11_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.99,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.246,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 80.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 12,
+      "phase": "approach",
+      "t_rel_s": 31.18,
+      "bbox": [
+        429,
+        8,
+        566,
+        319
+      ],
+      "x_center": 0.777,
+      "fill": 0.139,
+      "bottom": 0.665,
+      "confidence": "high",
+      "sharpness": 761.273193359375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 422,
+      "action": "pivot L 0.10s hop 20 gate=confirmed",
+      "vlm_latency_s": 1.27,
+      "frame_path": "logs/frames/2824ea8048bb/ap_12_check.jpg",
+      "pivot_cmd_s": 0.09586440677966103,
+      "pivot_dir": -1,
+      "hop_moved_s": 1.0,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.16,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": null,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 13,
+      "phase": "approach",
+      "t_rel_s": 31.42,
+      "bbox": [
+        429,
+        8,
+        566,
+        319
+      ],
+      "x_center": 0.777,
+      "fill": 0.139,
+      "bottom": 0.665,
+      "confidence": "high",
+      "sharpness": 761.273193359375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 67,
+      "action": "pivot R 0.13s hop 20 sonar_stop_blocked",
+      "vlm_latency_s": 1.27,
+      "frame_path": "logs/frames/2824ea8048bb/ap_12_check.jpg",
+      "pivot_cmd_s": 0.1314576271186441,
+      "pivot_dir": 1,
+      "hop_moved_s": 0.06,
+      "hop_src": "fixed",
+      "d_vlm_cm": null,
+      "centred": false
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 13,
+    "sweeps_used": 3,
+    "gimbal_looks": 9,
+    "chassis_pivots": 5,
+    "chassis_spin_deg_total": 158.6,
+    "search_vlm_calls": 9,
+    "bearing_deg_at_lock": -21.45,
+    "residual_e_at_lock": 0.004,
+    "hops_done": 3,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 169.9,
+    "sharpness_median": 379.4,
+    "detections_rejected": {
+      "degenerate_fill": 1
+    },
+    "arrival_cross_check": null,
+    "gimbal_only_lock": null,
+    "vlm_time_s": 12.23,
+    "motion_time_s": 3.98,
+    "wall_time_s": 16.26,
+    "sonar_stops": 1,
+    "arrival_reason": "obstacle",
+    "vlm_calls": 11,
+    "approach_wall_time_s": 28.49,
+    "hop_src_counts": {
+      "fixed": 3
+    }
+  },
+  "looked": {
+    "centre": 13
+  },
+  "scan_looks": [],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {
+    "following": false,
+    "paused": false,
+    "sonar_mm": 1251,
+    "t_start": null,
+    "obstacle_events": 0,
+    "bends": []
+  },
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 76.99,
+    "per_step_s": [
+      0.57,
+      0.72,
+      31.42
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 1,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "841977849bcc",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 13,
+      "latency_total_s": 15.034,
+      "latency_mean_s": 1.156,
+      "prompt_tokens_total": 4096,
+      "completion_tokens_total": 703,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 4.869,
+      "latency_mean_s": 2.435,
+      "prompt_tokens_total": 759,
+      "completion_tokens_total": 353,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 2,
+  "guidance_log": [
+    {
+      "reason": "line_follow_unavailable",
+      "question": "I stopped because I could not complete the step. What should I do next?",
+      "answer": "look at the black bag it is in front of you just go towards it",
+      "t_rel_s": 0.58,
+      "replanned": true
+    },
+    {
+      "reason": "obstacle",
+      "question": "I stopped because something is in my way. What should I do next?",
+      "answer": "abort the mission",
+      "t_rel_s": 60.12,
+      "replanned": false
+    }
+  ],
+  "halt_reason": "guidance_declined",
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 0.58,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 25.3,
+      "state": "thinking"
+    },
+    {
+      "t_rel_s": 27.87,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 29.19,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 53.38,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 60.11,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 76.85,
+      "state": "blocked"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "mission_blocked",
+      "detail": "the mission stopped before finishing (obstacle)"
+    },
+    {
+      "code": "approach_budget_overrun",
+      "detail": "used 13 of 20 available cycles (>50%)"
+    },
+    {
+      "code": "hallucinated_box_rejected",
+      "detail": "1 detection(s) were rejected as implausible (degenerate_fill) \u2014 counted, not believed"
+    }
+  ],
+  "spoken_summary": "The rover halted after guidance, with the mission stopped before finishing due to an obstacle. The route was a single straight run. There were no scan looks recorded."
+}

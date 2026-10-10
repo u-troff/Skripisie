@@ -1,0 +1,300 @@
+{
+  "session_id": "cb6a75b6e707",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L4",
+  "command": "please check if the orange box is next to a blue bottle and if so go towards the  orange box it is on the left of your view right now",
+  "resolved_command": "go towards the orange box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "check",
+        "target": "the orange box is visible"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 5,
+        "action": "scan",
+        "when": "no"
+      }
+    ],
+    "notes": "The plan first checks for visibility. If visible, it uses approach, observes, and reports. If not visible, it scans to potentially find it or attempt another search action."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "check",
+        "target": "the orange box is visible"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "orange box",
+        "when": "yes"
+      },
+      {
+        "id": 5,
+        "action": "scan",
+        "when": "no"
+      }
+    ],
+    "notes": "The plan first checks for visibility. If visible, it uses approach, observes, and reports. If not visible, it scans to potentially find it or attempt another search action."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "check",
+      "target": "the orange box is visible",
+      "status": "ok",
+      "detail": {
+        "condition": "the orange box is visible",
+        "answer": "no"
+      },
+      "elapsed_s": 1.5
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "orange box",
+      "status": "skipped",
+      "detail": "branch no not taken",
+      "elapsed_s": 0.0
+    },
+    {
+      "index": 2,
+      "action": "observe",
+      "target": "orange box",
+      "status": "skipped",
+      "detail": "branch no not taken",
+      "elapsed_s": 0.0
+    },
+    {
+      "index": 3,
+      "action": "report",
+      "target": "orange box",
+      "status": "skipped",
+      "detail": "branch no not taken",
+      "elapsed_s": 0.0
+    },
+    {
+      "index": 4,
+      "action": "scan",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.23
+    }
+  ],
+  "checks": [
+    {
+      "kind": "condition_check",
+      "condition": "the orange box is visible",
+      "answer": "no",
+      "aimed": "centre",
+      "t_rel_s": 0.71,
+      "latency_s": 0.79,
+      "frame_path": "logs/frames/cb6a75b6e707/check_0.jpg",
+      "result": {
+        "answer": "no",
+        "reason": "There is no orange box visible in the image."
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "left",
+      "t_rel_s": 2.73,
+      "latency_s": 1.09,
+      "frame_path": "logs/frames/cb6a75b6e707/scan_left.jpg",
+      "result": {
+        "description": "The camera sees a light-colored, open floor area with a yellow tape line stretching across the foreground, and a large orange object and dark furniture visible in the background."
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "right",
+      "t_rel_s": 4.48,
+      "latency_s": 0.89,
+      "frame_path": "logs/frames/cb6a75b6e707/scan_right.jpg",
+      "result": {
+        "description": "A wide, light-colored floor extends into the distance, with a dark line running along the right side, and several pairs of shoes are visible in the upper right corner."
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "centre",
+      "t_rel_s": 6.2,
+      "latency_s": 0.93,
+      "frame_path": "logs/frames/cb6a75b6e707/scan_centre.jpg",
+      "result": {
+        "description": "The camera views a large, empty, light-colored concrete floor with dark, out-of-focus objects visible in the background on the right."
+      }
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {
+    "centre": 2,
+    "left": 1,
+    "right": 1
+  },
+  "conditions": [
+    {
+      "condition": "the orange box is visible",
+      "answer": "no"
+    }
+  ],
+  "scan_looks": [
+    {
+      "aimed": "left",
+      "description": "The camera sees a light-colored, open floor area with a yellow tape line stretching across the foreground, and a large orange object and dark furniture visible in the background."
+    },
+    {
+      "aimed": "right",
+      "description": "A wide, light-colored floor extends into the distance, with a dark line running along the right side, and several pairs of shoes are visible in the upper right corner."
+    },
+    {
+      "aimed": "centre",
+      "description": "The camera views a large, empty, light-colored concrete floor with dark, out-of-focus objects visible in the background on the right."
+    }
+  ],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 7.84,
+    "per_step_s": [
+      1.5,
+      0.0,
+      0.0,
+      0.0,
+      1.23
+    ],
+    "vlm_latency_mean_s": 0.93,
+    "vlm_latency_max_s": 1.09,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "a98e90bb0c71",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object",
+        "check": "look once and decide whether a stated condition is true (yes or no); steps tagged \"when\" run only for the matching answer"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot's plan only includes 'approach' to the 'orange box'. Since the robot is restricted to only driving and looking, 'approach' alone is insufficient to confirm the objective is met or to report on the target unless 'look' is explicitly used afterwards, or 'approach' is defined to include a look. Given the constraints, a plan that includes a 'look' action after the approach to verify the target's presence or state is necessary for a complete mission.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 7,
+      "latency_total_s": 14.701,
+      "latency_mean_s": 2.1,
+      "prompt_tokens_total": 1751,
+      "completion_tokens_total": 486,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 3.548,
+      "latency_mean_s": 1.774,
+      "prompt_tokens_total": 958,
+      "completion_tokens_total": 223,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 7.84,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [],
+  "spoken_summary": "The rover completed its command and followed a single straight run. The left scan showed a light-colored floor with a yellow tape line and a large orange object. The right scan revealed a wide, light-colored floor with several pairs of shoes visible."
+}

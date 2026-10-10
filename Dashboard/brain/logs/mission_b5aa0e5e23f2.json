@@ -1,0 +1,195 @@
+{
+  "session_id": "b5aa0e5e23f2",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L0",
+  "command": "can you tell me what you see",
+  "resolved_command": "can you tell me what you see",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": "environment"
+      }
+    ],
+    "notes": "The command 'can you tell me what you see' implies a general visual assessment of the current area. A 'scan' action captures the surrounding visual data."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": "environment"
+      }
+    ],
+    "notes": "The command 'can you tell me what you see' implies a general visual assessment of the current area. A 'scan' action captures the surrounding visual data."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "scan",
+      "target": "environment",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.23
+    }
+  ],
+  "checks": [
+    {
+      "kind": "scan_look",
+      "aimed": "left",
+      "t_rel_s": 1.23,
+      "latency_s": 1.28,
+      "frame_path": "logs/frames/b5aa0e5e23f2/scan_left.jpg",
+      "result": {
+        "description": "The camera sees a light-colored, empty room with a white wall, a white doorway on the right, a yellow tape line running across the floor, and a small electronic device sitting on the floor near the wall."
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "right",
+      "t_rel_s": 3.31,
+      "latency_s": 1.26,
+      "frame_path": "logs/frames/b5aa0e5e23f2/scan_right.jpg",
+      "result": {
+        "description": "The camera sees a light-colored tiled floor with a black object in the background, and a white/light object to the right of the black one, with no immediate path blockages visible except for the objects in the distance."
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "centre",
+      "t_rel_s": 5.35,
+      "latency_s": 0.9,
+      "frame_path": "logs/frames/b5aa0e5e23f2/scan_centre.jpg",
+      "result": {
+        "description": "The camera views an indoor space with a white floor, featuring an electronic device and a cardboard box in the background."
+      }
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {
+    "left": 1,
+    "right": 1,
+    "centre": 1
+  },
+  "scan_looks": [
+    {
+      "aimed": "left",
+      "description": "The camera sees a light-colored, empty room with a white wall, a white doorway on the right, a yellow tape line running across the floor, and a small electronic device sitting on the floor near the wall."
+    },
+    {
+      "aimed": "right",
+      "description": "The camera sees a light-colored tiled floor with a black object in the background, and a white/light object to the right of the black one, with no immediate path blockages visible except for the objects in the distance."
+    },
+    {
+      "aimed": "centre",
+      "description": "The camera views an indoor space with a white floor, featuring an electronic device and a cardboard box in the background."
+    }
+  ],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 7.06,
+    "per_step_s": [
+      1.23
+    ],
+    "vlm_latency_mean_s": 1.15,
+    "vlm_latency_max_s": 1.28,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "841977849bcc",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": true,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 6,
+      "latency_total_s": 6.963,
+      "latency_mean_s": 1.16,
+      "prompt_tokens_total": 1484,
+      "completion_tokens_total": 242,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 1.436,
+      "latency_mean_s": 0.718,
+      "prompt_tokens_total": 382,
+      "completion_tokens_total": 69,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 7.06,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [],
+  "spoken_summary": "The rover completed its command. Looking left, the rover saw a light-colored, empty room with a white wall, a white doorway on the right, a yellow tape line, and a small electronic device on the floor. Looking right, the camera saw a light-colored tiled floor with a black object in the background, and a white/light object to the right of the black one."
+}

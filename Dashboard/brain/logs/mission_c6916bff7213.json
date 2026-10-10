@@ -1,0 +1,195 @@
+{
+  "session_id": "c6916bff7213",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L0",
+  "command": "tell me what you can see",
+  "resolved_command": "tell me what you can see\nClarification \u2014 What specific object are you interested in me looking at or going to? just tell me what you can see around you",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": null
+      }
+    ],
+    "notes": "Since the request is to 'tell me what you can see around you' without specifying a target object, a general scan is the appropriate first action to gather visual information."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "scan",
+        "target": null
+      }
+    ],
+    "notes": "Since the request is to 'tell me what you can see around you' without specifying a target object, a general scan is the appropriate first action to gather visual information."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "scan",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.23
+    }
+  ],
+  "checks": [
+    {
+      "kind": "scan_look",
+      "aimed": "left",
+      "t_rel_s": 1.23,
+      "latency_s": 1.02,
+      "frame_path": "logs/frames/c6916bff7213/scan_left.jpg",
+      "result": {
+        "description": "The camera is viewing a light-colored, empty room with a white and gray wall in the background, and a small electronic device is visible on the floor in the middle-right area."
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "right",
+      "t_rel_s": 2.81,
+      "latency_s": 0.86,
+      "frame_path": "logs/frames/c6916bff7213/scan_right.jpg",
+      "result": {
+        "description": "The camera is looking across a light wooden floor towards some furniture, with a possible obstruction in the upper right area."
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "centre",
+      "t_rel_s": 4.26,
+      "latency_s": 1.29,
+      "frame_path": "logs/frames/c6916bff7213/scan_centre.jpg",
+      "result": {
+        "description": "The camera sees a white and grey industrial area with a control box on the left, a large orange and white robotic arm/device in the center, and a large black object on the right, with no immediate path blockage visible in the foreground."
+      }
+    }
+  ],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {
+    "left": 1,
+    "right": 1,
+    "centre": 1
+  },
+  "scan_looks": [
+    {
+      "aimed": "left",
+      "description": "The camera is viewing a light-colored, empty room with a white and gray wall in the background, and a small electronic device is visible on the floor in the middle-right area."
+    },
+    {
+      "aimed": "right",
+      "description": "The camera is looking across a light wooden floor towards some furniture, with a possible obstruction in the upper right area."
+    },
+    {
+      "aimed": "centre",
+      "description": "The camera sees a white and grey industrial area with a control box on the left, a large orange and white robotic arm/device in the center, and a large black object on the right, with no immediate path blockage visible in the foreground."
+    }
+  ],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 6.29,
+    "per_step_s": [
+      1.23
+    ],
+    "vlm_latency_mean_s": 1.06,
+    "vlm_latency_max_s": 1.29,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "841977849bcc",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 6,
+      "latency_total_s": 6.693,
+      "latency_mean_s": 1.115,
+      "prompt_tokens_total": 1483,
+      "completion_tokens_total": 235,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 1.087,
+      "latency_mean_s": 1.087,
+      "prompt_tokens_total": 318,
+      "completion_tokens_total": 60,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 6.28,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [],
+  "spoken_summary": "The route was a single straight run. Looking left, the view shows a light-colored room with a small electronic device. Looking right, the view shows a light wooden floor toward furniture."
+}

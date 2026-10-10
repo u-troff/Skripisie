@@ -58,7 +58,7 @@ def profile_info() -> dict:
     models.planner_profile and the UI's header pill."""
     profile = _profile()
     vocabulary = _build_vocabulary(profile.ACTIONS, _guidance_for(profile))
-    digest = hashlib.sha256((vocabulary + profile.STEP_SCHEMA).encode("utf-8")).hexdigest()[:12]
+    digest = hashlib.sha256((vocabulary + profile.STEP_SCHEMA).encode("utf-8")).hexdigest()[:12]#identify what prompt was used and model
     return {"profile": profile.PROFILE_NAME, "prompt_sha": digest, "actions": dict(profile.ACTIONS)}
 
 
@@ -67,7 +67,14 @@ def build_plan_prompt(command: str, scene: str = "") -> str:
     tools/snapshot_prompt.py can print the exact prompt without calling a
     model. Nothing here may change what generate_plan sends."""
     profile = _profile()
-    vocabulary = _build_vocabulary(profile.ACTIONS, _guidance_for(profile))
+    conditional = profile is planner_pi and bool(_CONDITIONAL.search(command))
+    actions = dict(profile.ACTIONS)
+
+    if not conditional:
+        actions.pop("check", None)
+    guidance = _guidance_for(profile) + ((" " + planner_pi.CONDITIONAL_GUIDANCE) if conditional else "")
+
+    vocabulary = _build_vocabulary(actions, guidance)
 
     scene_block = ""
     if scene:
@@ -93,6 +100,9 @@ _DIRECTIONAL = re.compile(
     r"\d+(\.\d+)?\s*(cm|m|metres?|meters?|steps?))\b",
     re.IGNORECASE,
 )
+
+_CONDITIONAL = re.compile(r"\b(if|whether|otherwise|unless)\b", re.IGNORECASE)
+
 
 
 def _promote_moves_to_approach(steps: list) -> None:

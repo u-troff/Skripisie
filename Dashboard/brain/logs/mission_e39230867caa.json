@@ -1,0 +1,599 @@
+{
+  "session_id": "e39230867caa",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L5",
+  "command": "can you please go towards the rn fox and then come to see a rally",
+  "resolved_command": "can you please go towards the rn fox and then come to see a rally\nClarification \u2014 What are the locations or descriptions of the 'rn fox' and 'rally'? can you please go to the orange box and tell me what you see around the orange box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "orange_box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "orange_box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "orange_box"
+      }
+    ],
+    "notes": "The original command was ambiguous. I have replaced the target 'rn fox' and 'rally' with the clarified target 'orange box' based on the final instructions."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "orange_box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "orange_box"
+      },
+      {
+        "id": 3,
+        "action": "report",
+        "target": "orange_box"
+      }
+    ],
+    "notes": "The original command was ambiguous. I have replaced the target 'rn fox' and 'rally' with the clarified target 'orange box' based on the final instructions."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "orange_box",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 7,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 24.12
+    },
+    {
+      "index": 1,
+      "action": "observe",
+      "target": "orange_box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 2,
+      "action": "report",
+      "target": "orange_box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.46,
+      "bbox": [
+        132,
+        217,
+        257,
+        324
+      ],
+      "x_center": 0.304,
+      "fill": 0.043,
+      "bottom": 0.674,
+      "confidence": "high",
+      "sharpness": 324.8243103027344,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.41,
+      "frame_path": "logs/frames/e39230867caa/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 7.78,
+      "bbox": [
+        340,
+        225,
+        464,
+        329
+      ],
+      "x_center": 0.628,
+      "fill": 0.042,
+      "bottom": 0.685,
+      "confidence": "high",
+      "sharpness": 308.2660827636719,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 1.28,
+      "frame_path": "logs/frames/e39230867caa/ap_lock_verify.jpg",
+      "bearing_deg": -10.98,
+      "pivot_requested_deg": -10.98,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": -1,
+      "residual_e": 0.128,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 12.61,
+      "bbox": [
+        274,
+        205,
+        452,
+        355
+      ],
+      "x_center": 0.568,
+      "fill": 0.087,
+      "bottom": 0.739,
+      "confidence": "high",
+      "sharpness": 283.9090270996094,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 607,
+      "action": "pivot R 0.06s hop 50 gate=confirmed",
+      "vlm_latency_s": 1.32,
+      "frame_path": "logs/frames/e39230867caa/ap_03_check.jpg",
+      "pivot_cmd_s": 0.06074576271186441,
+      "pivot_dir": 1,
+      "hop_moved_s": 2.45,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.042,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 250.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 15.87,
+      "bbox": [
+        242,
+        188,
+        458,
+        366
+      ],
+      "x_center": 0.547,
+      "fill": 0.125,
+      "bottom": 0.763,
+      "confidence": "high",
+      "sharpness": 281.8211669921875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 949,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.24,
+      "frame_path": "logs/frames/e39230867caa/ap_04_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 1.01,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.087,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 160.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 19.1,
+      "bbox": [
+        253,
+        167,
+        519,
+        392
+      ],
+      "x_center": 0.604,
+      "fill": 0.195,
+      "bottom": 0.817,
+      "confidence": "high",
+      "sharpness": 301.2396240234375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 776,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.29,
+      "frame_path": "logs/frames/e39230867caa/ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 1.01,
+      "gate": "confirmed",
+      "hops_done": 3,
+      "fill_prev": 0.125,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 270.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 22.26,
+      "bbox": [
+        156,
+        152,
+        487,
+        437
+      ],
+      "x_center": 0.503,
+      "fill": 0.307,
+      "bottom": 0.91,
+      "confidence": "high",
+      "sharpness": 352.29071044921875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 615,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.25,
+      "frame_path": "logs/frames/e39230867caa/ap_06_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 1.02,
+      "gate": "confirmed",
+      "hops_done": 4,
+      "fill_prev": 0.195,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 110.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 24.12,
+      "bbox": [
+        156,
+        152,
+        487,
+        437
+      ],
+      "x_center": 0.503,
+      "fill": 0.307,
+      "bottom": 0.91,
+      "confidence": "high",
+      "sharpness": 352.29071044921875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 481,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 1.25,
+      "frame_path": "logs/frames/e39230867caa/ap_06_check.jpg",
+      "hops_done": 4,
+      "fill_prev": 0.195,
+      "arrival_block": null,
+      "d_vlm_cm": 150.0
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "left",
+      "t_rel_s": 24.63,
+      "latency_s": 1.6,
+      "frame_path": "logs/frames/e39230867caa/scan_left.jpg",
+      "result": {
+        "description": "The image shows an indoor area with various objects and markings on the floor.",
+        "objects": [
+          "white, background wall",
+          "grey, baseboard",
+          "light grey, floor",
+          "black, thin line on floor",
+          "black, small rectangular object on floor",
+          "orange, vertical structure on right",
+          "yellow, thick line on floor"
+        ]
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "right",
+      "t_rel_s": 26.91,
+      "latency_s": 1.49,
+      "frame_path": "logs/frames/e39230867caa/scan_right.jpg",
+      "result": {
+        "description": "The image shows an indoor scene with various objects in the background and a light-colored floor in the foreground.",
+        "objects": [
+          "brown/orange, left side",
+          "white/patterned, left side",
+          "black, center background",
+          "white, right side",
+          "black, foreground/floor area"
+        ]
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "centre",
+      "t_rel_s": 29.18,
+      "latency_s": 1.46,
+      "frame_path": "logs/frames/e39230867caa/scan_centre.jpg",
+      "result": {
+        "description": "The image shows a rover looking at its surroundings, featuring a large orange barrier.",
+        "objects": [
+          "orange, center",
+          "white, right",
+          "brown, bottom right",
+          "light grey, floor front",
+          "white, floor middle",
+          "dark grey, floor left",
+          "black, floor far left"
+        ]
+      }
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "orange_box",
+    "expected": [
+      "orange_box",
+      "fox",
+      "come",
+      "rally",
+      "clarification",
+      "locations",
+      "descriptions",
+      "orange"
+    ],
+    "known": [],
+    "t_rel_s": 22.26,
+    "latency_s": 1.2,
+    "frame_path": "logs/frames/e39230867caa/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "orange_box"
+      ],
+      "missing": [
+        "fox",
+        "come",
+        "rally",
+        "clarification",
+        "locations",
+        "descriptions",
+        "orange"
+      ],
+      "unexpected": [
+        ""
+      ],
+      "description": "A large, orange rectangular box is visible in the center of the image."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 7,
+    "sweeps_used": 1,
+    "gimbal_looks": 1,
+    "chassis_pivots": 2,
+    "chassis_spin_deg_total": -11.0,
+    "search_vlm_calls": 1,
+    "bearing_deg_at_lock": -10.98,
+    "residual_e_at_lock": 0.128,
+    "hops_done": 4,
+    "frames_skipped_blurry": 0,
+    "sharpness_min": 281.8,
+    "sharpness_median": 308.3,
+    "detections_rejected": {},
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 9.04,
+    "motion_time_s": 5.67,
+    "wall_time_s": 11.62,
+    "sonar_stops": 0,
+    "arrival_reason": "fill",
+    "vlm_calls": 7,
+    "approach_wall_time_s": 20.66,
+    "hop_src_counts": {
+      "fixed": 4
+    }
+  },
+  "looked": {
+    "centre": 9,
+    "left": 1,
+    "right": 1
+  },
+  "conditions": [],
+  "scan_looks": [
+    {
+      "aimed": "left",
+      "description": "The image shows an indoor area with various objects and markings on the floor.",
+      "objects": [
+        "white, background wall",
+        "grey, baseboard",
+        "light grey, floor",
+        "black, thin line on floor",
+        "black, small rectangular object on floor",
+        "orange, vertical structure on right",
+        "yellow, thick line on floor"
+      ]
+    },
+    {
+      "aimed": "right",
+      "description": "The image shows an indoor scene with various objects in the background and a light-colored floor in the foreground.",
+      "objects": [
+        "brown/orange, left side",
+        "white/patterned, left side",
+        "black, center background",
+        "white, right side",
+        "black, foreground/floor area"
+      ]
+    },
+    {
+      "aimed": "centre",
+      "description": "The image shows a rover looking at its surroundings, featuring a large orange barrier.",
+      "objects": [
+        "orange, center",
+        "white, right",
+        "brown, bottom right",
+        "light grey, floor front",
+        "white, floor middle",
+        "dark grey, floor left",
+        "black, floor far left"
+      ]
+    }
+  ],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "orange_box"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 31.41,
+    "per_step_s": [
+      24.12,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 1.44,
+    "vlm_latency_max_s": 1.6,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "a98e90bb0c71",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object",
+        "check": "look once and decide whether a stated condition is true (yes or no); steps tagged \"when\" run only for the matching answer"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 13,
+      "latency_total_s": 20.777,
+      "latency_mean_s": 1.598,
+      "prompt_tokens_total": 3835,
+      "completion_tokens_total": 1070,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 1,
+      "latency_total_s": 1.883,
+      "latency_mean_s": 1.883,
+      "prompt_tokens_total": 338,
+      "completion_tokens_total": 148,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 0.51,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 7.78,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 31.41,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: fox, come, rally, clarification, locations, descriptions, orange"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    }
+  ],
+  "spoken_summary": "Arrival at the orange box was successful. The most important uncertainty is expected but not visible items. Left scan showed a white wall, grey baseboard, light grey floor, black line, small rectangular object, and an orange vertical structure. Centre scan showed an orange object, white object, brown object, light grey floor front, white floor middle, and dark grey floor left. Right scan showed brown/orange and white/patterned objects on the left side, a black object in the center background, and white and black areas on the right side."
+}

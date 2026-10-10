@@ -1,0 +1,1189 @@
+{
+  "session_id": "35586000b633",
+  "outcome": "completed_after_guidance",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L3",
+  "command": "please go towards the orange box if you can see it and right to hear it",
+  "resolved_command": "go towards the orange box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "turn",
+        "target": "right"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "orange box"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "orange box"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "orange box"
+      }
+    ],
+    "notes": "The person indicated the orange box is to the right and to go forward. The previous failed approach was replaced by a turn right, followed by a new approach, and finally observation/reporting to complete the original goal."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "orange box"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "orange box"
+      }
+    ],
+    "notes": "The original command implied finding and reporting on the object. Given the constraints (no arms, no direct reporting capability on objects unless the goal was to 'find' something specific), 'approach' gets the rover to the closest 'orange box', and 'observe' confirms its location and allows perception of it before stopping, satisfying the travel requirement."
+  },
+  "plan_was_revised": true,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "orange box",
+      "status": "blocked",
+      "detail": {
+        "reason": "obstacle",
+        "sonar_mm": 269,
+        "cycles": 6
+      },
+      "elapsed_s": 18.97
+    },
+    {
+      "index": 1,
+      "action": "turn",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.73
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "orange box",
+      "status": "blocked",
+      "detail": {
+        "reason": "target_not_found",
+        "cycles": 13
+      },
+      "elapsed_s": 38.17
+    },
+    {
+      "index": 3,
+      "action": "turn",
+      "target": "right",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.72
+    },
+    {
+      "index": 4,
+      "action": "approach",
+      "target": "orange box",
+      "status": "ok",
+      "detail": {
+        "reason": "sonar",
+        "cycles": 8,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 24.87
+    },
+    {
+      "index": 5,
+      "action": "observe",
+      "target": "orange box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 6,
+      "action": "report",
+      "target": "orange box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 2.82,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 210.68199157714844,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 0.93,
+      "frame_path": "logs/frames/35586000b633/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.36,
+      "bbox": [
+        136,
+        62,
+        206,
+        185
+      ],
+      "x_center": 0.267,
+      "fill": 0.028,
+      "bottom": 0.385,
+      "confidence": "high",
+      "sharpness": 104.8248062133789,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.39,
+      "frame_path": "logs/frames/35586000b633/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "skipped",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.84,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": 67.60550689697266,
+      "frame_attempts": 3,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "skipped_blurry",
+      "vlm_latency_s": null,
+      "frame_path": "logs/frames/35586000b633/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "reason": "blurry"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "search",
+      "t_rel_s": 5.17,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 98.31766510009766,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=-290 gate=not_visible",
+      "vlm_latency_s": 0.88,
+      "frame_path": "logs/frames/35586000b633/ap_s0_p-290.jpg",
+      "sweep": 0,
+      "pan_offset": -290,
+      "pan_deg": -23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "search",
+      "t_rel_s": 6.17,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 116.61786651611328,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=-290 gate=not_visible",
+      "vlm_latency_s": 0.89,
+      "frame_path": "logs/frames/35586000b633/ap_s0_p-290.jpg",
+      "sweep": 0,
+      "pan_offset": -290,
+      "pan_deg": -23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 7.56,
+      "bbox": [
+        323,
+        53,
+        448,
+        182
+      ],
+      "x_center": 0.603,
+      "fill": 0.052,
+      "bottom": 0.38,
+      "confidence": "high",
+      "sharpness": 158.49423217773438,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 1.29,
+      "frame_path": "logs/frames/35586000b633/ap_lock_verify.jpg",
+      "bearing_deg": -13.05,
+      "pivot_requested_deg": -13.05,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": -1,
+      "residual_e": 0.103,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "search",
+      "t_rel_s": 7.87,
+      "bbox": [
+        511,
+        51,
+        640,
+        203
+      ],
+      "x_center": 0.899,
+      "fill": 0.064,
+      "bottom": 0.423,
+      "confidence": "high",
+      "sharpness": 286.14605712890625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=290 gate=confirmed",
+      "vlm_latency_s": 1.18,
+      "frame_path": "logs/frames/35586000b633/ap_s0_p290.jpg",
+      "sweep": 0,
+      "pan_offset": 290,
+      "pan_deg": 23.809,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "search",
+      "t_rel_s": 8.52,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 122.79290771484375,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=290 gate=not_visible",
+      "vlm_latency_s": 0.85,
+      "frame_path": "logs/frames/35586000b633/ap_s0_p290.jpg",
+      "sweep": 0,
+      "pan_offset": 290,
+      "pan_deg": 23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "search",
+      "t_rel_s": 9.84,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": null,
+      "frame_attempts": null,
+      "vlm_said_visible": null,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "sweep_advance_pivot",
+      "vlm_latency_s": null,
+      "frame_path": null,
+      "sweep": 0,
+      "pivot_requested_deg": 90.0,
+      "pivot_cmd_s": 0.7627118644067796,
+      "pivot_dir": 1
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 12.16,
+      "bbox": [
+        231,
+        18,
+        488,
+        228
+      ],
+      "x_center": 0.561,
+      "fill": 0.176,
+      "bottom": 0.476,
+      "confidence": "high",
+      "sharpness": 171.38699340820312,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1156,
+      "action": "hop 50 gate=fill_jump",
+      "vlm_latency_s": 1.27,
+      "frame_path": "logs/frames/35586000b633/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.46,
+      "gate": "fill_jump",
+      "hops_done": 1,
+      "fill_prev": 0.052,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 120.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "lock",
+      "t_rel_s": 12.16,
+      "bbox": [
+        175,
+        45,
+        348,
+        195
+      ],
+      "x_center": 0.409,
+      "fill": 0.084,
+      "bottom": 0.406,
+      "confidence": "high",
+      "sharpness": 171.2347412109375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=1 pivot_s=0.39 gate=confirmed",
+      "vlm_latency_s": 1.17,
+      "frame_path": "logs/frames/35586000b633/ap_lock_verify.jpg",
+      "bearing_deg": 46.15,
+      "pivot_requested_deg": 46.15,
+      "pivot_cmd_s": 0.39,
+      "pivot_dir": 1,
+      "residual_e": -0.091,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "search",
+      "t_rel_s": 12.57,
+      "bbox": [
+        220,
+        19,
+        257,
+        73
+      ],
+      "x_center": 0.372,
+      "fill": 0.007,
+      "bottom": 0.153,
+      "confidence": "high",
+      "sharpness": 289.4468078613281,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.23,
+      "frame_path": "logs/frames/35586000b633/ap_s1_p0.jpg",
+      "sweep": 1,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 15.29,
+      "bbox": [
+        255,
+        50,
+        361,
+        209
+      ],
+      "x_center": 0.481,
+      "fill": 0.055,
+      "bottom": 0.435,
+      "confidence": "high",
+      "sharpness": 173.85064697265625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1094,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.29,
+      "frame_path": "logs/frames/35586000b633/ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.97,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.084,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 150.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 15.43,
+      "bbox": [
+        173,
+        15,
+        540,
+        279
+      ],
+      "x_center": 0.557,
+      "fill": 0.316,
+      "bottom": 0.581,
+      "confidence": "high",
+      "sharpness": 189.8323974609375,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 659,
+      "action": "hop 20 gate=fill_jump",
+      "vlm_latency_s": 1.35,
+      "frame_path": "logs/frames/35586000b633/ap_04_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.99,
+      "gate": "fill_jump",
+      "hops_done": 2,
+      "fill_prev": 0.052,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 120.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "lock",
+      "t_rel_s": 16.88,
+      "bbox": [
+        452,
+        28,
+        482,
+        108
+      ],
+      "x_center": 0.73,
+      "fill": 0.008,
+      "bottom": 0.224,
+      "confidence": "high",
+      "sharpness": 319.139892578125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 1.39,
+      "frame_path": "logs/frames/35586000b633/ap_lock_verify.jpg",
+      "bearing_deg": -7.17,
+      "pivot_requested_deg": -7.17,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": -1,
+      "residual_e": 0.23,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 18.78,
+      "bbox": [
+        332,
+        91,
+        609,
+        330
+      ],
+      "x_center": 0.736,
+      "fill": 0.215,
+      "bottom": 0.687,
+      "confidence": "high",
+      "sharpness": 278.67889404296875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 462,
+      "action": "hop 20 gate=fill_jump",
+      "vlm_latency_s": 1.34,
+      "frame_path": "logs/frames/35586000b633/ap_05_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.97,
+      "gate": "fill_jump",
+      "hops_done": 3,
+      "fill_prev": 0.052,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 50.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 18.97,
+      "bbox": [
+        332,
+        91,
+        609,
+        330
+      ],
+      "x_center": 0.736,
+      "fill": 0.215,
+      "bottom": 0.687,
+      "confidence": "high",
+      "sharpness": 278.67889404296875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 269,
+      "action": "pivot R 0.11s hop 20 sonar_stop_blocked",
+      "vlm_latency_s": 1.34,
+      "frame_path": "logs/frames/35586000b633/ap_05_check.jpg",
+      "pivot_cmd_s": 0.112,
+      "pivot_dir": 1,
+      "hop_moved_s": 0.06,
+      "hop_src": "fixed",
+      "d_vlm_cm": 30.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 20.2,
+      "bbox": [
+        92,
+        0,
+        397,
+        364
+      ],
+      "x_center": 0.382,
+      "fill": 0.362,
+      "bottom": 0.759,
+      "confidence": "high",
+      "sharpness": 285.5045471191406,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 909,
+      "action": "hop 50 gate=fill_jump",
+      "vlm_latency_s": 1.56,
+      "frame_path": "logs/frames/35586000b633/ap_06_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.46,
+      "gate": "fill_jump",
+      "hops_done": 2,
+      "fill_prev": 0.055,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 50.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 20.74,
+      "bbox": [
+        92,
+        0,
+        397,
+        364
+      ],
+      "x_center": 0.382,
+      "fill": 0.362,
+      "bottom": 0.759,
+      "confidence": "high",
+      "sharpness": 285.5045471191406,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 266,
+      "action": "hop 20 sonar_stop_relook",
+      "vlm_latency_s": 1.56,
+      "frame_path": "logs/frames/35586000b633/ap_06_check.jpg",
+      "relook_after_sonar_stop": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 21.76,
+      "bbox": [
+        254,
+        50,
+        312,
+        153
+      ],
+      "x_center": 0.443,
+      "fill": 0.019,
+      "bottom": 0.318,
+      "confidence": "high",
+      "sharpness": 371.3351745605469,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1110,
+      "action": "pivot R 0.11s hop 50 gate=confirmed",
+      "vlm_latency_s": 1.34,
+      "frame_path": "logs/frames/35586000b633/ap_07_check.jpg",
+      "pivot_cmd_s": 0.10915254237288136,
+      "pivot_dir": 1,
+      "hop_moved_s": 2.43,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.008,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 150.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 22.83,
+      "bbox": [
+        127,
+        0,
+        451,
+        389
+      ],
+      "x_center": 0.452,
+      "fill": 0.41,
+      "bottom": 0.811,
+      "confidence": "high",
+      "sharpness": 352.25469970703125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 319,
+      "action": "hop 20 gate=fill_jump",
+      "vlm_latency_s": 1.15,
+      "frame_path": "logs/frames/35586000b633/ap_07_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.54,
+      "gate": "fill_jump",
+      "hops_done": 3,
+      "fill_prev": 0.055,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 60.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 8,
+      "phase": "approach",
+      "t_rel_s": 24.87,
+      "bbox": [
+        127,
+        0,
+        451,
+        389
+      ],
+      "x_center": 0.452,
+      "fill": 0.41,
+      "bottom": 0.811,
+      "confidence": "high",
+      "sharpness": 352.25469970703125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 241,
+      "action": "arrived (sonar)",
+      "vlm_latency_s": 1.15,
+      "frame_path": "logs/frames/35586000b633/ap_07_check.jpg",
+      "hops_done": 3,
+      "fill_prev": 0.055,
+      "arrival_block": null,
+      "d_vlm_cm": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 8,
+      "phase": "approach",
+      "t_rel_s": 26.08,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 452.9685363769531,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": 401,
+      "action": "hop 50 gate=not_visible",
+      "vlm_latency_s": 0.86,
+      "frame_path": "logs/frames/35586000b633/ap_08_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.46,
+      "gate": "not_visible",
+      "hops_done": 2,
+      "fill_prev": 0.019,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 150.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 9,
+      "phase": "approach",
+      "t_rel_s": 28.64,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 625.8447875976562,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "hop_back 0.6s gate=not_visible",
+      "vlm_latency_s": 1.03,
+      "frame_path": "logs/frames/35586000b633/ap_09_lostlook.jpg",
+      "gate": "not_visible",
+      "hop_moved_s": 0.61
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 10,
+      "phase": "approach",
+      "t_rel_s": 30.5,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 634.5281982421875,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "relocate_look gate=not_visible",
+      "vlm_latency_s": 0.97,
+      "frame_path": "logs/frames/35586000b633/ap_10_relocate.jpg",
+      "gate": "not_visible"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 11,
+      "phase": "search",
+      "t_rel_s": 32.81,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 650.5172119140625,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 0.89,
+      "frame_path": "logs/frames/35586000b633/ap_re0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 12,
+      "phase": "search",
+      "t_rel_s": 35.2,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 693.2272338867188,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=-290 gate=not_visible",
+      "vlm_latency_s": 0.9,
+      "frame_path": "logs/frames/35586000b633/ap_re0_p-290.jpg",
+      "sweep": 0,
+      "pan_offset": -290,
+      "pan_deg": -23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 13,
+      "phase": "search",
+      "t_rel_s": 37.67,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 341.644775390625,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=290 gate=not_visible",
+      "vlm_latency_s": 0.97,
+      "frame_path": "logs/frames/35586000b633/ap_re0_p290.jpg",
+      "sweep": 0,
+      "pan_offset": 290,
+      "pan_deg": 23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "orange box",
+    "expected": [
+      "orange box",
+      "orange",
+      "box",
+      "right",
+      "hear"
+    ],
+    "known": [],
+    "t_rel_s": 139.96,
+    "latency_s": 1.46,
+    "frame_path": "logs/frames/35586000b633/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "orange box",
+        "box"
+      ],
+      "missing": [
+        "orange",
+        "right",
+        "hear"
+      ],
+      "unexpected": [
+        "diagram",
+        "outline"
+      ],
+      "description": "The image displays a drawing of a structure or diagram on an orange-toned box, which contains the visual representation of the 'orange box'."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 8,
+    "sweeps_used": 2,
+    "gimbal_looks": 11,
+    "chassis_pivots": 6,
+    "chassis_spin_deg_total": 115.9,
+    "search_vlm_calls": 11,
+    "bearing_deg_at_lock": -13.05,
+    "residual_e_at_lock": 0.103,
+    "hops_done": 10,
+    "frames_skipped_blurry": 1,
+    "sharpness_min": 98.3,
+    "sharpness_median": 285.5,
+    "detections_rejected": {
+      "fill_jump": 5
+    },
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 30.17,
+    "motion_time_s": 15.56,
+    "wall_time_s": 0,
+    "sonar_stops": 2,
+    "arrival_reason": "sonar",
+    "vlm_calls": 26,
+    "approach_wall_time_s": 21.51,
+    "hop_src_counts": {
+      "fixed": 9
+    }
+  },
+  "looked": {
+    "centre": 28
+  },
+  "scan_looks": [],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "box",
+      "diagram",
+      "orange box",
+      "outline"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 142.52,
+    "per_step_s": [
+      18.97,
+      0.73,
+      38.17,
+      0.72,
+      24.87,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 1.46,
+    "vlm_latency_max_s": 1.46,
+    "checks_completed": 0,
+    "checks_skipped": 1,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "841977849bcc",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot is restricted to only driving and looking. The plan includes an action 'report' in step 3, which is not a supported action. Additionally, 'approach' implies movement towards a target, but since the robot cannot pick up or touch anything, a simple movement action is fine, but the 'report' action is problematic.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 27,
+      "latency_total_s": 32.948,
+      "latency_mean_s": 1.22,
+      "prompt_tokens_total": 8334,
+      "completion_tokens_total": 1579,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 6,
+      "latency_total_s": 12.526,
+      "latency_mean_s": 2.088,
+      "prompt_tokens_total": 2265,
+      "completion_tokens_total": 686,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 3,
+  "guidance_log": [
+    {
+      "reason": "obstacle",
+      "question": "I stopped because something is in my way. What should I do next?",
+      "answer": "vouchers in front of you",
+      "t_rel_s": 18.98,
+      "replanned": true
+    },
+    {
+      "reason": "target_not_found",
+      "question": "I stopped because I could not find the orange box after searching the room. What should I do next?",
+      "answer": "right",
+      "t_rel_s": 77.45,
+      "replanned": false
+    },
+    {
+      "reason": "target_not_found",
+      "question": "I could not turn that into a plan. What should I do next?",
+      "answer": "turn right the orange box is already right and go forward",
+      "t_rel_s": 96.65,
+      "replanned": true
+    }
+  ],
+  "halt_reason": null,
+  "recovered": true,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 0.52,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 7.58,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 18.98,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 34.82,
+      "state": "thinking"
+    },
+    {
+      "t_rel_s": 38.45,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 39.79,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 56.16,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 69.78,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 77.45,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 94.49,
+      "state": "thinking"
+    },
+    {
+      "t_rel_s": 96.65,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 114.37,
+      "state": "thinking"
+    },
+    {
+      "t_rel_s": 116.32,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 117.65,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 129.3,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 142.52,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: orange, right, hear"
+    },
+    {
+      "code": "target_lost_repeatedly",
+      "detail": "the target was lost and re-acquired 2 time(s) during the approach"
+    },
+    {
+      "code": "hallucinated_box_rejected",
+      "detail": "5 detection(s) were rejected as implausible (fill_jump) \u2014 counted, not believed"
+    },
+    {
+      "code": "blurry_frames_skipped",
+      "detail": "1 frame(s) were too blurry to check and were skipped"
+    }
+  ],
+  "spoken_summary": "The target, the orange box, was visible upon arrival. The most important uncertainty was that the expected details, like 'orange', 'right', and 'hear', were not visible. The rover arrived at the orange box after 139.96 seconds."
+}
