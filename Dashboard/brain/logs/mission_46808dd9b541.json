@@ -1,0 +1,1430 @@
+{
+  "session_id": "46808dd9b541",
+  "outcome": "completed_after_guidance",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "pi",
+  "test_level": "L5",
+  "command": "please go towards the white and black shoes in front of you and then turn and then observe what you see then turn left and then go towards the orange and white box and tell me what you see around the orange and white box",
+  "resolved_command": "go towards the white and black shoes and stop, observe what you see around the shoes, then turn left and go towards the orange and white box and tell me what you see around the orange and white box",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "turn",
+        "target": "right"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "orange and white box"
+      },
+      {
+        "id": 3,
+        "action": "observe",
+        "target": "orange and white box"
+      },
+      {
+        "id": 4,
+        "action": "report",
+        "target": "orange and white box"
+      }
+    ],
+    "notes": "The original goal was to go towards the white and black shoes and stop, observe what you see around the shoes, then turn left and go towards the orange and white box and tell me what you see around the orange and white box. Steps 1-4 seem to have partially addressed the shoes (scan, observe, turn, observe/check). The original goal for the box was to 'go towards... and tell me what you see around...'. Based on the conversation, the rover is now instructed to turn right and the box should be to the right. The final action should be to approach the box, observe it, and report what is around it."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "white and black shoes"
+      },
+      {
+        "id": 2,
+        "action": "observe",
+        "target": "white and black shoes"
+      },
+      {
+        "id": 3,
+        "action": "turn",
+        "target": "left"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "orange and white box"
+      },
+      {
+        "id": 5,
+        "action": "observe",
+        "target": "orange and white box"
+      },
+      {
+        "id": 6,
+        "action": "report",
+        "target": "orange and white box"
+      },
+      {
+        "id": 7,
+        "action": "stop",
+        "target": null
+      }
+    ],
+    "notes": "The final report action in step 6 fulfills the 'tell me what you see' part of the command for the box. Step 7 ensures the rover halts."
+  },
+  "plan_was_revised": true,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "white and black shoes",
+      "status": "blocked",
+      "detail": {
+        "reason": "obstacle",
+        "sonar_mm": 258,
+        "cycles": 6
+      },
+      "elapsed_s": 20.54
+    },
+    {
+      "index": 1,
+      "action": "scan",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 1.23
+    },
+    {
+      "index": 2,
+      "action": "observe",
+      "target": "white and black shoes",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 3,
+      "action": "turn",
+      "target": "left",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.7
+    },
+    {
+      "index": 4,
+      "action": "approach",
+      "target": "orange and white box",
+      "status": "blocked",
+      "detail": {
+        "reason": "obstacle",
+        "sonar_mm": 269,
+        "cycles": 4
+      },
+      "elapsed_s": 12.89
+    },
+    {
+      "index": 5,
+      "action": "observe",
+      "target": "in front of you",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 6,
+      "action": "check",
+      "target": "white and orange box",
+      "status": "ok",
+      "detail": {
+        "condition": "white and orange box",
+        "answer": "yes"
+      },
+      "elapsed_s": 1.37
+    },
+    {
+      "index": 7,
+      "action": "stop",
+      "target": null,
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    },
+    {
+      "index": 8,
+      "action": "turn",
+      "target": "left",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.71
+    },
+    {
+      "index": 9,
+      "action": "approach",
+      "target": "orange and white box",
+      "status": "blocked",
+      "detail": {
+        "reason": "target_not_found",
+        "cycles": 13
+      },
+      "elapsed_s": 41.52
+    },
+    {
+      "index": 10,
+      "action": "turn",
+      "target": "right",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.75
+    },
+    {
+      "index": 11,
+      "action": "approach",
+      "target": "orange and white box",
+      "status": "ok",
+      "detail": {
+        "reason": "fill",
+        "cycles": 6,
+        "arrival_cross_check": "confirmed",
+        "gimbal_only_lock": true
+      },
+      "elapsed_s": 19.14
+    },
+    {
+      "index": 12,
+      "action": "observe",
+      "target": "orange and white box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.51
+    },
+    {
+      "index": 13,
+      "action": "report",
+      "target": "orange and white box",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.0
+    }
+  ],
+  "checks": [
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.22,
+      "bbox": [
+        335,
+        156,
+        552,
+        241
+      ],
+      "x_center": 0.694,
+      "fill": 0.06,
+      "bottom": 0.503,
+      "confidence": "high",
+      "sharpness": 270.11798095703125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.34,
+      "frame_path": "logs/frames/46808dd9b541/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.24,
+      "bbox": [
+        33,
+        150,
+        191,
+        208
+      ],
+      "x_center": 0.175,
+      "fill": 0.03,
+      "bottom": 0.434,
+      "confidence": "high",
+      "sharpness": 344.24908447265625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=confirmed",
+      "vlm_latency_s": 1.36,
+      "frame_path": "logs/frames/46808dd9b541/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.31,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 351.5841064453125,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 1.41,
+      "frame_path": "logs/frames/46808dd9b541/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "skipped",
+      "cycle": 1,
+      "phase": "search",
+      "t_rel_s": 3.71,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": 83.79388427734375,
+      "frame_attempts": 3,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "skipped_blurry",
+      "vlm_latency_s": null,
+      "frame_path": "logs/frames/46808dd9b541/ap_s0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "reason": "blurry"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "search",
+      "t_rel_s": 5.65,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 424.7843933105469,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=-290 gate=not_visible",
+      "vlm_latency_s": 0.96,
+      "frame_path": "logs/frames/46808dd9b541/ap_s0_p-290.jpg",
+      "sweep": 0,
+      "pan_offset": -290,
+      "pan_deg": -23.809,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "skipped",
+      "cycle": 2,
+      "phase": "search",
+      "t_rel_s": 6.9,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": null,
+      "sharpness": 64.0721206665039,
+      "frame_attempts": 3,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "skipped_blurry",
+      "vlm_latency_s": null,
+      "frame_path": "logs/frames/46808dd9b541/ap_s0_p-290.jpg",
+      "sweep": 0,
+      "pan_offset": -290,
+      "reason": "blurry"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 7.27,
+      "bbox": [
+        142,
+        156,
+        372,
+        235
+      ],
+      "x_center": 0.401,
+      "fill": 0.059,
+      "bottom": 0.49,
+      "confidence": "high",
+      "sharpness": 306.8753967285156,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=1 pivot_s=0.12 gate=confirmed",
+      "vlm_latency_s": 1.22,
+      "frame_path": "logs/frames/46808dd9b541/ap_lock_verify.jpg",
+      "bearing_deg": 10.86,
+      "pivot_requested_deg": 10.86,
+      "pivot_cmd_s": 0.12,
+      "pivot_dir": 1,
+      "residual_e": -0.099,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 2,
+      "phase": "lock",
+      "t_rel_s": 7.54,
+      "bbox": [
+        269,
+        145,
+        425,
+        203
+      ],
+      "x_center": 0.542,
+      "fill": 0.029,
+      "bottom": 0.423,
+      "confidence": "high",
+      "sharpness": 346.34033203125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=-1 pivot_s=0.15 gate=confirmed",
+      "vlm_latency_s": 1.41,
+      "frame_path": "logs/frames/46808dd9b541/ap_lock_verify.jpg",
+      "bearing_deg": -18.2,
+      "pivot_requested_deg": -18.2,
+      "pivot_cmd_s": 0.15,
+      "pivot_dir": -1,
+      "residual_e": 0.042,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "search",
+      "t_rel_s": 8.42,
+      "bbox": [
+        463,
+        156,
+        487,
+        184
+      ],
+      "x_center": 0.742,
+      "fill": 0.002,
+      "bottom": 0.384,
+      "confidence": "high",
+      "sharpness": 171.34483337402344,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=290 gate=confirmed",
+      "vlm_latency_s": 1.4,
+      "frame_path": "logs/frames/46808dd9b541/ap_s0_p290.jpg",
+      "sweep": 0,
+      "pan_offset": 290,
+      "pan_deg": 23.809,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "search",
+      "t_rel_s": 9.62,
+      "bbox": [
+        422,
+        157,
+        604,
+        347
+      ],
+      "x_center": 0.802,
+      "fill": 0.113,
+      "bottom": 0.723,
+      "confidence": "high",
+      "sharpness": 392.97637939453125,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=290 gate=confirmed",
+      "vlm_latency_s": 1.28,
+      "frame_path": "logs/frames/46808dd9b541/ap_s0_p290.jpg",
+      "sweep": 0,
+      "pan_offset": 290,
+      "pan_deg": 23.809,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 11.85,
+      "bbox": [
+        0,
+        147,
+        384,
+        338
+      ],
+      "x_center": 0.3,
+      "fill": 0.238,
+      "bottom": 0.704,
+      "confidence": "high",
+      "sharpness": 416.7232360839844,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 912,
+      "action": "hop 50 gate=fill_jump",
+      "vlm_latency_s": 1.22,
+      "frame_path": "logs/frames/46808dd9b541/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.46,
+      "gate": "fill_jump",
+      "hops_done": 1,
+      "fill_prev": 0.059,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 170.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 3,
+      "phase": "approach",
+      "t_rel_s": 12.13,
+      "bbox": [
+        186,
+        152,
+        440,
+        252
+      ],
+      "x_center": 0.489,
+      "fill": 0.083,
+      "bottom": 0.525,
+      "confidence": "high",
+      "sharpness": 488.9250793457031,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1796,
+      "action": "hop 50 gate=confirmed",
+      "vlm_latency_s": 1.27,
+      "frame_path": "logs/frames/46808dd9b541/ap_03_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 2.44,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.029,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 290.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 12.89,
+      "bbox": [
+        0,
+        147,
+        384,
+        338
+      ],
+      "x_center": 0.3,
+      "fill": 0.238,
+      "bottom": 0.704,
+      "confidence": "high",
+      "sharpness": 416.7232360839844,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 269,
+      "action": "pivot L 0.09s hop 20 sonar_stop_blocked",
+      "vlm_latency_s": 1.22,
+      "frame_path": "logs/frames/46808dd9b541/ap_03_check.jpg",
+      "pivot_cmd_s": 0.09491525423728814,
+      "pivot_dir": -1,
+      "hop_moved_s": 0.91,
+      "hop_src": "fixed",
+      "d_vlm_cm": 40.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "lock",
+      "t_rel_s": 13.02,
+      "bbox": [
+        174,
+        100,
+        195,
+        156
+      ],
+      "x_center": 0.288,
+      "fill": 0.004,
+      "bottom": 0.326,
+      "confidence": "high",
+      "sharpness": 282.35748291015625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=1 pivot_s=0.32 gate=confirmed",
+      "vlm_latency_s": 1.48,
+      "frame_path": "logs/frames/46808dd9b541/ap_lock_verify.jpg",
+      "bearing_deg": 37.36,
+      "pivot_requested_deg": 37.36,
+      "pivot_cmd_s": 0.32,
+      "pivot_dir": 1,
+      "residual_e": -0.212,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "lock",
+      "t_rel_s": 13.93,
+      "bbox": [
+        31,
+        156,
+        284,
+        343
+      ],
+      "x_center": 0.246,
+      "fill": 0.154,
+      "bottom": 0.714,
+      "confidence": "high",
+      "sharpness": 512.998779296875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "verify pivot_dir=1 pivot_s=0.35 gate=confirmed",
+      "vlm_latency_s": 1.18,
+      "frame_path": "logs/frames/46808dd9b541/ap_lock_verify.jpg",
+      "bearing_deg": 40.72,
+      "pivot_requested_deg": 40.72,
+      "pivot_cmd_s": 0.35,
+      "pivot_dir": 1,
+      "residual_e": -0.254,
+      "gate": "confirmed"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 4,
+      "phase": "approach",
+      "t_rel_s": 15.29,
+      "bbox": [
+        147,
+        162,
+        305,
+        254
+      ],
+      "x_center": 0.352,
+      "fill": 0.047,
+      "bottom": 0.529,
+      "confidence": "high",
+      "sharpness": 592.7635498046875,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 755,
+      "action": "hop 20 gate=confirmed",
+      "vlm_latency_s": 1.27,
+      "frame_path": "logs/frames/46808dd9b541/ap_04_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.97,
+      "gate": "confirmed",
+      "hops_done": 2,
+      "fill_prev": 0.083,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 230.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 17.2,
+      "bbox": [
+        111,
+        156,
+        506,
+        474
+      ],
+      "x_center": 0.482,
+      "fill": 0.408,
+      "bottom": 0.987,
+      "confidence": "high",
+      "sharpness": 521.1890258789062,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 424,
+      "action": "pivot L 0.12s hop 20 gate=confirmed",
+      "vlm_latency_s": 1.25,
+      "frame_path": "logs/frames/46808dd9b541/ap_05_check.jpg",
+      "pivot_cmd_s": 0.12054237288135594,
+      "pivot_dir": -1,
+      "hop_moved_s": 0.98,
+      "gate": "confirmed",
+      "hops_done": 1,
+      "fill_prev": 0.154,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 150.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 18.13,
+      "bbox": [
+        204,
+        57,
+        303,
+        192
+      ],
+      "x_center": 0.396,
+      "fill": 0.044,
+      "bottom": 0.399,
+      "confidence": "high",
+      "sharpness": 402.1884460449219,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 1406,
+      "action": "pivot L 0.10s hop 50 gate=fill_jump",
+      "vlm_latency_s": 1.27,
+      "frame_path": "logs/frames/46808dd9b541/ap_05_check.jpg",
+      "pivot_cmd_s": 0.10061016949152543,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.47,
+      "gate": "fill_jump",
+      "hops_done": 1,
+      "fill_prev": 0.004,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 380.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 19.14,
+      "bbox": [
+        111,
+        156,
+        506,
+        474
+      ],
+      "x_center": 0.482,
+      "fill": 0.408,
+      "bottom": 0.987,
+      "confidence": "high",
+      "sharpness": 521.1890258789062,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 427,
+      "action": "arrived (fill)",
+      "vlm_latency_s": 1.25,
+      "frame_path": "logs/frames/46808dd9b541/ap_05_check.jpg",
+      "hops_done": 1,
+      "fill_prev": 0.154,
+      "arrival_block": null,
+      "d_vlm_cm": 120.0
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 5,
+      "phase": "approach",
+      "t_rel_s": 20.01,
+      "bbox": [
+        196,
+        171,
+        640,
+        440
+      ],
+      "x_center": 0.653,
+      "fill": 0.388,
+      "bottom": 0.917,
+      "confidence": "high",
+      "sharpness": 1100.5621337890625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 510,
+      "action": "pivot L 0.07s hop 50 gate=fill_jump",
+      "vlm_latency_s": 1.25,
+      "frame_path": "logs/frames/46808dd9b541/ap_05_check.jpg",
+      "pivot_cmd_s": 0.07023728813559323,
+      "pivot_dir": -1,
+      "hop_moved_s": 2.45,
+      "gate": "fill_jump",
+      "hops_done": 3,
+      "fill_prev": 0.047,
+      "reject_reason": "fill_jump",
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 140.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 20.54,
+      "bbox": [
+        196,
+        171,
+        640,
+        440
+      ],
+      "x_center": 0.653,
+      "fill": 0.388,
+      "bottom": 0.917,
+      "confidence": "high",
+      "sharpness": 1100.5621337890625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": 258,
+      "action": "pivot R 0.07s hop 20 sonar_stop_blocked",
+      "vlm_latency_s": 1.25,
+      "frame_path": "logs/frames/46808dd9b541/ap_05_check.jpg",
+      "pivot_cmd_s": 0.07261016949152543,
+      "pivot_dir": 1,
+      "hop_moved_s": 0.42,
+      "hop_src": "fixed",
+      "d_vlm_cm": 120.0,
+      "centred": false
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 6,
+      "phase": "approach",
+      "t_rel_s": 20.99,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 551.96337890625,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": 633,
+      "action": "hop 20 gate=not_visible",
+      "vlm_latency_s": 0.97,
+      "frame_path": "logs/frames/46808dd9b541/ap_06_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 1.02,
+      "gate": "not_visible",
+      "hops_done": 2,
+      "fill_prev": 0.004,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 250.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 7,
+      "phase": "approach",
+      "t_rel_s": 23.44,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 595.9363403320312,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "hop_back 0.6s gate=not_visible",
+      "vlm_latency_s": 0.89,
+      "frame_path": "logs/frames/46808dd9b541/ap_07_lostlook.jpg",
+      "gate": "not_visible",
+      "hop_moved_s": 0.61
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 8,
+      "phase": "approach",
+      "t_rel_s": 25.8,
+      "bbox": [
+        244,
+        5,
+        368,
+        184
+      ],
+      "x_center": 0.478,
+      "fill": 0.072,
+      "bottom": 0.383,
+      "confidence": "medium",
+      "sharpness": 578.61962890625,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "relocate_look gate=fill_jump",
+      "vlm_latency_s": 1.4,
+      "frame_path": "logs/frames/46808dd9b541/ap_08_relocate.jpg",
+      "gate": "fill_jump"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 9,
+      "phase": "approach",
+      "t_rel_s": 28.66,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 549.767333984375,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": 530,
+      "action": "hop 20 gate=not_visible",
+      "vlm_latency_s": 0.92,
+      "frame_path": "logs/frames/46808dd9b541/ap_09_check.jpg",
+      "pivot_cmd_s": null,
+      "pivot_dir": null,
+      "hop_moved_s": 0.98,
+      "gate": "not_visible",
+      "hops_done": 3,
+      "fill_prev": 0.004,
+      "reject_reason": null,
+      "arrival_block": null,
+      "hop_src": "fixed",
+      "d_vlm_cm": 250.0,
+      "centred": true
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 10,
+      "phase": "approach",
+      "t_rel_s": 31.26,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 551.80859375,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "hop_back 0.6s gate=not_visible",
+      "vlm_latency_s": 1.01,
+      "frame_path": "logs/frames/46808dd9b541/ap_10_lostlook.jpg",
+      "gate": "not_visible",
+      "hop_moved_s": 0.66
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 11,
+      "phase": "approach",
+      "t_rel_s": 33.17,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "medium",
+      "sharpness": 509.86224365234375,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "relocate_look gate=not_visible",
+      "vlm_latency_s": 0.93,
+      "frame_path": "logs/frames/46808dd9b541/ap_11_relocate.jpg",
+      "gate": "not_visible"
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 12,
+      "phase": "search",
+      "t_rel_s": 35.59,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 557.3742065429688,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "look pan=0 gate=not_visible",
+      "vlm_latency_s": 0.95,
+      "frame_path": "logs/frames/46808dd9b541/ap_re0_p0.jpg",
+      "sweep": 0,
+      "pan_offset": 0,
+      "pan_deg": 0.0,
+      "gate": "not_visible",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 13,
+      "phase": "search",
+      "t_rel_s": 38.32,
+      "bbox": [
+        457,
+        0,
+        640,
+        182
+      ],
+      "x_center": 0.857,
+      "fill": 0.108,
+      "bottom": 0.379,
+      "confidence": "high",
+      "sharpness": 705.8580932617188,
+      "frame_attempts": 1,
+      "vlm_said_visible": true,
+      "accepted_as_visible": true,
+      "sonar_mm": null,
+      "action": "look pan=-290 gate=confirmed",
+      "vlm_latency_s": 1.28,
+      "frame_path": "logs/frames/46808dd9b541/ap_re0_p-290.jpg",
+      "sweep": 0,
+      "pan_offset": -290,
+      "pan_deg": -23.809,
+      "gate": "confirmed",
+      "reject_reason": null
+    },
+    {
+      "kind": "approach_cycle",
+      "cycle": 13,
+      "phase": "approach",
+      "t_rel_s": 41.52,
+      "bbox": null,
+      "x_center": null,
+      "fill": null,
+      "bottom": null,
+      "confidence": "high",
+      "sharpness": 522.1143798828125,
+      "frame_attempts": 1,
+      "vlm_said_visible": false,
+      "accepted_as_visible": false,
+      "sonar_mm": null,
+      "action": "relock_look gate=not_visible",
+      "vlm_latency_s": 0.9,
+      "frame_path": "logs/frames/46808dd9b541/ap_13_relock.jpg",
+      "gate": "not_visible"
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "left",
+      "t_rel_s": 44.59,
+      "latency_s": 1.21,
+      "frame_path": "logs/frames/46808dd9b541/scan_left.jpg",
+      "result": {
+        "description": "A robot's camera sees a sparsely furnished, brightly lit interior space with a white and gray tiled floor, a large white door on the right, and a dark blue object in the lower right foreground."
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "right",
+      "t_rel_s": 46.49,
+      "latency_s": 1.1,
+      "frame_path": "logs/frames/46808dd9b541/scan_right.jpg",
+      "result": {
+        "description": "The camera is focused on a close-up view of a dark shoe, with the heel and upper visible, and a large, light-colored, curved object partially obscuring the shoe."
+      }
+    },
+    {
+      "kind": "scan_look",
+      "aimed": "centre",
+      "t_rel_s": 48.32,
+      "latency_s": 0.91,
+      "frame_path": "logs/frames/46808dd9b541/scan_centre.jpg",
+      "result": {
+        "description": "A close-up view of a black athletic shoe with white stripes, seen against a background featuring a white door and a patterned wallpaper."
+      }
+    },
+    {
+      "kind": "condition_check",
+      "condition": "white and orange box",
+      "answer": "yes",
+      "aimed": "centre",
+      "t_rel_s": 89.95,
+      "latency_s": 0.74,
+      "frame_path": "logs/frames/46808dd9b541/check_1.jpg",
+      "result": {
+        "answer": "yes",
+        "reason": "There is a white box with orange elements visible in the image."
+      }
+    }
+  ],
+  "look_left": null,
+  "arrival": {
+    "kind": "arrival",
+    "target": "orange and white box",
+    "expected": [
+      "orange and white box",
+      "white",
+      "black",
+      "shoes",
+      "stop",
+      "left",
+      "orange",
+      "box"
+    ],
+    "known": [],
+    "t_rel_s": 176.64,
+    "latency_s": 1.34,
+    "frame_path": "logs/frames/46808dd9b541/arrival.jpg",
+    "result": {
+      "target_visible": true,
+      "confidence": "high",
+      "seen": [
+        "orange and white box",
+        "white",
+        "orange",
+        "box"
+      ],
+      "missing": [
+        "black",
+        "shoes",
+        "stop",
+        "left"
+      ],
+      "unexpected": [
+        ""
+      ],
+      "description": "A large orange and white box is visible in the center of the image, sitting on a light-colored floor."
+    }
+  },
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": {
+    "cycles_used": 6,
+    "sweeps_used": 1,
+    "gimbal_looks": 8,
+    "chassis_pivots": 9,
+    "chassis_spin_deg_total": 70.7,
+    "search_vlm_calls": 8,
+    "bearing_deg_at_lock": -18.2,
+    "residual_e_at_lock": 0.042,
+    "hops_done": 12,
+    "frames_skipped_blurry": 2,
+    "sharpness_min": 171.3,
+    "sharpness_median": 513.0,
+    "detections_rejected": {
+      "fill_jump": 3
+    },
+    "arrival_cross_check": "confirmed",
+    "gimbal_only_lock": true,
+    "vlm_time_s": 33.54,
+    "motion_time_s": 17.77,
+    "wall_time_s": 0,
+    "sonar_stops": 2,
+    "arrival_reason": "fill",
+    "vlm_calls": 28,
+    "approach_wall_time_s": 15.9,
+    "hop_src_counts": {
+      "fixed": 10
+    }
+  },
+  "looked": {
+    "centre": 31,
+    "left": 1,
+    "right": 1
+  },
+  "conditions": [
+    {
+      "condition": "white and orange box",
+      "answer": "yes"
+    }
+  ],
+  "scan_looks": [
+    {
+      "aimed": "left",
+      "description": "A robot's camera sees a sparsely furnished, brightly lit interior space with a white and gray tiled floor, a large white door on the right, and a dark blue object in the lower right foreground.",
+      "objects": null
+    },
+    {
+      "aimed": "right",
+      "description": "The camera is focused on a close-up view of a dark shoe, with the heel and upper visible, and a large, light-colored, curved object partially obscuring the shoe.",
+      "objects": null
+    },
+    {
+      "aimed": "centre",
+      "description": "A close-up view of a black athletic shoe with white stripes, seen against a background featuring a white door and a patterned wallpaper.",
+      "objects": null
+    }
+  ],
+  "scene_id": null,
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [
+      "box",
+      "orange",
+      "orange and white box",
+      "white"
+    ],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 179.08,
+    "per_step_s": [
+      20.54,
+      1.23,
+      0.51,
+      0.7,
+      12.89,
+      0.51,
+      1.37,
+      0.0,
+      0.71,
+      41.52,
+      0.75,
+      19.14,
+      0.51,
+      0.0
+    ],
+    "vlm_latency_mean_s": 1.06,
+    "vlm_latency_max_s": 1.34,
+    "checks_completed": 0,
+    "checks_skipped": 2,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "pi",
+      "prompt_sha": "a98e90bb0c71",
+      "actions": {
+        "follow_line": "follow the floor line to its end marker \u2014 the only way to travel more than a short distance",
+        "move": "drive forward or backward",
+        "turn": "rotate on the spot",
+        "approach": "find a visible object and drive up to it (searches by turning if it is not in view)",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "hold still and look at a named target",
+        "stop": "halt",
+        "report": "say what was found, and is around the object",
+        "check": "look once and decide whether a stated condition is true (yes or no); steps tagged \"when\" run only for the matching answer"
+      }
+    }
+  },
+  "rover_summary": {},
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 1,
+    "capped": false,
+    "verified": true,
+    "concerns": null,
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 34,
+      "latency_total_s": 41.736,
+      "latency_mean_s": 1.228,
+      "prompt_tokens_total": 10217,
+      "completion_tokens_total": 1993,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 4,
+      "latency_total_s": 14.033,
+      "latency_mean_s": 3.508,
+      "prompt_tokens_total": 2214,
+      "completion_tokens_total": 1095,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 3,
+  "guidance_log": [
+    {
+      "reason": "obstacle",
+      "question": "I stopped because something is in my way. What should I do next?",
+      "answer": "you should turn left and go to the orange and white box after you observe what you see in front of you and around you",
+      "t_rel_s": 20.55,
+      "replanned": true
+    },
+    {
+      "reason": "obstacle",
+      "question": "I stopped because something is in my way. What should I do next?",
+      "answer": "observe what you see in front of you and if it is the white and orange box then stop",
+      "t_rel_s": 66.02,
+      "replanned": true
+    },
+    {
+      "reason": "target_not_found",
+      "question": "I stopped because I could not find the orange and white box after searching the room. What should I do next?",
+      "answer": "turn right and then the orange and white box should be to your right",
+      "t_rel_s": 132.93,
+      "replanned": true
+    }
+  ],
+  "halt_reason": null,
+  "recovered": true,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 0.51,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 7.54,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 20.55,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 40.39,
+      "state": "thinking"
+    },
+    {
+      "t_rel_s": 43.25,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 53.63,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 60.4,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 66.02,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 84.38,
+      "state": "thinking"
+    },
+    {
+      "t_rel_s": 88.73,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 91.92,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 104.44,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 124.58,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 132.93,
+      "state": "awaiting_guidance"
+    },
+    {
+      "t_rel_s": 154.69,
+      "state": "thinking"
+    },
+    {
+      "t_rel_s": 158.59,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 159.95,
+      "state": "searching"
+    },
+    {
+      "t_rel_s": 173.37,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 179.08,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [
+    {
+      "code": "expected_not_seen",
+      "detail": "expected but not visible at arrival: black, shoes, stop, left"
+    },
+    {
+      "code": "soft_target_arrival",
+      "detail": "arrival was decided by vision only (fill) \u2014 sonar did not confirm"
+    },
+    {
+      "code": "target_lost_repeatedly",
+      "detail": "the target was lost and re-acquired 4 time(s) during the approach"
+    },
+    {
+      "code": "hallucinated_box_rejected",
+      "detail": "3 detection(s) were rejected as implausible (fill_jump) \u2014 counted, not believed"
+    },
+    {
+      "code": "blurry_frames_skipped",
+      "detail": "2 frame(s) were too blurry to check and were skipped"
+    }
+  ],
+  "spoken_summary": "The arrival was decided by vision only. The scan showed a dark blue object in the lower right, a dark shoe, and a black athletic shoe in the center. Uncertainty exists regarding expected items not being visible."
+}

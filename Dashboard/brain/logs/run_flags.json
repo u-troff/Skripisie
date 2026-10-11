@@ -158,5 +158,20 @@
   "flag": "good",
   "note": "successfull it can report what it saw when it wentnear a object and reported everything it saw\n\nArrival at the orange box was successful. The most important uncertainty is expected but not visible items. Left scan showed a white wall, grey baseboard, light grey floor, black line, small rectangular object, and an orange vertical structure. Centre scan showed an orange object, white object, brown object, light grey floor front, white floor middle, and dark grey floor left. Right scan showed brown/orange and white/patterned objects on the left side, a black object in the center background, and white and black areas on the right side",
   "flagged_at": "2026-10-11T00:06:02"
+ },
+ "38e3cbbc54af": {
+  "flag": "good",
+  "note": "The commanded route was resolved to go towards the shoe, observe, turn right, and go towards the orange box. The rover arrived at the orange box with high confidence. The most important uncertainty was that the expected shoe was not visible upon arrival.'     \n[voice] mission_endedigh for the rover so it did not view the shoe in the frame. Not a bad L5 run. I made a good plan to first approach the shoe and then the orange box. ",
+  "flagged_at": "2026-10-11T13:01:43"
+ },
+ "f57b63d1e8fd": {
+  "flag": "good",
+  "note": "It did follow the path and needed some guidance as it was traveling. It did eventually get to the ornage box but due to the light differences on the camera. IT struggles to confirm that it sees the orange box and then fails to stop. It did hoiver follow it plan and ask for guidance when it got stuck.\n\nL5",
+  "flagged_at": "2026-10-11T13:08:19"
+ },
+ "46808dd9b541": {
+  "flag": "good",
+  "note": "Was almost out of the view but it did get to view the boix. The box fill the entire frame so be able to see the orange and white box was tought. I think the best mix is the gemma4:e4b runs it does lack accurate vision in low lioght areas but this results in  a fast inference time between planning and vision checks. It is good at stopping and asking for guidance if it does not actaully understand where it is and what its next steps should be\n\nL5",
+  "flagged_at": "2026-10-11T13:17:13"
  }
 }
