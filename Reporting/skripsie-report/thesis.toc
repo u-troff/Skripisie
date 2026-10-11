@@ -30,48 +30,50 @@
 \contentsline {section}{\numberline {3.2}System architecture}{16}{section.3.2}%
 \contentsline {subsection}{\numberline {3.2.1}Off-board inference and the thin-client split}{16}{subsection.3.2.1}%
 \contentsline {subsection}{\numberline {3.2.2}Two-rate control: waypoint intents versus the reactive layer}{19}{subsection.3.2.2}%
-\contentsline {section}{\numberline {3.3}The capability vocabulary}{19}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Clarification loop design}{19}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Navigation as instrumentation}{19}{section.3.5}%
-\contentsline {subsection}{\numberline {3.5.1}The line follower as the reactive layer}{19}{subsection.3.5.1}%
-\contentsline {section}{\numberline {3.6}Summary of design decisions}{20}{section.3.6}%
-\contentsline {chapter}{\numberline {4}Implementation}{21}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Speech-to-text subsystem}{21}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Planner}{21}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Vision-language verification}{21}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Clarification manager}{21}{section.4.4}%
-\contentsline {section}{\numberline {4.5}Rover client and reactive layer}{21}{section.4.5}%
-\contentsline {section}{\numberline {4.6}Communication protocol and dashboard}{21}{section.4.6}%
-\contentsline {section}{\numberline {4.7}Logging and measurement instrumentation}{21}{section.4.7}%
-\contentsline {chapter}{\numberline {5}Experimental Evaluation}{22}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Experimental methodology}{22}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Command corpus design}{22}{subsection.5.1.1}%
-\contentsline {paragraph}{Virtual tests.}{22}{paragraph*.19}%
-\contentsline {paragraph}{Physical tests.}{23}{paragraph*.20}%
-\contentsline {subsection}{\numberline {5.1.2}Evaluation metrics}{23}{subsection.5.1.2}%
-\contentsline {section}{\numberline {5.2}Plan correctness under vague commands}{23}{section.5.2}%
-\contentsline {paragraph}{Levels 1 and 2.}{23}{paragraph*.23}%
-\contentsline {paragraph}{Level 3.}{23}{paragraph*.24}%
-\contentsline {paragraph}{Level 4.}{24}{paragraph*.26}%
-\contentsline {paragraph}{Level 5.}{24}{paragraph*.28}%
-\contentsline {paragraph}{Exploratory runs.}{24}{paragraph*.29}%
-\contentsline {section}{\numberline {5.3}Executability on the physical chassis}{25}{section.5.3}%
-\contentsline {paragraph}{Ultrasonic stop.}{25}{paragraph*.31}%
-\contentsline {paragraph}{Distance from vision.}{25}{paragraph*.34}%
-\contentsline {section}{\numberline {5.4}Compositional depth and hallucination onset}{26}{section.5.4}%
-\contentsline {paragraph}{Where execution failed.}{26}{paragraph*.37}%
-\contentsline {paragraph}{Probe chains.}{26}{paragraph*.38}%
-\contentsline {paragraph}{Context window and the plan ceiling.}{27}{paragraph*.39}%
-\contentsline {section}{\numberline {5.5}Reference comparison against cloud models}{28}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Discussion}{29}{section.5.6}%
-\contentsline {paragraph}{RQ1.}{29}{paragraph*.43}%
-\contentsline {paragraph}{RQ2.}{29}{paragraph*.44}%
-\contentsline {paragraph}{Limitations.}{29}{paragraph*.45}%
-\contentsline {chapter}{\numberline {6}Conclusion}{30}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Answers to the research questions}{30}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Contributions}{30}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Limitations}{30}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Recommendations for future work}{30}{section.6.4}%
-\contentsline {chapter}{References}{31}{chapter*.46}%
-\contentsline {chapter}{\numberline {A}Appendix title goes here}{33}{appendix.A}%
+\contentsline {subsection}{\numberline {3.2.3}The end-to-end pipeline}{20}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Status lights}{20}{subsection.3.2.4}%
+\contentsline {section}{\numberline {3.3}The capability vocabulary}{21}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Clarification loop design}{21}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Navigation as instrumentation}{21}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}The line follower as the reactive layer}{21}{subsection.3.5.1}%
+\contentsline {section}{\numberline {3.6}Summary of design decisions}{22}{section.3.6}%
+\contentsline {chapter}{\numberline {4}Implementation}{23}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Speech-to-text subsystem}{23}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Planner}{23}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Vision-language verification}{23}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Clarification manager}{23}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Rover client and reactive layer}{23}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Communication protocol and dashboard}{23}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Logging and measurement instrumentation}{23}{section.4.7}%
+\contentsline {chapter}{\numberline {5}Experimental Evaluation}{24}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Experimental methodology}{24}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Command corpus design}{24}{subsection.5.1.1}%
+\contentsline {paragraph}{Virtual tests.}{24}{paragraph*.21}%
+\contentsline {paragraph}{Physical tests.}{25}{paragraph*.22}%
+\contentsline {subsection}{\numberline {5.1.2}Evaluation metrics}{25}{subsection.5.1.2}%
+\contentsline {section}{\numberline {5.2}Plan correctness under vague commands}{25}{section.5.2}%
+\contentsline {paragraph}{Levels 1 and 2.}{25}{paragraph*.25}%
+\contentsline {paragraph}{Level 3.}{25}{paragraph*.26}%
+\contentsline {paragraph}{Level 4.}{26}{paragraph*.28}%
+\contentsline {paragraph}{Level 5.}{26}{paragraph*.30}%
+\contentsline {paragraph}{Exploratory runs.}{26}{paragraph*.31}%
+\contentsline {section}{\numberline {5.3}Executability on the physical chassis}{27}{section.5.3}%
+\contentsline {paragraph}{Ultrasonic stop.}{27}{paragraph*.33}%
+\contentsline {paragraph}{Distance from vision.}{27}{paragraph*.36}%
+\contentsline {section}{\numberline {5.4}Compositional depth and hallucination onset}{28}{section.5.4}%
+\contentsline {paragraph}{Where execution failed.}{28}{paragraph*.39}%
+\contentsline {paragraph}{Probe chains.}{28}{paragraph*.40}%
+\contentsline {paragraph}{Context window and the plan ceiling.}{29}{paragraph*.41}%
+\contentsline {section}{\numberline {5.5}Reference comparison against cloud models}{30}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Discussion}{31}{section.5.6}%
+\contentsline {paragraph}{RQ1.}{31}{paragraph*.45}%
+\contentsline {paragraph}{RQ2.}{31}{paragraph*.46}%
+\contentsline {paragraph}{Limitations.}{31}{paragraph*.47}%
+\contentsline {chapter}{\numberline {6}Conclusion}{32}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Answers to the research questions}{32}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Contributions}{32}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Limitations}{32}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Recommendations for future work}{32}{section.6.4}%
+\contentsline {chapter}{References}{33}{chapter*.48}%
+\contentsline {chapter}{\numberline {A}Appendix title goes here}{35}{appendix.A}%
 \contentsfinish 

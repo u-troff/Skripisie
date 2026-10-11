@@ -10,9 +10,10 @@
 \contentsline {figure}{\numberline {2.4}{\ignorespaces The introspective planning pipeline: a knowledge base of explained past examples is built offline, and at deployment the most similar example is retrieved to inform the LLM's confidence for each candidate step. Reproduced from \citet {liang2024introspective}.}}{13}{figure.caption.15}%
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces The compute split. The three models and the dialogue run on the brain. The Pi runs only what must keep working without them.}}{18}{figure.caption.18}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces One command from speech to report. Shaded blocks call a model. The dashed block drives the rover. Dashed arrows show the scene digest feeding the two checks that need to know what is in the room.}}{20}{figure.caption.19}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces (a) Plans with the correct visit order out of three runs, against chain depth, at three context settings (points are offset horizontally for legibility). (b) Projected tokens per planning call against depth, measured to depth 30, with the 1024 and 2048 limits marked.}}{28}{figure.caption.40}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces (a) Plans with the correct visit order out of three runs, against chain depth, at three context settings (points are offset horizontally for legibility). (b) Projected tokens per planning call against depth, measured to depth 30, with the 1024 and 2048 limits marked.}}{30}{figure.caption.42}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsfinish 

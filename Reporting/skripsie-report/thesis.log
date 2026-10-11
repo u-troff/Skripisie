@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.9.8)  11 OCT 2026 17:18
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.9.8)  11 OCT 2026 23:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1925,7 +1925,7 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <8> on input line 4.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <6> on input line 4.
-<stb-thesis-frntp.pdf, id=227, 597.50786pt x 845.04686pt>
+<stb-thesis-frntp.pdf, id=235, 597.50786pt x 845.04686pt>
 File: stb-thesis-frntp.pdf Graphic file (type pdf)
 <use stb-thesis-frntp.pdf>
 Package pdftex.def Info: stb-thesis-frntp.pdf  used on input line 4.
@@ -2132,7 +2132,7 @@ Chapter 2.
 [6
 
 ]
-<figures/figure1.drawio.png, id=540, 523.9575pt x 684.5575pt>
+<figures/figure1.drawio.png, id=560, 523.9575pt x 684.5575pt>
 File: figures/figure1.drawio.png Graphic file (type png)
 <use figures/figure1.drawio.png>
 Package pdftex.def Info: figures/figure1.drawio.png  used on input line 48.
@@ -2154,7 +2154,7 @@ Package fancyhdr Warning: \headheight is too small (14.5pt):
 (fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
 
 [8 <./figures/figure1.drawio.png>]
-<figures/saycan_scoring.png, id=553, 1435.3625pt x 877.2775pt>
+<figures/saycan_scoring.png, id=573, 1435.3625pt x 877.2775pt>
 File: figures/saycan_scoring.png Graphic file (type png)
 <use figures/saycan_scoring.png>
 Package pdftex.def Info: figures/saycan_scoring.png  used on input line 74.
@@ -2188,7 +2188,7 @@ Package fancyhdr Warning: \headheight is too small (14.5pt):
 (fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
 
 [10]
-<figures/knowno_prediction_set.png, id=580, 1244.65pt x 637.38126pt>
+<figures/knowno_prediction_set.png, id=600, 1244.65pt x 637.38126pt>
 File: figures/knowno_prediction_set.png Graphic file (type png)
 <use figures/knowno_prediction_set.png>
 Package pdftex.def Info: figures/knowno_prediction_set.png  used on input line 
@@ -2212,7 +2212,7 @@ Package fancyhdr Warning: \headheight is too small (14.5pt):
 (fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
 
 [12]
-<figures/introspective_planning_pipeline.png, id=615, 1294.8375pt x 416.55624pt
+<figures/introspective_planning_pipeline.png, id=635, 1294.8375pt x 416.55624pt
 >
 File: figures/introspective_planning_pipeline.png Graphic file (type png)
 <use figures/introspective_planning_pipeline.png>
@@ -2308,7 +2308,190 @@ Package fancyhdr Warning: \headheight is too small (14.5pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
 
-[19]) (./chapters/implementation.tex
+[19]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 210.
+
+
+! Package pgf Error: Unknown arrow tip kind 'Stealth'.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.219     \draw[arr]
+                     (voice)--(stt);
+? 
+Missing character: There is no [ in font nullfont!
+Missing character: There is no ] in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no @ in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
+
+! Package pgf Error: Unknown arrow tip kind 'Stealth'.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.220     \draw[arr]
+                     (stt)--(clar);
+? 
+Missing character: There is no [ in font nullfont!
+Missing character: There is no ] in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no @ in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
+
+! Package pgf Error: Unknown arrow tip kind 'Stealth'.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.221     \draw[arr]
+                     (clar)--node[lbl]{clear}(plan);
+? 
+Missing character: There is no [ in font nullfont!
+Missing character: There is no ] in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no @ in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
+
+! Package pgf Error: Unknown arrow tip kind 'Stealth'.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.222     \draw[arr]
+                     (plan)--(ver);
+? 
+Missing character: There is no [ in font nullfont!
+Missing character: There is no ] in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no @ in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
+
+! Package pgf Error: Unknown arrow tip kind 'Stealth'.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.223     \draw[arr]
+                     (ver)--(conf);
+? 
+Missing character: There is no [ in font nullfont!
+Missing character: There is no ] in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no @ in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
+
+! Package pgf Error: Unknown arrow tip kind 'Stealth'.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.224     \draw[arr]
+                     (conf)--node[lbl]{yes}(exec);
+? 
+Missing character: There is no [ in font nullfont!
+Missing character: There is no ] in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no @ in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
+
+! Package pgf Error: Unknown arrow tip kind 'Stealth'.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.225     \draw[arr]
+                     (exec)--(rep);
+? 
+Missing character: There is no [ in font nullfont!
+Missing character: There is no ] in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no @ in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
+
+! Package pgf Error: Unknown arrow tip kind 'Stealth'.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.226     \draw[arr, dashed]
+                             (scene.south) -- (clar.north);
+? 
+Missing character: There is no [ in font nullfont!
+Missing character: There is no ] in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no @ in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
+
+! Package pgf Error: Unknown arrow tip kind 'Stealth'.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.227     \draw[arr, dashed]
+                             (scene.east) -| (12.3,-2) -- (ver.east);
+? 
+Missing character: There is no [ in font nullfont!
+Missing character: There is no ] in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no @ in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no p in font nullfont!
 
 Package fancyhdr Warning: \headheight is too small (14.5pt): 
 (fancyhdr)                Make it at least 27.11653pt, for example:
@@ -2317,12 +2500,32 @@ Package fancyhdr Warning: \headheight is too small (14.5pt):
 (fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
 
 [20]
+Overfull \hbox (26.91805pt too wide) in paragraph at lines 246--260
+ [][] 
+ []
+
+
+Package fancyhdr Warning: \headheight is too small (14.5pt): 
+(fancyhdr)                Make it at least 27.11653pt, for example:
+(fancyhdr)                \setlength{\headheight}{27.11653pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
+
+[21]) (./chapters/implementation.tex
+
+Package fancyhdr Warning: \headheight is too small (14.5pt): 
+(fancyhdr)                Make it at least 27.11653pt, for example:
+(fancyhdr)                \setlength{\headheight}{27.11653pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
+
+[22]
 Chapter 4.
-) (./chapters/evaluation.tex [21
+) (./chapters/evaluation.tex [23
 
 ]
 Chapter 5.
-[22
+[24
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 49--49
@@ -2331,22 +2534,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 49--49
 
 Package hyperref Info: bookmark level for unknown todo defaults to 0 on input l
 ine 57.
-
-Package fancyhdr Warning: \headheight is too small (14.5pt): 
-(fancyhdr)                Make it at least 27.11653pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11653pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
-
-[23]
-
-Package fancyhdr Warning: \headheight is too small (14.5pt): 
-(fancyhdr)                Make it at least 27.11653pt, for example:
-(fancyhdr)                \setlength{\headheight}{27.11653pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
-
-[24]
 
 Package fancyhdr Warning: \headheight is too small (14.5pt): 
 (fancyhdr)                Make it at least 27.11653pt, for example:
@@ -2363,12 +2550,6 @@ Package fancyhdr Warning: \headheight is too small (14.5pt):
 (fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
 
 [26]
-<figures/fig_ctx_sweep.png, id=749, 462.528pt x 195.129pt>
-File: figures/fig_ctx_sweep.png Graphic file (type png)
-<use figures/fig_ctx_sweep.png>
-Package pdftex.def Info: figures/fig_ctx_sweep.png  used on input line 160.
-(pdftex.def)             Requested size: 455.24411pt x 192.06473pt.
-
 
 Package fancyhdr Warning: \headheight is too small (14.5pt): 
 (fancyhdr)                Make it at least 27.11653pt, for example:
@@ -2384,7 +2565,13 @@ Package fancyhdr Warning: \headheight is too small (14.5pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
 
-[28 <./figures/fig_ctx_sweep.png>]) (./chapters/conclusion.tex
+[28]
+<figures/fig_ctx_sweep.png, id=782, 462.528pt x 195.129pt>
+File: figures/fig_ctx_sweep.png Graphic file (type png)
+<use figures/fig_ctx_sweep.png>
+Package pdftex.def Info: figures/fig_ctx_sweep.png  used on input line 160.
+(pdftex.def)             Requested size: 455.24411pt x 192.06473pt.
+
 
 Package fancyhdr Warning: \headheight is too small (14.5pt): 
 (fancyhdr)                Make it at least 27.11653pt, for example:
@@ -2393,10 +2580,26 @@ Package fancyhdr Warning: \headheight is too small (14.5pt):
 (fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
 
 [29]
-Chapter 6.
-) [30
 
-] (./thesis.bbl [31
+Package fancyhdr Warning: \headheight is too small (14.5pt): 
+(fancyhdr)                Make it at least 27.11653pt, for example:
+(fancyhdr)                \setlength{\headheight}{27.11653pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
+
+[30 <./figures/fig_ctx_sweep.png>]) (./chapters/conclusion.tex
+
+Package fancyhdr Warning: \headheight is too small (14.5pt): 
+(fancyhdr)                Make it at least 27.11653pt, for example:
+(fancyhdr)                \setlength{\headheight}{27.11653pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
+
+[31]
+Chapter 6.
+) [32
+
+] (./thesis.bbl [33
 
 ]) (./appendices/appendices.tex
 (./appendices/an_appendix.tex
@@ -2407,14 +2610,14 @@ Package fancyhdr Warning: \headheight is too small (14.5pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-12.61653pt}.
 
-[32]
+[34]
 Appendix A.
 ))
 
 Package caption Warning: Unused \captionsetup[algorithm] on input line 376.
 See the caption package documentation for explanation.
 
-[33
+[35
 
 ] (./thesis.aux)
  ***********
@@ -2434,31 +2637,35 @@ Package rerunfilecheck Warning: File `thesis.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `thesis.out':
-(rerunfilecheck)             Before: DBCB023D8E56D1B89DDCDD6B11F63277;9936
-(rerunfilecheck)             After:  2C7F9073761B9ADC46712341E5CC13F1;10223.
+(rerunfilecheck)             Before: 5B5DD75942740F323A256E3AB4AD5826;10249
+(rerunfilecheck)             After:  8C43F8335D7C14C2022B58F276EAA9BE;10536.
  ) 
 Here is how much of TeX's memory you used:
- 53095 strings out of 469005
- 1088930 string characters out of 5454799
- 1675015 words of memory out of 5000000
- 80437 multiletter control sequences out of 15000+600000
- 761285 words of font info for 269 fonts, out of 8000000 for 9000
+ 53203 strings out of 469005
+ 1090523 string characters out of 5454799
+ 1675580 words of memory out of 5000000
+ 80522 multiletter control sequences out of 15000+600000
+ 771706 words of font info for 282 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
  115i,12n,110p,2553b,938s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-pdfTeX warning (dest): name{table.caption.40} has been referenced but does not 
+pdfTeX warning (dest): name{table.caption.42} has been referenced but does not 
 exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{table.caption.34} has been referenced but does not 
+pdfTeX warning (dest): name{table.caption.36} has been referenced but does not 
 exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{table.caption.31} has been referenced but does not 
+pdfTeX warning (dest): name{table.caption.33} has been referenced but does not 
 exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{table.caption.20} has been referenced but does not 
+pdfTeX warning (dest): name{table.caption.22} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{table.caption.19} has been referenced but does not 
 exist, replaced by a fixed one
 
 
@@ -2470,7 +2677,7 @@ pdfTeX warning (dest): name{table.caption.10} has been referenced but does not
 exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{figure.caption.39} has been referenced but does not
+pdfTeX warning (dest): name{figure.caption.41} has been referenced but does not
  exist, replaced by a fixed one
 
 
@@ -2482,7 +2689,7 @@ pdfTeX warning (dest): name{figure.caption.11} has been referenced but does not
  exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{chapter*.45} has been referenced but does not exist
+pdfTeX warning (dest): name{chapter*.47} has been referenced but does not exist
 , replaced by a fixed one
 
  </Users/utroff/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec
@@ -2505,10 +2712,10 @@ ic/lm/lmri12.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/lm
 ></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></us
 r/local/texlive/2025basic/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></usr/loc
 al/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (46 pages, 1701521 bytes).
+Output written on thesis.pdf (48 pages, 1712694 bytes).
 PDF statistics:
- 942 PDF objects out of 1000 (max. 8388607)
- 820 compressed objects within 9 object streams
- 175 named destinations out of 1000 (max. 500000)
- 71651 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 977 PDF objects out of 1000 (max. 8388607)
+ 853 compressed objects within 9 object streams
+ 182 named destinations out of 1000 (max. 500000)
+ 77811 words of extra memory for PDF output out of 89155 (max. 10000000)
 

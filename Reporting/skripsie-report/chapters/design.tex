@@ -144,9 +144,17 @@ putting it on hardware.
 The default configuration is fully local. Speech recognition is
 \texttt{faster-whisper} with the \texttt{fluister-turbo} model, the planner is
 \texttt{gemma4:e4b} \texttt{gemma4:e4b}, and the vision model is \texttt{qwen2.5vl:3b} or \texttt{gemma4:e4b}. Both are
-served by Ollama with a context of 8192 tokens. Speech output uses Piper with the
-\texttt{en\_US-lessac-medium} voice. Cloud providers go through the same
-interface, and I use them only as a comparison to the local models
+served by Ollama with a context of 8192 tokens. 
+
+
+Speech output uses Piper, a small neural text-to-speech engine that runs locally.
+It turns text into a waveform with a voice model stored as an ONNX file, and I use
+the \texttt{en\_US-lessac-medium} voice. I chose it for three reasons. The rest of
+the pipeline is local, so the rover's voice has to be local too (NR1), and a cloud
+speech service would put a network call and a third party into every spoken
+reply. Piper also runs on the CPU so it does not compete with the Vision and planner models
+for VRAM. One thing to note if I use 1 model for both vision and reasoning, I would have 
+more VRAM at my disposal.
 
 The 8192-token window is a constraint I check instead of assuming. Every
 clarification turn and every recovery turn adds text
@@ -159,8 +167,110 @@ window is the limiting factor.
 \mysubsection{Two-rate control: waypoint intents versus the reactive layer}{Two-rate Control}
 \label{ssec:rates}
 
+Everystep or run requires the rover to do a vision-model call. In order to process, where
+it is at the current time and if it is still on track. A vision-model call takes about 4.78\,s
+on my hardware. If the rover is using the line follower to control the driving, The steering of the rover
+cannot occur in a closed loop. 
+
+Instead there is a reactive layer on the turboPi itself, that came stock with it. It reads the sonar at 10-30\,Hz
+and stop the rover if something is in the way. It also follows a line from the IR array uder the rover without consulting 
+the models. The actual decision making engine runs on the brain at a pace  of the models and hardware. It chooses the next steps,
+deciddes whether the rover has arrived at the desired destination. Where the closed loop system occurs is at 
+every step boundary and at distinctive times during the rovers runs. 
+
+The reason it is design like this is because the rover never relies on the vision model to make a immediate decision on when to stop
+If a obstacle arises infront of the rover.
+
+
+\mysubsection{The end-to-end pipeline}{Pipeline}
+\label{ssec:pipeline}
+
+The Figure~\ref{fig:pipeline} gives you a the overview of the process of one command, given to the rover. A short walkthrough video is recorded
+of the room the rover will be traversing ing. The then breaks up the video of the room into keyframes (the number depends on the environment variable set). The vision
+model them lists all the objects it sees in the in each frame as well as any obstructions in the image.  This is called the scene digest which can be called on by the model to
+understand the environment. It is capped at 8 major objects with each having 2 attributes for each object. The reason it was capped at 8 objects so that it fits the planners prompt
+without the dialogue. 
+
+I chose text over a map delibreatly. A map is a seperate system to create and keep updating and generating one is outside the scope of my Skripsie.
+
+A spoken command by someone is then transcribed and enters the clarification loop (Section~\ref{sec:clarification_design}).
+If the command is not flagged as ambiguous the planner can turn is into steps using the actions and vocabulary/actions the rover can execute.
+(Section~\ref{sec:vocabulary}). The vision model then checks the plan against the digest for steps that are not able to be executed. If it comes back successful the
+plan is read back to the command giver and the rover only moves after they confirm the plan. The rover then run the steps one at a time and at the end reports are logged and spoken.
+
+A Websocket will be used to carry the dialog sessions. \texttt{/ws/dialogue} will serve everything up until the confirmation, and \texttt{/ws/execution}
+servers all the communication during the mission run. I keep them apart so that the dialogue state and the mission state never share a single session.
+
+
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.82, transform shape]
+    \node[mdl] (scene) at (7.0,2.4) {Scene digest\\(video $\rightarrow$ keyframes\\$\rightarrow$ vision model $\rightarrow$ text)};
+    \node[blk] (voice) at (0,0)    {Spoken\\command};
+    \node[mdl] (stt)   at (3.5,0)  {Speech\\recognition};
+    \node[mdl] (clar)  at (7.0,0)  {Ambiguity check\\(asks until clear)};
+    \node[mdl] (plan)  at (10.5,0) {Planner};
+    \node[mdl] (ver)   at (10.5,-2){Plan\\check};
+    \node[blk] (conf)  at (7.0,-2) {Read-back and\\confirmation};
+    \node[hw]  (exec)  at (3.5,-2) {Mission loop\\(rover steps)};
+    \node[blk] (rep)   at (0,-2)   {Report\\(spoken, logged)};
+    \draw[arr] (voice)--(stt);
+    \draw[arr] (stt)--(clar);
+    \draw[arr] (clar)--node[lbl]{clear}(plan);
+    \draw[arr] (plan)--(ver);
+    \draw[arr] (ver)--(conf);
+    \draw[arr] (conf)--node[lbl]{yes}(exec);
+    \draw[arr] (exec)--(rep);
+    \draw[arr, dashed] (scene.south) -- (clar.north);
+    \draw[arr, dashed] (scene.east) -| (12.3,-2) -- (ver.east);
+  \end{tikzpicture}
+  \caption{One command from speech to report. Shaded blocks call a model. The dashed block drives the rover. Dashed arrows show the scene digest feeding the two checks that need to know what is in the room.}
+  \label{fig:pipeline}
+\end{figure}
+
+\mysubsection{Status lights}{Status Lights}
+\label{ssec:lights}
+
+To provide the user with some feedback on the rover state throughout the mission so that they can tell what the rover is doing. The Pi has RGB LEDs
+the expansion board as well as the ultra sonic sensor ring. I used them as a state display (Table~\ref{tab:lights}). During each phase of the mission execution as
+well as the dialogue session before a mission is executed. Each light color is tied to one state.  If the light setting failed it should not hinder the rovers execution therefore
+Rovers that have no LEDs inherit a no-op, and one setting (\texttt{RGB\_ENABLED}) turns the whole thing off.
+
+\begin{table}[htbp]
+  \centering
+  \caption{The eight light states.}
+  \label{tab:lights}
+  \small
+  \begin{tabular}{@{}l l p{6.6cm}@{}}
+    \toprule
+    State & Pattern & Meaning \\
+    \midrule
+    listening & steady blue & Waiting for a command or an answer. \\
+    thinking & red and green alternating, 0.5\,s & A model is working. \\
+    confirm & steady amber & A plan has been read back and the rover is waiting for yes or no. \\
+    executing & steady green & Carrying out a step. \\
+    searching & steady cyan & Looking for a target. \\
+    awaiting\_guidance & magenta, 1\,s on and off & Stopped and waiting for the person to say what to do next. \\
+    arrived & three green flashes, then steady green & A target has been reached. \\
+    blocked & steady red & The mission has stopped and cannot continue. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The mission logs also log the changes with timestamps, therefore allowing one to reconstruct the mission run  later on or use it for debugging.
+
+
+
 \mysection{The capability vocabulary}{The Capability Vocabulary}
 \label{sec:vocabulary}
+
+Since these planners are LLMs and have generalized knowledge, a planner based on a LLM may write any step it likes and will also write steps that the rover 
+cannot execute. Commands like 'bring me that bottle' invites a \texttt{pick\_up} step. Since our rover has not arm. I gave the planner a fixed list of actions and 
+in the prompt describe which exists and what each of these actions means. 
+
+The list depends on the rover, so it lives in a planner profile
 
 \mysection{Clarification loop design}{Clarification Loop Design}
 \label{sec:clarification_design}
