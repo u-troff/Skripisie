@@ -1,0 +1,805 @@
+%!TEX root = ../thesis.tex
+% ===================================================================
+% Chapter 3: System Design  (replaces the stubs in chapters/design.tex)
+% Needs in imports.tex:
+%   \usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit,backgrounds,calc}
+% Lines marked %CHECK need a value or label confirmed before you hand in.
+% ===================================================================
+\mychapter{System Design}{System Design}{}
+\label{chap:design}
+
+% -------------------------------------------------------------------
+% Shared figure styles. Move into imports.tex if you prefer.
+% -------------------------------------------------------------------
+\tikzset{
+  blk/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+              minimum width=2.6cm, minimum height=0.95cm, inner sep=3pt},
+  mdl/.style={blk, fill=black!8},
+  hw/.style={blk, dashed},
+  st/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+             minimum width=2.7cm, minimum height=0.9cm},
+  dec/.style={draw, diamond, aspect=2.2, align=center, font=\scriptsize,
+              inner sep=1pt},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  lbl/.style={font=\scriptsize, fill=white, inner sep=1pt}
+}
+
+%% ===================================================================
+\mysection{User and functional requirements}{User and Functional Requirements}
+\label{sec:requirements}
+
+The person I have in mind is someone in a home or small office who wants to
+tell a rover what to do in ordinary speech, and who is not watching a screen
+while it happens. They will say things like ``go and look at the orange box''
+without checking whether there is one orange box or two. The rover has to cope
+with that, and it has to be honest when it cannot. I turned this into the
+requirements in Table~\ref{tab:requirements}. Each one traces to an objective in
+Section~\ref{sec:objectives}, so the evaluation in Chapter~\ref{chap:evaluation}
+can be read back against them.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Functional (FR) and non-functional (NR) requirements, with the objective each one serves.}
+  \label{tab:requirements}
+  \small
+  \begin{tabular}{@{}l p{9.4cm} l@{}}
+    \toprule
+    ID & Requirement & Objective \\
+    \midrule
+    FR1 & Take the command by voice and transcribe it locally. & 2 \\
+    FR2 & Before planning, check the command against the room and ask the person a spoken question when it is ambiguous, up to a fixed number of questions. & 4 \\
+    FR3 & Produce a plan that uses only actions the rover has and objects the room contains. & 3, 5 \\
+    FR4 & Read the plan back and move only after a spoken confirmation. A rejection must lead back to the dialogue, not end it. & 4 \\
+    FR5 & Carry out the plan one step at a time, with obstacle stopping that does not depend on any model. & 1, 3 \\
+    FR6 & Use the camera to check progress and arrival during a step. & 5 \\
+    FR7 & Say at the end what happened and what the rover was still unsure about. & 4, 7 \\
+    FR8 & When a step fails, ask the person what to do next and carry on from where the rover is. This is for failure only, never for ambiguity. & 4 \\
+    FR9 & Log every model call, check and decision in a form the evaluation can count. & 6, 7, 8 \\
+    FR10 & When a command contains a condition, look once to decide it, run only the matching steps, and ask the person when the camera cannot tell. Never guess a branch. & 3, 7 \\
+    FR11 & When the person asks what is near a target, report what is around it and not only whether the target was reached. & 3, 5 \\
+    NR1 & Run planning, vision and speech on a Ryzen 5 3600 with 16\,GB RAM and a 12\,GB GPU. Cloud models are allowed only as a benchmark. & 9 \\
+    NR2 & Keep the rover stoppable when the network or a model is slow or gone. & 1 \\
+    NR3 & Use only a camera, an ultrasonic sensor and a line sensor. No encoders, IMU or lidar. & 1 \\
+    NR4 & Let the planner or vision model be swapped by configuration, with no change to the pipeline code. & 9 \\
+    NR5 & Show the person what state the rover is in without a screen. & 4 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+NR3 is the one that shapes the rest of the chapter. Without odometry the rover
+does not know how far it has moved. Every distance it covers is an open-loop
+estimate, and the camera and sonar are what correct it.
+
+The command levels in Table~\ref{tab:command-levels} each need something
+different from the design, and Table~\ref{tab:level_map} says what. I made this
+mapping before building the later parts, and it is the reason FR10 and FR11
+exist. A level with no mechanism behind it would be a level I could not
+honestly claim to test.
+
+\begin{table}[htbp]
+  \centering
+  \caption{What the design provides for each command level.}
+  \label{tab:level_map}
+  \small
+  \begin{tabular}{@{}l p{4.0cm} p{6.4cm}@{}}
+    \toprule
+    Level & Command type & Mechanism \\
+    \midrule
+    L1 & Single action & One \texttt{move} or \texttt{turn} step, read back and confirmed. \\
+    L2 & Sequence of actions & Ordered steps, each finished before the next starts. \\
+    L3 & Perception-dependent & \texttt{approach} to find and reach a named object (Section~\ref{ssec:freeroam}), or \texttt{follow\_line} to a visible end point. \\
+    L4 & Conditional & A \texttt{check} step with tagged branches (Section~\ref{sec:conditional}). \\
+    L5 & Vague & The clarification loop before departure (Section~\ref{sec:clarification_design}) and a survey of the surroundings when the command asks for one (Section~\ref{ssec:survey}). \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+%% ===================================================================
+\mysection{System architecture}{System Architecture}
+\label{sec:architecture}
+
+\mysubsection{Off-board inference and the thin-client split}{Off-board Inference}
+\label{ssec:split}
+
+The rover is a Hiwonder TurboPi with a Raspberry Pi 5. I run the speech
+recogniser, the planner and the vision model on a separate machine, which I call
+the brain, and keep only motion and sensing on the Pi. The reason is size. The
+three models together take about 7\,GB, which does not fit on the Pi next to the
+camera and drive stack, and a model small enough to fit would plan poorly. Running
+them off-board also means I can swap a model by changing one environment
+variable, which the cloud comparison in Chapter~\ref{chap:evaluation} depends on
+(NR4).
+
+The brain reaches the Pi over rosbridge on port 9090 using roslibpy
+(Figure~\ref{fig:split}). Commands go one way. Camera frames, sonar readings and
+step results come back the other. The brain owns the dialogue, the plan and the
+mission loop. The Pi owns whatever has to keep working when the link is slow,
+which is the sonar stop and the line follower. If the network drops during a
+step, the rover still stops for an obstacle (NR2).
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.85, transform shape]
+    \node[mdl] (stt) at (0,1.2)  {Speech\\recogniser};
+    \node[mdl] (pln) at (3.0,1.2){Planner\\(LLM)};
+    \node[mdl] (vlm) at (6.0,1.2){Vision\\model};
+    \node[blk] (dlg) at (1.5,-0.3){Dialogue and\\mission loop};
+    \node[blk] (tts) at (4.5,-0.3){Speech\\output};
+    \begin{scope}[on background layer]
+      \node[draw, rounded corners=3pt, fit=(stt)(pln)(vlm)(dlg)(tts),
+            inner sep=7pt, label={[font=\footnotesize]above:Brain (desktop or laptop)}] (brain) {};
+    \end{scope}
+    \node[hw] (react) at (11.2,1.2) {Reactive layer\\sonar stop, line\\follower};
+    \node[hw] (io)    at (11.2,-0.3){Camera, gimbal,\\wheels, LEDs};
+    \begin{scope}[on background layer]
+      \node[draw, rounded corners=3pt, fit=(react)(io), inner sep=7pt,
+            label={[font=\footnotesize]above:Rover (Raspberry Pi 5)}] (pi) {};
+    \end{scope}
+    \draw[arr, <->] (brain.east) -- node[lbl, above]{rosbridge} (pi.west);
+  \end{tikzpicture}
+  \caption{The compute split. The three models and the dialogue run on the brain. The Pi runs only what must keep working without them.}
+  \label{fig:split}
+\end{figure}
+
+The code boundary is one method, \texttt{RoverController.execute\_step}. The brain
+hands it one step and gets back \texttt{ok}, \texttt{blocked} or \texttt{halted}.
+Everything above that method is the same for the real rover and for a simulated
+one, so I can run the same dialogue and mission code in simulation before
+putting it on hardware.
+
+The default configuration is fully local. Speech recognition is
+\texttt{faster-whisper} with the \texttt{fluister-turbo} model, the planner is
+\texttt{gemma4:e2b}, and the vision model is \texttt{qwen2.5vl:3b}. Both are
+served by Ollama with a context of 8192 tokens. Speech output uses Piper with the
+\texttt{en\_US-lessac-medium} voice. Cloud providers go through the same
+interface, and I use them only as a comparison in
+Section~\ref{sec:cloud_comparison}.
+
+The 8192-token window is a constraint I check instead of assuming. Every
+clarification turn and every recovery turn (Section~\ref{sec:recovery}) adds text
+to a prompt, and a small model that is silently truncated plans worse without
+raising any error. A separate offline tool, \texttt{context\_budget.py}, counts
+the tokens each part of the prompt takes (fixed instructions, room digest, one
+clarification turn, one recovery turn) so I know how many turns fit before the
+window is the limiting factor. The measured counts are in
+Chapter~\ref{chap:evaluation}.
+
+\mysubsection{Two-rate control: waypoint intents versus the reactive layer}{Two-rate Control}
+\label{ssec:rates}
+
+A vision-model call takes about 15\,s on my hardware. Keeping a mecanum chassis
+on a line needs a command every 30 to 100\,ms. A steering loop cannot go through
+a model that slow, so I split control into two layers that run at different rates.
+
+The reactive layer runs on the Pi at 10 to 30\,Hz. It reads the sonar, zeroes the
+wheels when something is in the way, and follows the line from the IR array
+without asking a model anything. The deliberative layer runs on the brain at the
+pace of the models. It chooses the next step, decides whether the rover has
+arrived, and looks at a frame when a step finishes. The two layers meet at step
+boundaries and at a small number of checks during a step, not at every control
+tick.
+
+The consequence I care about is that the vision model never sits in a safety
+path. A slow or wrong answer from it can send the rover to the wrong place, which
+I measure, but it cannot make the rover drive into a wall, because the stop is on
+the Pi.
+
+\mysubsection{The end-to-end pipeline}{Pipeline}
+\label{ssec:pipeline}
+
+Figure~\ref{fig:pipeline} shows the path of one command. Before any command, I
+record a short walkthrough video of the room. The brain takes up to ten
+keyframes from it, has the vision model list the objects in each, and condenses
+the result into a short text description that I call the scene digest. The digest
+is built once and reused. It is capped at 8 objects with 2 attributes each, so it
+fits the planner prompt without crowding out the dialogue. I chose text over a
+map deliberately. A map is a separate system to build and keep right, and
+building one is outside the scope set in Section~\ref{sec:scope-and-limitations}.
+
+A spoken command is transcribed and enters the clarification loop
+(Section~\ref{sec:clarification_design}). When the command is clear, the planner
+turns it into steps using the vocabulary of the active rover profile
+(Section~\ref{sec:vocabulary}). The vision model then checks the plan against the
+digest for steps that cannot work, for example a target that is not in the room.
+The plan is read back, and the rover moves only after a spoken confirmation. The
+mission loop then runs the steps one at a time, and at the end a report is logged
+and spoken.
+
+Two WebSocket endpoints carry this. \texttt{/ws/dialogue} serves everything up to
+confirmation, and \texttt{/ws/execution} serves the mission. I kept them apart so
+the dialogue state and the mission state never share a session object. A dialogue
+session that sits idle for 30 minutes is dropped.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.82, transform shape]
+    \node[mdl] (scene) at (7.0,2.4) {Scene digest\\(video $\rightarrow$ keyframes\\$\rightarrow$ vision model $\rightarrow$ text)};
+    \node[blk] (voice) at (0,0)    {Spoken\\command};
+    \node[mdl] (stt)   at (3.5,0)  {Speech\\recognition};
+    \node[mdl] (clar)  at (7.0,0)  {Ambiguity check\\(asks until clear)};
+    \node[mdl] (plan)  at (10.5,0) {Planner};
+    \node[mdl] (ver)   at (10.5,-2){Plan\\check};
+    \node[blk] (conf)  at (7.0,-2) {Read-back and\\confirmation};
+    \node[hw]  (exec)  at (3.5,-2) {Mission loop\\(rover steps)};
+    \node[blk] (rep)   at (0,-2)   {Report\\(spoken, logged)};
+    \draw[arr] (voice)--(stt);
+    \draw[arr] (stt)--(clar);
+    \draw[arr] (clar)--node[lbl]{clear}(plan);
+    \draw[arr] (plan)--(ver);
+    \draw[arr] (ver)--(conf);
+    \draw[arr] (conf)--node[lbl]{yes}(exec);
+    \draw[arr] (exec)--(rep);
+    \draw[arr, dashed] (scene.south) -- (clar.north);
+    \draw[arr, dashed] (scene.east) -| (12.3,-2) -- (ver.east);
+  \end{tikzpicture}
+  \caption{One command from speech to report. Shaded blocks call a model. The dashed block drives the rover. Dashed arrows show the scene digest feeding the two checks that need to know what is in the room.}
+  \label{fig:pipeline}
+\end{figure}
+
+\mysubsection{Status lights}{Status Lights}
+\label{ssec:lights}
+
+NR5 asks that the person can tell what the rover is doing without looking at a
+screen. The Pi has RGB LEDs on the board and on the sonar ring, so I use them as
+a state display (Table~\ref{tab:lights}). The brain sets a light at each phase
+change through one call, \texttt{status\_light}, which returns at once and never
+raises. A failed light must not be able to stop a mission. Rovers that have no
+LEDs inherit a no-op, and one setting (\texttt{RGB\_ENABLED}) turns the whole
+thing off.
+
+\begin{table}[htbp]
+  \centering
+  \caption{The eight light states.}
+  \label{tab:lights}
+  \small
+  \begin{tabular}{@{}l l p{6.6cm}@{}}
+    \toprule
+    State & Pattern & Meaning \\
+    \midrule
+    listening & steady blue & Waiting for a command or an answer. \\
+    thinking & red and green alternating, 0.5\,s & A model is working. \\
+    confirm & steady amber & A plan has been read back and the rover is waiting for yes or no. \\
+    executing & steady green & Carrying out a step. \\
+    searching & steady cyan & Looking for a target. \\
+    awaiting\_guidance & magenta, 1\,s on and off & Stopped and waiting for the person to say what to do next. \\
+    arrived & three green flashes, then steady green & A target has been reached. \\
+    blocked & steady red & The mission has stopped and cannot continue. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The mission loop logs each change with a timestamp, so the same signal that the
+person sees is also in the run log and can be drawn as a timeline afterwards.
+
+%% ===================================================================
+\mysection{The capability vocabulary}{The Capability Vocabulary}
+\label{sec:vocabulary}
+
+A planner that may write any step it likes will write steps the rover cannot do.
+A command like ``bring me the bottle'' invites a \texttt{pick\_up} step, and the
+TurboPi has no arm. I give the planner a fixed list of actions and say in the
+prompt which exist and what each one means. The
+list depends on the rover, so it lives in a planner profile, one file per rover,
+chosen by the \texttt{ROVER} variable or overridden with
+\texttt{PLANNER\_PROFILE}.
+
+On the real rover the base actions are \texttt{follow\_line}, \texttt{move},
+\texttt{turn}, \texttt{approach}, \texttt{scan}, \texttt{observe}, \texttt{stop}
+and \texttt{report}. A step is a small JSON object with an id, an action and a
+target. The simulated rover's profile is the same except that
+\texttt{follow\_line} is absent and \texttt{move} and \texttt{turn} carry a
+distance and an angle, because the simulator can execute an exact value and the
+Pi cannot (NR3). The prompt also states that the rover has no arm and cannot pick
+up or carry anything, so a request for it is answered with what the rover can do
+instead.
+
+A ninth action, \texttt{check}, is not always on the list. It means ``look once
+and decide whether a stated condition is true'' (Section~\ref{sec:conditional}),
+and I offer it only when the command contains one of the words \emph{if},
+\emph{whether}, \emph{otherwise} or \emph{unless}. In that case the prompt also
+gains a short block that explains the \texttt{check} step and the optional
+\texttt{when} field a step then carries (\texttt{yes} or \texttt{no}), with one
+worked example. I left \texttt{check} out of every other prompt for two reasons.
+Every extra line is context the 8192-token window has to pay for, and an action
+the planner has no use for is one it can misuse, for instance by inventing a
+condition nobody spoke. The cost of deciding this with a word match is that a
+conditional phrased in other words, such as ``when you see the door, stop'', gets
+no \texttt{check} action and the planner cannot express it. I accept that limit
+for now and name it in the evaluation. Conditionals exist only on the real rover's
+profile, not the simulated one.
+
+I should be exact about where this constraint is enforced, because it is easy to
+overstate. For the first plan it lives in the prompt. Nothing between the planner
+and the read-back rejects a step whose action is outside the list. Three things
+catch it afterwards. A step with an unknown action returns \texttt{blocked} when
+the rover tries to run it. The end-of-mission report counts the out-of-vocabulary
+actions in each plan, so I can measure how often the planner ignores the list
+(Section~\ref{sec:executability}). And the person hears the plan before anything
+moves. I chose to measure the first-plan failure instead of silently repairing it,
+because how often the planner leaves the vocabulary is itself a result for RQ1.
+The one repair I do make is on the real rover in free-roam mode, where a
+\texttt{move} step that names an object is rewritten to \texttt{approach}, since
+the planner often reaches for the wrong word and the intent is clear.
+
+A plan produced during recovery is different, and there I do enforce the list.
+When a step fails and the person gives new instructions, the replacement plan
+goes straight into the mission with no spoken read-back, so nobody has heard it.
+\texttt{validate\_steps} therefore checks that every step is an object whose
+action is in the profile, and a plan that fails the check is thrown away
+(Section~\ref{sec:recovery}). In free-roam mode the list for a replan leaves out
+\texttt{follow\_line}, since there is no floor line for it to follow.
+
+Keeping the profile in its own file has one more benefit. A hash of the profile's
+vocabulary and step format is logged with every run, so when I change the wording
+I can tell which results came from which version. The hash covers the base
+profile and not the per-command variant, so it does not separate a conditional
+prompt from a normal one. The command is in the log, which tells me which variant
+was used. %CHECK: say this only if you leave profile_info() as it is.
+
+%% ===================================================================
+\mysection{Clarification loop design}{Clarification Loop Design}
+\label{sec:clarification_design}
+
+\mysubsection{Where the loop sits}{Placement}
+
+Spoken commands are often underspecified, and the cost of acting on a wrong guess
+is a rover in the wrong place. I handle ambiguity at three moments, and this
+section covers the first. Before departure, the system asks when the command is
+unclear. During the mission it does not stop to ask about ambiguity. It compares
+what it sees with the digest and corrects itself if it can
+(Section~\ref{ssec:revision}). At the end, it says what it was still unsure
+about. I leave out a mid-mission question about ambiguity on purpose. The person
+is often not next to the rover, and a robot that stops and waits for an answer it
+may not get is worse than one that makes its best attempt and says what it did.
+This differs from KnowNo~\cite{ren2023knowno} and Introspective
+Planning~\cite{liang2024introspective}, which ask for help when their confidence
+drops, and I come back to the difference in Section~\ref{sec:clarification_lit}.
+
+\mysubsection{The dialogue as a state machine}{State Machine}
+\label{ssec:statemachine}
+
+A command moves through the phases in Figure~\ref{fig:states}. In
+\texttt{CLARIFYING}, the vision model is asked whether the command is ambiguous,
+given the command, the dialogue so far and the scene digest. It answers in JSON
+with four fields: whether it is ambiguous, why, a question to ask, and a rewritten
+command. If it is ambiguous, the question is spoken and the answer is added to the
+history. If it is clear, the rewritten command is used from then on. I require
+that this command names the object only and avoids words like ``left'' or
+``behind you'', because those are relative to the camera view at the time of
+asking and are wrong once the rover has moved.
+
+The loop is capped at five questions. If the command is still unclear after that,
+the system marks the session as capped and plans from the rewritten command if
+the model produced one, and from the original command if it did not. In that case
+it no longer appends the dialogue so far to the command. %CHECK: add your reason for this change.
+The loop also drops a question it has already asked. If the only question the
+model offers is one that is already in the dialogue, there is nothing new to ask,
+so the system treats the session the same way as a capped one and moves on to
+planning with the warning in the read-back. The read-back
+then begins with ``I am not fully sure I understood'', so the person knows the
+plan rests on a guess. I chose a cap over an open loop because I would rather have
+a person confirm or reject a flawed plan than get tired of questions and walk
+away.
+
+A failed vision call is never read as ``nothing is unclear''. If the call errors,
+I retry once. If it fails again, the person is told and asked to repeat the
+command. Without this, an unavailable model would look the same as a clear
+command and let everything through.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.9, transform shape]
+    \node[st] (cl) at (0,0)    {CLARIFYING};
+    \node[st] (pl) at (4.2,0)  {PLANNING};
+    \node[st] (ve) at (8.4,0)  {VERIFYING};
+    \node[st] (aw) at (4.2,-2.6){AWAITING\_\\CONFIRMATION};
+    \node[st] (ca) at (8.4,-2.6){CANCELLED};
+    \node[st] (ex) at (4.2,-5.0){EXECUTING};
+    \node[st] (re) at (8.4,-5.0){REPORTING};
+    \draw[arr] (cl)--node[lbl]{clear}(pl);
+    \path (cl) edge[arr, loop above, min distance=7mm]
+          node[lbl, above]{ambiguous: ask} (cl);
+    \draw[arr] (pl)--(ve);
+    \draw[arr] (ve.north) to[out=120,in=60]
+          node[lbl, above]{unworkable: replan once} (pl.north);
+    \draw[arr] (ve.south west)--node[lbl, right]{plan ready}(aw.north east);
+    \draw[arr] (aw)--node[lbl, right]{yes}(ex);
+    \draw[arr] (ex)--(re);
+    \draw[arr] (aw.west) -| node[lbl, pos=0.3, below]{no: ``What should I change?''} (cl.south);
+    \draw[arr] (aw)--node[lbl]{cancel}(ca);
+  \end{tikzpicture}
+  \caption{The dialogue phases up to the start of a mission. A rejection returns to \texttt{CLARIFYING} with the person's reason added to the history.}
+  \label{fig:states}
+\end{figure}
+% CHECK: CANCELLED is drawn only from AWAITING_CONFIRMATION. Redraw if other phases can cancel.
+
+\mysubsection{Checking the plan before reading it back}{Plan Check}
+\label{ssec:plancheck}
+
+After the planner produces a plan, the vision model checks it against the digest
+and returns whether it is workable and a list of concerns. If it says no, the
+planner runs once more with the concerns added as advice while the original goal
+stays as it was. I replan only once. A second round rarely fixes what the first
+did not, and each round costs another model call. If the checker itself is
+unavailable, the answer is neither yes nor no, and I do not replan. Skipping the
+check is a safer failure than inventing a concern.
+
+\mysubsection{Confirmation}{Confirmation}
+\label{ssec:confirmation}
+
+The plan is read back as a short sentence per step, and the rover does not move
+until the person answers. The answer is classified in two stages. A keyword pass
+runs first over English and Afrikaans phrase lists, with the reject list checked
+before the confirm list, so ``no, don't go'' is not taken as a yes because it
+contains ``go''. If the keywords find nothing, the planner model classifies the
+reply. If that also fails or is unsure, the answer counts as unclear and the rover
+stays where it is. I made the safe outcome the default, since a missed ``yes''
+costs a few seconds and a missed ``no'' costs a moving robot. Unclear answers are
+retried twice.
+
+A rejection does not end the session. The system asks ``What should I change?''
+and returns to \texttt{CLARIFYING} with the answer in the history, so the person
+can fix one step without starting over.
+
+Commands are accepted by voice only. A typed route exists for testing, but it is
+off unless \texttt{ALLOW\_TEXT\_COMMANDS} is set, so the dialogue I evaluate is
+the one a person would actually use.
+
+\mysubsection{The two later moments}{Later Moments}
+\label{ssec:revision}
+
+Once the rover is moving, the second moment is self-correction. While a step
+runs, new frames are compared with the digest. A small module, \texttt{revision},
+classifies what it sees as no change, a reroute, a material change or a block,
+and it does this with plain code and no model call. The planner may propose a
+change, but the classifier decides whether the person has to be asked. A reroute
+is applied between steps. A material change moves the mission into
+\texttt{AWAITING\_REVISION\_CONFIRMATION}, and the rover waits for a spoken yes
+before it follows the new plan. The third moment is the report
+(Section~\ref{sec:report}).
+
+%% ===================================================================
+\mysection{Failure recovery}{Failure Recovery}
+\label{sec:recovery}
+
+Some things go wrong that no amount of questioning beforehand would have
+prevented. The orange box is behind a chair. Someone has left a bag in the
+corridor. The rover reaches the place the plan named and the camera does not
+agree. In these cases the plan was clear and the world did not cooperate.
+
+When a step returns \texttt{blocked}, the mission enters
+\texttt{AWAITING\_GUIDANCE} (Figure~\ref{fig:guidance}). The rover says why it
+stopped, using one of four fixed sentences chosen by the reason (target not found,
+obstacle, arrival contradicted, or out of time) or a general sentence for
+anything else, and asks what to do next. The
+light turns magenta. The person answers by voice. The planner then writes a new
+plan for what is still left, given the original command, the steps already done,
+the step that failed and why, what the rover has recently seen, and the
+conversation so far. The prompt tells the planner to use the answer to decide
+where to look or what to reach instead. If the person says where the target is,
+the plan should turn that way and approach the target again, and it must still end
+by reaching the target. The output then goes through two checks. The first is
+\texttt{validate\_steps} (Section~\ref{sec:vocabulary}). The second applies when
+the failed step was an \texttt{approach}: a plan that never approaches anything is
+rejected, because a plan that walks away from the failed step is not a recovery.
+If the plan passes both, the mission carries on from where the rover is, and the
+rover says ``Okay. Trying again.''
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[st] (bl) at (0,0)    {Step returns\\\texttt{blocked}};
+    \node[st] (aw) at (4.0,0)  {Speak reason,\\ask what next};
+    \node[dec] (an) at (8.0,0) {answer?};
+    \node[st] (rp) at (8.0,-2.2){Replan from\\current state};
+    \node[dec] (ok) at (4.0,-2.2){steps pass\\\texttt{validate\_steps}?};
+    \node[st] (go) at (0,-2.2) {Resume mission\\(EXECUTING)};
+    \node[st] (hl) at (8.0,2.2) {HALTED\\``I cannot continue''};
+    \draw[arr] (bl)--(aw);
+    \draw[arr] (aw)--(an);
+    \draw[arr] (an)--node[lbl, right]{an instruction}(rp);
+    \draw[arr] (rp)--(ok);
+    \draw[arr] (ok)--node[lbl]{yes}(go);
+    \draw[arr] (ok.north) -- node[lbl, left]{no: ask again}(aw.south);
+    \draw[arr] (an)--node[lbl, right]{stop, timeout, or 3 turns used}(hl);
+  \end{tikzpicture}
+  \caption{The recovery loop. The turn counter is shared across the whole mission, so it cannot be used to drag a failing mission on.}
+  \label{fig:guidance}
+\end{figure}
+
+Three limits keep this from becoming an open-ended chat. There are at most three
+guidance turns per mission. A reply has 120\,s to arrive. And the person can
+decline. A reply that begins with ``stop'', ``cancel'', ``give up'' or ``never
+mind'', or a bare short ``no'', ends the mission with the rover halted. I did not
+reuse the confirmation classifier for this. Its reject list contains ``no'',
+``wait'' and ``wrong'', so ``there is no box on the left'' would end the mission,
+and that is exactly the kind of answer I am asking for.
+
+Two decisions here are easy to miss. First, recovery fires only for a physical or
+search failure. It never fires for ambiguity. Ambiguity is asked about before
+departure and reported at the end, and keeping recovery separate from it is what
+stops the design from collapsing into KnowNo. Second, a run that needed an answer
+is never logged as a plain success. The report classes a mission as completed,
+completed after guidance, halted after guidance, halted or aborted, so the
+evaluation can separate what the rover did alone from what it did with help.
+The report also carries a separate \texttt{recovered} flag, and it is stricter. It
+is set only if an \texttt{approach} step succeeded after the last blocked step. A
+mission that was talked through and then simply ran out of plan is not a
+recovery, and I do not want it counted as one.
+
+I do not call \texttt{halt()} on the way into recovery. A blocked step has already
+ended its own timed motion, and on the Pi \texttt{halt()} sets a flag that only
+the next \texttt{execute\_step} clears. The free-roam approach in
+Section~\ref{ssec:freeroam} calls the drive primitives directly, so a latched flag
+would make every later hop fail.
+
+%% ===================================================================
+\mysection{Conditional commands}{Conditional Commands}
+\label{sec:conditional}
+
+A conditional command, level L4 in Table~\ref{tab:command-levels}, asks the rover
+to decide something and act on the answer: ``check whether the orange box is
+visible, and if it is, go to it, otherwise stop''. The design question is who
+makes the decision and when. I split it in two. The planner writes both branches
+up front, before anything moves, and the rover only evaluates the one condition at
+the moment it matters. That keeps the planner doing the thing it is good at,
+turning words into a structure, and leaves the single judgement that needs a
+camera to the vision model.
+
+Table~\ref{tab:cond_plan} shows the plan shape the prompt asks for. One
+\texttt{check} step states the condition as a short sentence. Steps for the yes
+case carry \texttt{when: yes}, steps for the no case carry \texttt{when: no}, and
+steps with no tag always run.
+
+\begin{table}[htbp]
+  \centering
+  \caption{A conditional plan, as the prompt shows it to the planner.}
+  \label{tab:cond_plan}
+  \small
+  \begin{tabular}{@{}l l l l@{}}
+    \toprule
+    Id & Action & Target & When \\
+    \midrule
+    1 & check & the orange box is visible & \\
+    2 & approach & orange box & yes \\
+    3 & report & orange box & yes \\
+    4 & turn & left & no \\
+    5 & stop & & no \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+When the mission loop reaches the \texttt{check} step, the rover centres the
+gimbal, waits half a second for it to settle, and takes one frame
+(Figure~\ref{fig:cond}). The vision model is asked whether the stated condition is
+true of what is visible and may answer yes, no or unsure. The loop remembers the
+answer. Every later step tagged with the other answer is skipped and logged as
+skipped, so the run record shows which branch ran and which did not. Replacing the
+plan, which recovery can do, clears the remembered answer.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.9, transform shape]
+    \node[st] (ck) at (0,0)     {\texttt{check} step:\\look once, centred};
+    \node[dec] (an) at (4.4,0)  {answer?};
+    \node[st] (ys) at (8.6,1.5) {Run steps tagged\\\texttt{yes}, skip \texttt{no}};
+    \node[st] (no) at (8.6,0)   {Run steps tagged\\\texttt{no}, skip \texttt{yes}};
+    \node[st] (bl) at (8.6,-1.7){\texttt{blocked}:\\ask the person};
+    \draw[arr] (ck)--(an);
+    \draw[arr] (an)--node[lbl, above]{yes}(ys.west);
+    \draw[arr] (an)--node[lbl, above]{no}(no.west);
+    \draw[arr] (an)--node[lbl, below]{unsure or error}(bl.west);
+  \end{tikzpicture}
+  \caption{How a condition is resolved. An answer the camera cannot support does not pick a branch. It stops the step and goes to the recovery loop.}
+  \label{fig:cond}
+\end{figure}
+
+The important choice is what happens on ``unsure'', and on a failed vision call,
+which I treat the same way. The step returns \texttt{blocked}, and the existing
+recovery loop (Section~\ref{sec:recovery}) asks the person what to do. I did not
+add a default branch. If the rover guessed ``no'' whenever it could not tell, a
+wrong guess would send it the wrong way and nobody would know it had been a guess.
+Reusing the recovery loop also means conditionals need no second mechanism for
+asking for help.
+
+There are limits, and I would rather state them than have them found. The check is
+one frame from wherever the rover is standing. It does not search. A condition
+about an object just outside the camera's view will come back ``no'' or
+``unsure'' even if the object is in the room, so the result depends on where the
+rover was facing. The remembered answer is one value, so conditions cannot be
+nested, and a tagged step that runs before any \texttt{check} has run does so
+unconditionally. The spoken read-back lists each step as an action and a target
+without its tag, so the person hears every branch as if it would run. %CHECK: fix the read-back (summarise_plan) or leave this sentence in.
+
+%% ===================================================================
+\mysection{Navigation as instrumentation}{Navigation as Instrumentation}
+\label{sec:navigation}
+
+Navigation is not what this project is about, but the pipeline needs the rover to
+go somewhere so that a plan can succeed or fail on something real. I built two
+ways of getting there and kept both simple. One follows a taped line. The other
+finds a named object with the camera and drives to it.
+
+\mysubsection{Free-roam approach to a named object}{Free-roam Approach}
+\label{ssec:freeroam}
+
+For \texttt{approach} the rover has no map and no odometry (NR3), so the vision
+model finds the target, and the sonar and a second vision call decide whether it
+has arrived. Figure~\ref{fig:approach} shows the loop.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.9, transform shape]
+    \node[st] (s) at (0,0)      {Search:\\pan the gimbal};
+    \node[st] (l) at (4.0,0)    {Lock: one pivot,\\then verify};
+    \node[st] (h) at (8.0,0)    {Hop toward\\target};
+    \node[st] (b) at (0,-2.6)   {\texttt{blocked}\\with a reason};
+    \node[dec] (a) at (4.0,-2.6){arrived?};
+    \node[st] (c) at (8.0,-2.6) {Look again,\\gate the box};
+    \node[st] (o) at (4.0,-4.8) {Second look\\cross-check};
+    \node[st] (d) at (8.0,-4.8) {\texttt{ok}};
+    \draw[arr] (s)--(l);
+    \draw[arr] (l)--(h);
+    \draw[arr] (h)--(c);
+    \draw[arr] (c)--(a);
+    \draw[arr] (a)--node[lbl, right]{yes}(o);
+    \draw[arr] (o)--node[lbl]{confirmed}(d);
+    \draw[arr] (a.north east)--node[lbl, above left]{no}(h.south west);
+    \draw[arr] (s)--node[lbl, right]{not found}(b);
+    \draw[arr] (a)--node[lbl, below]{obstacle, budget}(b);
+    \draw[arr] (o.west) -| node[lbl, pos=0.2, above]{contradicted} (b.south);
+  \end{tikzpicture}
+  \caption{The free-roam approach. Each cycle is one hop and one look. Every exit that is not \texttt{ok} returns \texttt{blocked} with a reason, and that is what starts recovery.}
+  \label{fig:approach}
+\end{figure}
+
+Search is done with the gimbal, not by turning the chassis. The camera pans
+through a fixed list of angles, at most 18 vision calls in three sweeps, and the
+chassis pivots by 110\textdegree{} between sweeps only if the first sweep finds
+nothing. I chose gimbal-first because a pan is quick and its angle is known from
+the servo setting, while a pivot on a mecanum base is an open-loop turn that
+drifts. When the vision model reports the target at some horizontal position in
+the frame, the bearing is the pan angle plus the offset from the frame centre
+scaled by the measured 56\textdegree{} field of view. The rover then makes one
+pivot toward that bearing and looks again to verify.
+
+The vision model is a 3-billion-parameter model and it makes mistakes about
+boxes. I do not take its bounding box at face value. Every detection passes a
+plausibility gate that rejects a box that fills more than 60\% of the frame, a box
+over 95\% of the frame's width or height, a box too small to be real, a box whose
+area jumps threefold between hops while the rover is still far away, and a large
+box sitting exactly at the centre. A detection that the model labels low
+confidence is held until a second look at the same pan angle puts the box within
+0.15 of the frame width of the first. Frames below a sharpness threshold are
+never sent to the model, since a blurred frame gives it nothing reliable to
+work from. The rover retries the grab twice and then skips the look.
+
+Distance is where odometry would normally help. Lacking it, I scale each hop by
+what the camera and sonar say. The default is a fixed pair: a 50\,cm hop while the
+target looks small in the frame, and a 20\,cm hop once it fills more than 8\% of
+it. A variable mode asks the vision model for a distance estimate in the same
+call that locates the target, so it costs no extra call, and hops 60\% of the
+estimated distance minus a 30\,cm stop margin, clamped between 8 and 50\,cm. If
+the target is centred, the sonar clearance can shorten that further. I use a
+fraction of the estimate, not all of it, because the number is uncalibrated and
+open-loop hops drift. If the model returns no usable distance, the hop falls back
+to the fixed pair. I built both modes because I do not know yet which is better,
+and Chapter~\ref{chap:evaluation} compares them. The fixed mode stays the default
+until that result is in.
+
+Arrival is decided by two independent signals. The sonar says arrived when it
+reads 300\,mm or less with the target centred. The camera says arrived when the
+box fills 20\% of the frame or its bottom edge reaches 90\% of the frame height,
+but only after at least one hop, only if the box did not shrink, and only if the
+sonar does not read more than 800\,mm. Either signal then triggers a second vision
+call that asks whether the target is still visible. If the answer is no, the rover
+steps back, looks again, and returns \texttt{blocked} with the reason
+\texttt{arrival\_contradicted} if the target stays hidden. I added this check
+because a single positive from a 3B model, or from a sonar reading against some
+other object, is not enough to call a step done.
+
+The sonar threshold deserves a note. A sonar stop in the middle of a hop is common
+at 300\,mm, because the hop ends inside the stopping distance. If the last look
+showed the target centred, the first such stop is treated as the end of the hop and
+the loop looks again. A second consecutive sonar stop without arrival is treated as
+an obstacle and the step returns \texttt{blocked}. %CHECK ROVER_PI_SONAR_STOP_MM in .env was still 200 at last read; the code default is 300.
+
+The loop has four ways to end in \texttt{blocked}: the target is not found after
+the sweeps, an obstacle stops the second hop, the arrival cross-check
+contradicts, or the cycle budget runs out (20 cycles or 240\,s). Each is the
+reason the rover speaks in Section~\ref{sec:recovery}.
+
+\mysubsection{Looking around: scan and survey}{Scan and Survey}
+\label{ssec:survey}
+
+A \texttt{scan} step on its own only moves the gimbal, which sees nothing. So
+that ``tell me what you see'' has an answer in the log, the mission loop stops the
+gimbal at three positions, left, right and centre, takes a frame at each, and has
+the vision model describe it in one sentence. The rover is stationary the whole
+time. That respects the control split in Section~\ref{ssec:rates}, since the
+vision model never runs while the rover is moving. The gimbal finishes facing
+forward.
+
+Level L5 asks for more than a sentence. A command like ``what is near the orange
+box'' is about an area, and a one-line description loses the small things. When
+the command contains a word such as \emph{near}, \emph{nearby}, \emph{around},
+\emph{beside}, \emph{next to} or \emph{everything}, the loop runs the same three
+looks after the \texttt{observe} or \texttt{report} step, but asks a different
+question: list every object in the frame, with its colour and where it sits,
+each one once and at most ten. I limited the list because a small model asked to
+list everything tends to repeat itself, which I had already seen when building
+the room digest. The survey runs at most once per mission.
+
+What the rover saw goes into the report as a list per direction. The spoken
+summary is then told to name every listed object, grouped by left, centre and
+right, and is allowed up to six sentences for that case instead of three. The
+limits are plain. The rover looks in three directions and never behind itself,
+and an object the model does not list is an object the report cannot mention.
+
+\mysubsection{The line follower as the reactive layer}{The Line Follower}
+\label{ssec:line_follower}
+% KEEP your existing text for this subsection here, unchanged, and add this paragraph at its end:
+%
+% If the node's services cannot be reached, the supervisor now returns
+% \texttt{blocked} with the reason \texttt{line\_follow\_unavailable} instead of
+% letting the rover appear to run. Without that check, a missing node looked like
+% a rover that had been told to follow a line and had simply not moved.
+%CHECK: edit the last sentence if you do not want to describe the failure that way.
+
+%% ===================================================================
+\mysection{Reporting what happened}{Reporting}
+\label{sec:report}
+
+The third ambiguity moment is the report at the end of every mission, whether it
+completed, was halted or was aborted. It has two parts. A block of facts is built
+by plain code from the run log: which steps ran, how long each took, how many
+model calls there were, what the approach did, and which models were used. Rules
+then flag residual uncertainty from the same log. Examples are a target that was
+not visible at arrival, a vision arrival that the sonar contradicted, an approach
+that overran its time budget, and an action outside the vocabulary. Only the
+spoken summary uses a model call, and it is given the facts and the flags so it
+has nothing to invent. If that call fails, a fixed summary is spoken instead and
+the facts are still logged.
+
+The same log feeds Chapter~\ref{chap:evaluation}, which is why FR9 is a
+requirement and not an afterthought. A mission is written to disk as a single
+record that includes the plan, the checks, the guidance turns, the light timeline
+and the model tag, so a run can be replayed and counted without the dashboard. Each condition that
+was checked is listed with its answer, and when the person asked about
+surroundings the record lists what was seen in each direction. A test level can
+be tagged on a batch of runs, so the evaluation can group them without reading
+every command.
+
+%% ===================================================================
+\mysection{Summary of design decisions}{Summary of Design Decisions}
+\label{sec:design_decisions}
+
+Table~\ref{tab:decisions} lists the decisions that shape the rest of the report,
+with the reason for each and the alternative I turned down.
+
+\begin{table}[htbp]
+  \centering
+  \caption{The main design decisions.}
+  \label{tab:decisions}
+  \small
+  \begin{tabular}{@{}p{3.6cm} p{5.6cm} p{4.0cm}@{}}
+    \toprule
+    Decision & Reason & Turned down \\
+    \midrule
+    Models on a separate machine & About 7\,GB of models do not fit on the Pi. & Everything on the Pi, with a much smaller model. \\
+    Reactive layer stays on the Pi & A model call takes 15\,s, steering needs 30 to 100\,ms. & Closing the loop through the vision model. \\
+    Room as a text digest & A map is a separate system and out of scope. & Building a map from the walkthrough. \\
+    Ask before departure only & The person may not be present once the rover is moving. & Asking when confidence drops mid-mission. \\
+    Unclear confirmation means stay & A missed yes is cheap, a missed no is not. & Moving on a best guess. \\
+    Vocabulary stated in the prompt and audited & Lets me measure how often the planner leaves it. & Silently correcting every plan. \\
+    Vocabulary enforced on recovery plans & Nobody hears a recovery plan before it runs. & Trusting the prompt alone. \\
+    Recovery only on failure & Keeps it distinct from clarification. & One mechanism for both. \\
+    Unsure condition means ask & A wrong guessed branch looks like a correct one. & Defaulting to yes or no. \\
+    Condition action offered only when needed & Keeps the prompt short and stops a condition being invented. & Listing every action in every prompt. \\
+    A recovery plan must retry the approach & A plan that walks away from the failed step is not recovery. & Accepting any valid plan. \\
+    Gimbal-first search & Pan angles are known, pivots drift. & Spinning the chassis to look. \\
+    Two-signal arrival & Neither sonar nor a 3B vision model is reliable alone. & Trusting the first positive. \\
+    Fixed hop as default, variable as option & The distance estimate is uncalibrated, and I want it tested first. & Committing to the variable hop. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
