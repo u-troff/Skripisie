@@ -104634,3 +104634,4 @@ Traceback (most recent call last):
     raise RuntimeError(msg % message_type)
 RuntimeError: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
 2026-10-11 13:19:24 ERROR brain.rover_pi [pi] lf cmd STOP failed: Service /line_follow/cmd does not exist
+2026-10-12 10:17:30 INFO  brain          logging to /Users/utroff/Desktop/Skripsie/Dashboard/brain/logs/brain.log
