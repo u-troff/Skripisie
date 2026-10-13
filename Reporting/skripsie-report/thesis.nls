@@ -1,0 +1,10 @@
+
+\begin{thenomenclature} 
+\nomgroup{C}
+  \item [{$c$}]\begingroup A constant.\nomeqref {0}\nompageref{viii}
+\nomgroup{F}
+  \item [{$f$}]\begingroup A function.\nomeqref {0}\nompageref{viii}
+\nomgroup{V}
+  \item [{$\mathbf{x}$}]\begingroup A variable.\nomeqref {0}\nompageref{viii}
+
+\end{thenomenclature}

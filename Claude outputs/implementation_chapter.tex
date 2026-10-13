@@ -1,0 +1,635 @@
+%!TEX root = ../thesis.tex
+% ===================================================================
+% Chapter 4: Implementation (replaces the stubs in chapters/implementation.tex)
+% Uses the same tikzset as design_chapter.tex. If design.tex already defines
+% it (it does, as of 11 Oct), delete the \tikzset block below to avoid a
+% duplicate-definition warning; otherwise keep it, since this chapter also
+% draws two figures.
+% ===================================================================
+\mychapter{Implementation}{Implementation}{}
+\label{chap:implementation}
+
+\tikzset{
+  blk/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+              minimum width=2.6cm, minimum height=0.95cm, inner sep=3pt},
+  mdl/.style={blk, fill=black!8},
+  hw/.style={blk, dashed},
+  st/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+             minimum width=2.7cm, minimum height=0.9cm},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  lbl/.style={font=\scriptsize, fill=white, inner sep=1pt}
+}
+
+Chapter~\ref{chap:design} said what each part of the pipeline does and why.
+This chapter says how each part is actually built: the libraries, the process
+layout, the message formats, and the places where a design decision turned
+into a specific piece of code. I keep the numbers here that
+Chapter~\ref{chap:design} left out on purpose, such as port numbers, file
+names and exact thresholds, since those belong to how the system is built
+rather than why it is shaped the way it is. Where Chapter~\ref{chap:design}
+described a behaviour only as a concept, such as mid-mission revision or the
+guidance loop that follows a blocked step, this chapter is also where that
+concept gets grounded in the function that actually carries it out.
+
+%% ===================================================================
+\mysection{Speech input and output}{Speech Input and Output}
+\label{sec:speech}
+
+\mysubsection{Speech-to-text}{Speech-to-text}
+\label{sec:stt}
+
+Transcription runs through \texttt{faster-whisper}, a CTranslate2 reimplementation
+of Whisper, using the \texttt{digiphyte/\allowbreak fluister-turbo} model. I picked that model
+over stock Whisper because it is trained to include South African English and
+Afrikaans accents, which matters for a project the supervisor will test in person.
+The model runs on the CPU with \texttt{compute\_type="int8"} and 8 threads. I kept
+it off the GPU on purpose, since the planner and the vision model already share
+the 12\,GB of video memory, and transcription is short enough that CPU inference
+does not become the bottleneck in a turn.
+
+\texttt{transcribe\_audio} takes either raw bytes (an encoded clip from the
+dashboard or the Pi client, decoded through FFmpeg) or a NumPy array of raw
+float32 samples, since the capture path that reads straight from a microphone has
+no container format to decode. The function is called once per utterance rather
+than as a stream. Whisper pads every clip to 30\,s internally, so chunking a long
+recording into pieces would not reduce latency, only repeat the padding cost.
+
+One behaviour was worth adding after seeing it happen on real recordings.
+\texttt{fluister-turbo} occasionally transcribes silence or background noise as
+one of a handful of fixed captioning artefacts, most often ``thank you so much
+for watching''. I did not expect this and found it by reading failed-command
+logs where the ambiguity check was asked to resolve a command that was never
+actually said. \texttt{transcribe\_audio} now checks the lowercased, punctuation-stripped
+output against a short set of these phrases and returns an empty string
+when it matches, so the rest of the pipeline treats it the same as a transcription
+that genuinely failed, rather than as a real command.
+
+\mysubsection{Speech output: Piper}{Speech Output}
+\label{ssec:tts}
+
+Spoken output goes through Piper, a local neural TTS engine, using the
+\texttt{en\_US-lessac-medium} voice. \texttt{tts.py} mirrors \texttt{stt.py}'s
+cached-model pattern: \texttt{get\_voice} loads the \texttt{PiperVoice} once
+from \texttt{PIPER\_VOICE\_MODEL} and keeps it in a module-level variable, and
+\texttt{synthesize\_speech} writes the result into an in-memory \texttt{wave}
+buffer rather than a temporary file, since \texttt{synthesize\_wav} needs an
+actual \texttt{Wave\_write} object to call \texttt{setframerate}\allowbreak\texttt{/writeframes}
+on. Piper's voices are not fetched the way \texttt{faster-whisper}'s model is;
+I had to run \texttt{python -m piper.\allowbreak download\_voices en\_US-\allowbreak lessac-medium} once
+by hand and point the environment variable at the resulting \texttt{.onnx} file,
+with its paired \texttt{.onnx.json} config sitting alongside it, which is how
+Piper expects a voice to be packaged.
+
+There is no Afrikaans voice in the \texttt{rhasspy/\allowbreak piper-voices} set, which I
+checked rather than assumed. This turned out not to matter: every \texttt{\_speak}
+call site speaks a hard-coded English template string regardless of the
+session's detected language, so only the speech-to-text side needs to branch on
+language at all. Speaking back in the user's own language would mean
+localising those template strings, which is a separate piece of work from
+picking a synthesis engine, and I have not done it.
+
+Synthesis itself happens on a worker thread, through
+\texttt{asyncio.to\_thread}, inside the same function,
+\texttt{mission.\_speak}, that builds the \texttt{speak} event the Pi client
+plays back. This matters because \texttt{\_speak} runs inside the step loop,
+which shares an event loop with \texttt{ingest\_frame}; synthesis is sub-second
+but still a blocking call, and perception should not stall mid-mission for the
+sake of a voice line. If synthesis itself throws, the exception is caught and
+logged, and the event is sent without an \texttt{audio} field: the mission
+degrades to text-only rather than stopping, the same soft-fail stance the
+pre-departure dialogue's own \texttt{\_speak} in \texttt{pipeline.py} already
+takes.
+
+%% ===================================================================
+\mysection{Model inference layer}{Model Inference Layer}
+\label{sec:inference}
+
+\mysubsection{Planner}{Planner}
+\label{sec:planner}
+
+The planner is one function, \texttt{generate\_plan}, behind a provider interface
+that Section~\ref{sec:vlm} shares with the vision model. \texttt{InferenceProvider}
+is an abstract class with one method, \texttt{complete}, that takes a list of
+chat messages and an optional image and returns a \texttt{Completion}: the text,
+which provider and model answered, the latency, and token counts and cost when
+the provider reports them. \texttt{OllamaProvider} and
+\texttt{OpenAICompatibleProvider} both implement it, the second covering OpenAI
+and DeepSeek, since both speak the same \texttt{/chat/completions} schema.
+Swapping the planner or the vision model is then a matter of an environment
+variable (\texttt{PLANNER\_PROVIDER}, \texttt{VLM\_PROVIDER}) and not a code
+change, which is what the cloud comparison in
+Section~\ref{sec:cloud_comparison} depends on.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[node distance=0.8cm]
+    \node[blk] (pl) at (0,1.2)    {\texttt{planner.py}};
+    \node[blk] (vl) at (0,-1.2)   {\texttt{vlm.py}};
+    \node[mdl] (if) at (4.0,0)    {\texttt{InferenceProvider}\\\texttt{.complete()}};
+    \node[mdl] (ol) at (8.5,1.2)  {\texttt{OllamaProvider}\\(local)};
+    \node[mdl] (oa) at (8.5,-1.2) {\texttt{OpenAICompatibleProvider}\\(OpenAI, DeepSeek)};
+    \draw[arr] (pl)--(if);
+    \draw[arr] (vl)--(if);
+    \draw[arr] (if)--(ol);
+    \draw[arr] (if)--(oa);
+  \end{tikzpicture}
+  \caption{Both roles call the same interface. \texttt{get\_provider(role)} resolves \texttt{PLANNER\_PROVIDER} or \texttt{VLM\_PROVIDER} to a concrete class and caches the instance.}
+  \label{fig:providers}
+\end{figure}
+
+\texttt{get\_provider(role)} resolves the provider name and the model tag from
+configuration, with the model name itself looked up per provider
+(\texttt{PLANNER\_MODEL\_OLLAMA}, \texttt{PLANNER\_MODEL\_OPENAI}, and so on), so
+switching providers does not require re-typing a model name that was already
+correct. A DeepSeek instance is constructed with \texttt{supports\_vision=False},
+and \texttt{get\_provider} refuses to hand a text-only provider to the VLM role,
+since DeepSeek's hosted models cannot see an image at all. Every construction is
+cached by (role, provider, model), so a long-running process reuses one client
+rather than reconnecting on every call.
+
+\texttt{OllamaProvider} sends \texttt{num\_ctx} (8192 by default), an optional
+\texttt{repeat\_penalty}, and \texttt{format="json"} for every planner and VLM
+call, so the model is forced to emit JSON rather than prose. Two failures are
+retried once before being allowed to fail a mission: a runner crash during a cold
+CUDA load on \texttt{gemma4:e4b}, which happened during testing on 5 October, and
+Ollama's own repeat-limit abort, which happens when a small model loops on the
+same tokens. Both are transient, so a retry after a short sleep usually succeeds,
+and it is cheaper than treating every such failure as a dead provider.
+
+\texttt{build\_plan\_prompt} assembles the prompt from the active planner
+profile (Section~\ref{sec:vocabulary}), the room digest when one is loaded, and
+the conditional guidance block when the command contains a condition word
+(Section~\ref{sec:conditional}). It is kept as a pure function, separate from
+\texttt{generate\_plan} itself, so a small tool,
+\texttt{tools/snapshot\_prompt.py}, can print the exact prompt a command would
+produce without calling a model, which is how I checked the prompt actually
+changes shape for a conditional command.
+
+\texttt{generate\_plan} parses the model's JSON reply defensively rather than
+trusting it. A smaller model sometimes writes a step as a bare string instead of
+an object, or nests the list oddly; any step that is not a well-formed object is
+dropped before anything downstream calls \texttt{.get} on it, and a note is
+appended to the plan recording that steps were dropped. \texttt{\_promote\_moves\_to\_approach}
+then rewrites a \texttt{move} step whose target names an object into an
+\texttt{approach} step, the one repair mentioned in
+Section~\ref{sec:vocabulary}.
+
+Failure recovery (Section~\ref{ssec:guidance_loop}) is a second prompt builder,
+\texttt{build\_replan\_prompt}, and a second entry point,
+\texttt{replan\_from\_state}, rather than a parameter on \texttt{generate\_plan}.
+I kept them separate because the two prompts carry different context: a first
+plan is built from the command and the room digest, while a replan is built from
+the command, the steps already done, the step that failed and why, and the
+guidance conversation so far. \texttt{validate\_steps} runs after both, but with
+a different action list depending on the call, since a replan in free-roam mode
+has no \texttt{follow\_line} to offer (Section~\ref{sec:vocabulary}).
+
+\mysubsection{Vision-language verification}{Vision-language Verification}
+\label{sec:vlm}
+
+Every call into the vision model goes through one function, \texttt{\_ask}, which
+takes a named stage (for logging), a prompt, an optional image and a salvage
+flag. It resolves the VLM provider, sends the prompt with \texttt{json\_mode=True},
+and parses the reply. A reply that fails to parse as JSON is not immediately
+treated as an error: when \texttt{salvage=True}, a short recovery routine,
+\texttt{\_salvage\_truncated\_json}, is tried first. It walks the text tracking
+open brackets and attempts to close the JSON at the latest point that still
+parses, starting from the end and working backwards through the last twenty
+candidate cut points. This exists because \texttt{inventory\_frame} and
+\texttt{survey\_frame}, the two calls that ask for a list of objects, sometimes
+hit \texttt{num\_predict} mid-list on a model that has started repeating itself,
+and a reply with ten correct objects and one truncated one is more useful than
+throwing the whole thing away. Every other call in this module keeps
+\texttt{salvage=False}, since a truncated yes/no answer or a truncated bounding
+box is not something a partial parse can safely recover.
+
+Every stage built on \texttt{\_ask} is a separate, short, single-purpose prompt:
+\texttt{check\_ambiguity}, \texttt{verify\_plan}, \texttt{describe\_frame},
+\texttt{inventory\_frame}, \texttt{locate\_target}, \texttt{check\_condition} and
+\texttt{survey\_frame} (the last two added for the conditional and surroundings
+work, Sections~\ref{sec:conditional} and~\ref{ssec:survey}). None of them share a
+prompt template; each states only what that one check needs to know. I did this
+deliberately rather than writing one general-purpose ``look and answer'' function,
+since a prompt that tries to serve several callers tends to grow extra fields
+that most callers never fill in, which makes a wrong answer harder to trace back
+to a cause.
+
+\texttt{locate\_target} is the one with the most moving parts, since it is called
+once per cycle of the free-roam approach (Section~\ref{ssec:freeroam}). It asks
+for a bounding box, a confidence label, and, when \texttt{VLM\_DIST\_MAX\_CM}
+permits it, a distance estimate in the units \texttt{VLM\_DIST\_MODE} selects:
+either a number of metres or one of five coarse buckets. \texttt{distance\_cm\_from}
+converts whichever the model returned into centimetres, or returns \texttt{None}
+for any value outside \((0,\;\texttt{VLM\_DIST\_MAX\_CM}]\), including a
+\texttt{NaN} that would otherwise fail every comparison silently. Every numeric
+field from the model is treated this way: accepted only inside a sane range, and
+\texttt{None} otherwise, because a model this size occasionally returns a
+plausible-looking number for a question it cannot actually answer.
+
+%% ===================================================================
+\mysection{Clarification and mission orchestration}{Clarification and Mission Orchestration}
+\label{sec:orchestration}
+
+\mysubsection{Clarification manager}{Clarification Manager}
+\label{sec:clarification_impl}
+
+The clarification loop (Section~\ref{sec:clarification_design}) is implemented as
+a small state machine, \texttt{DialogueSession}, and a module of handler
+functions in \texttt{pipeline.py} that mutate it. \texttt{Phase} is a plain
+enumeration (\texttt{CLARIFYING}, \texttt{PLANNING}, \texttt{VERIFYING},
+\texttt{AWAITING\_CONFIRMATION}, \texttt{EXECUTING}, \texttt{REPORTING},
+\texttt{CANCELLED}), and every \texttt{Turn} the rover and the person exchange is
+appended to \texttt{session.turns}. \texttt{effective\_command} is the one
+property everything downstream reads instead of the raw transcript: it returns
+the resolved command once the vision model has rewritten one, the original
+command once the session is capped, and otherwise the command with the
+dialogue so far appended, in that order.
+
+\texttt{\_advance\_to\_confirmation} is the function that drives one turn of the
+loop. It calls \texttt{check\_ambiguity}, and if the reply says the command is
+still ambiguous, it checks the proposed question against every question already
+asked in this session, case-insensitively, before appending it. Without that
+check, a model that cannot think of anything new to ask would repeat the same
+question until the five-turn cap was reached, rather than giving up as soon as it
+had nothing left to add. A session that reaches the cap, or runs out of new
+questions, is marked \texttt{capped}, and \texttt{summarise\_plan}
+(Section~\ref{sec:clarification_design}) opens the read-back with a warning in
+that case.
+
+Confirmation is a smaller state machine of its own, in \texttt{confirmation.py}.
+\texttt{keyword\_pass} checks the reply against two phrase lists, English and
+Afrikaans, with the reject list checked first; only if neither list matches does
+\texttt{classify} fall back to a planner-model call, and an unparseable or
+missing answer from that call is treated as \texttt{UNCLEAR} rather than guessed.
+\texttt{DialogueSession} hands off to \texttt{MissionSession} once confirmation
+succeeds, and everything from there on, including recovery and revision, is the
+orchestration described in the rest of this section.
+
+\mysubsection{The mission execution loop}{The Mission Execution Loop}
+\label{ssec:mission_loop}
+
+Once a plan is confirmed, \texttt{run\_mission} is the single function that
+drives it, one step at a time, until the mission reaches a terminal phase or
+runs out of steps. Each iteration reads \texttt{mission.cursor} to get the next
+step, sets the status light to \texttt{executing}, and then checks whether the
+step is conditional: if it carries a \texttt{when} tag of \texttt{yes} or
+\texttt{no} and a branch answer has already been recorded from an earlier
+\texttt{check} step, a step whose tag does not match the branch is recorded as
+\texttt{skipped} with the branch it was skipped for, and the cursor moves on
+without ever calling \texttt{execute\_step}. This is the piece of
+Section~\ref{sec:conditional} that is actually code: the planner only decides
+which steps carry a \texttt{when} tag, and the loop here is what honours it.
+
+Which function actually runs the step depends on what it is and what the
+rover can do. A \texttt{check} step goes to \texttt{\_run\_check}, which calls
+the vision model's \texttt{check\_condition} or \texttt{survey\_frame} rather
+than moving anything. An \texttt{approach} step goes to
+\texttt{approach\_controller}, the free-roam hop loop
+(Section~\ref{ssec:freeroam}), but only when \texttt{NAV\_MODE} is
+\texttt{free} and the rover object actually exposes \texttt{pivot},
+\texttt{hop}, \texttt{get\_frame} and \texttt{set\_gimbal}; everything else,
+including every step on \texttt{VirtualRover} and every step on a
+line-following drive, goes straight to \texttt{rover.execute\_step} on a
+worker thread. A keyframe monitor is spawned alongside a \texttt{follow\_line}
+step, but only when the rover object has a \texttt{get\_frame} method at all:
+neither \texttt{SimulatedRover} nor \texttt{VirtualRover} implements one, so
+the entire mid-drive check path is switched off for them automatically,
+without an explicit mode flag anywhere, rather than behaving differently on
+a model that happens not to have a camera to poll.
+
+What happens after a step finishes depends on its result's \texttt{status}.
+An \texttt{ok} result on a \texttt{check} step records the branch answer for
+later conditional steps; on a \texttt{scan} step, or on an \texttt{observe} or
+\texttt{report} step whose command asked about the surroundings, it triggers
+the L5 survey (Section~\ref{ssec:survey}). A \texttt{blocked} result hands off
+to the guidance loop (Section~\ref{ssec:guidance_loop}): if that loop stages a
+new plan, the outer loop \texttt{continue}s without advancing the cursor,
+and the next iteration sees \texttt{mission.pending\_swap} set and applies it
+by replacing \texttt{active\_plan} and resetting the cursor to 0 before
+reading the next step; if the guidance loop instead ends the mission, the
+outer loop \texttt{break}s. A \texttt{halted} result breaks immediately, with
+no guidance offered, since that status means the step itself decided the
+mission cannot continue, which is a narrower condition than being blocked and
+askable.
+
+The loop's \texttt{finally} block is where every non-aborted mission writes
+its report, whether it finished cleanly, ran out of guidance, or was halted
+outright, because a run that ended badly is exactly the run whose report
+matters most for the evaluation. The one path that skips this is an
+\texttt{asyncio.CancelledError}, raised when the operator sends an explicit
+stop: that path calls \texttt{rover.halt()} immediately, sets the phase to
+\texttt{ABORTED}, and writes the deterministic half of the report straight to
+disk with \texttt{spoken=False}, so stopping the rover is never delayed by a
+planner call or a spoken summary it has no time to give.
+
+\mysubsection{Failure recovery in code}{Failure Recovery in Code}
+\label{ssec:guidance_loop}
+
+A \texttt{blocked} result is handed to \texttt{\_guidance\_loop}, which is
+where the recovery behaviour of Section~\ref{sec:recovery} is actually
+implemented. If \texttt{GUIDANCE\_ENABLED} is off, it halts immediately with
+a spoken ``I am blocked and have stopped.'' and nothing else happens; this
+exists mainly for test batches that want a plain pass/fail on the first
+failure rather than a multi-turn conversation. Otherwise it builds a question
+from a fixed template keyed on the failure reason:
+\texttt{target\_not\_found}, \texttt{obstacle}, \texttt{arrival\_contradicted},
+and \texttt{cycle\_budget\_exhausted} each get their own wording, with
+anything else falling back to a generic ``I could not complete the step.''
+It then asks the question, up to \texttt{MAX\_GUIDANCE\_TURNS} times (3 by default).
+
+Each turn waits for an answer through \texttt{\_wait\_for\_guidance}, which has
+two modes. In normal operation it polls \texttt{mission.pending\_guidance}
+every 200\,ms until \texttt{GUIDANCE\_TIMEOUT\_S} (120\,s by default) expires
+or an answer arrives, which is how \texttt{handle\_guidance}, fed by either
+transcribed audio or typed text from the dashboard, gets a reply into the
+loop without the two functions sharing a direct call. In tests,
+\texttt{mission.guidance\_provider} can instead be set to a plain synchronous
+function, which lets a batch of L0–L5 runs script an answer for every
+question the loop asks without any audio or WebSocket round-trip at all; a
+provider that runs out of scripted answers returns \texttt{"stop"} rather than
+raising, so an under-specified test script fails the mission the same way a
+silent human would, not with a stack trace.
+
+An answer that declines is checked with \texttt{\_declines}, not
+\texttt{confirmation.keyword\_pass}, for the reason noted in
+Section~\ref{sec:clarification_impl}: the confirmation reject list includes
+words like ``no'' and ``wrong'' that show up constantly inside a perfectly
+good guidance answer such as ``there is no box on the left, try the shelf''.
+\texttt{\_declines} only triggers on an answer that opens with an explicit
+stop word (\texttt{stop}, \texttt{cancel}, \texttt{abort}, \texttt{give up},
+\texttt{never mind}, \texttt{forget it}, \texttt{quit}), or on a bare answer
+of three words or fewer that \texttt{confirmation.keyword\_pass} alone calls a
+reject. Anything longer that is not an explicit stop is assumed to be an
+instruction and goes to \texttt{replan\_from\_state}
+(Section~\ref{sec:planner}) along with the steps already done, the failed
+step, the reason, and the guidance conversation so far. A plan that comes
+back is staged as \texttt{pending\_swap} and the function returns \texttt{True};
+a reply that produced no usable steps is logged and the loop asks again,
+without spending one of the three turns on a parse failure that was not the
+human's fault. Running out of turns, a timeout, or an explicit decline each
+set a distinct \texttt{halt\_reason}
+(\texttt{guidance\_timeout}/\texttt{guidance\_declined}/\texttt{guidance\_exhausted})
+that ends up in the run log, so a batch of failed runs can be told apart by
+why they failed rather than only that they did.
+
+\mysubsection{Mid-mission revision}{Mid-mission Revision}
+\label{ssec:revision_impl}
+
+Every frame that arrives during a mission passes through \texttt{ingest\_frame},
+which gates three tiers of increasingly expensive work so that the VLM is
+not asked to look at every frame a camera happens to send. Tier 0 is free: a
+32$\times$32 greyscale thumbnail and a Laplacian-variance blur score, computed
+off the event loop's thread pool so a burst of frames cannot stall the step
+loop. A frame below \texttt{PERCEPTION\_MIN\_SHARPNESS} (25.0) is dropped as
+motion blur, and a frame that arrives before
+\texttt{PERCEPTION\_MIN\_INTERVAL\_S} (6\,s) has passed, or whose thumbnail has
+not moved more than \texttt{PERCEPTION\_CHANGE\_THRESHOLD} (0.06) from the last
+one analysed, is dropped as ``nothing has changed''. Only a frame that passes
+all three reaches tier 1, a single \texttt{describe\_frame} caption, which is
+always recorded as an observation regardless of mission phase. Tier 2 only
+fires while the mission is \texttt{EXECUTING}: it asks \texttt{revise\_plan}
+whether the remaining steps still make sense against what was just seen, and
+most captions change nothing, so most frames never reach this tier either.
+
+A proposal from tier 2 is never applied on the model's say-so. It is handed
+to \texttt{revision.classify}, a plain rule, not a model call, which compares
+the confirmed plan's targets against the proposed plan's targets and the
+action vocabulary each uses. If the proposed plan adds a target, drops a
+confirmed target, or introduces an action outside a fixed whitelist of
+navigation words (\texttt{move}, \texttt{approach}, \texttt{turn},
+\texttt{scan}, and so on, with no world-touching action on that list by
+construction), the change is \texttt{MATERIAL} and the mission moves to
+\texttt{AWAITING\_REVISION\_CONFIRMATION}, speaks the delta through
+\texttt{revision.summarise}, and waits for a yes before
+\texttt{handle\_revision\_confirmation} applies it; an empty revised plan is
+\texttt{BLOCKED} and ends the mission outright. Only when the goal and every
+target are unchanged, and the only new actions are navigation ones, is the
+change a \texttt{REROUTE}: that case is applied immediately and only
+announced, never confirmed, since nothing about what the rover is trying to
+do has actually changed, only the path it takes there. I kept this
+classification out of the model deliberately, for the same reason
+\texttt{confirmation.keyword\_pass} exists ahead of a model fallback: whether
+a human must be consulted is not a decision to delegate to something that can
+hallucinate its way to ``no change needed''.
+
+%% ===================================================================
+\mysection{Rover client and reactive layer}{Rover Client and Reactive Layer}
+\label{sec:rover_client}
+
+\mysubsection{Real hardware: PiRoverController}{Real Hardware}
+\label{ssec:pi_rover}
+
+\texttt{RoverController} is an abstract class with two required methods,
+\texttt{execute\_step} and \texttt{halt}, and one optional one,
+\texttt{status\_light}, which defaults to a no-op so the simulated rovers do not
+need to implement lighting. Three classes satisfy it: \texttt{SimulatedRover}, a
+timer that always reports success and exists only to exercise the mission loop
+without any geometry; \texttt{VirtualRover}, described in
+Section~\ref{ssec:virtual_rover}; and \texttt{PiRoverController}, which drives
+the real TurboPi.
+
+\texttt{PiRoverController} talks to the Pi over \texttt{roslibpy}, a Python
+client for rosbridge. On construction it opens one \texttt{roslibpy.Ros}
+connection to the rosbridge websocket, advertises a \texttt{/cmd\_vel} topic for
+driving and a PWM-servo topic for the gimbal, and opens two ROS2 services,
+\texttt{/line\_follow/cmd} and \texttt{/line\_follow/set\_running}, that control
+the stock line-follower node. The sonar reading is a subscribed topic throttled
+to a 100\,ms publish rate on the Pi side; each accepted reading increments a
+sequence counter, \texttt{\_sonar\_seq}, which is how the obstacle check tells
+``two consecutive readings below the threshold'' from ``the same stale value read
+twice'', since the subscription is throttled but the control loop that reads it
+is not.
+
+Two threading events carry meanings that are easy to conflate and are kept
+deliberately separate. \texttt{\_halted} means the controller has been told to
+stop, through \texttt{halt()}, and is cleared only by the next
+\texttt{execute\_step}; this is the flag Section~\ref{sec:recovery} explains the
+free-roam loop must never trip by calling \texttt{halt()} on its own.
+\texttt{\_target\_confirmed} means a mid-drive scan has confirmed the named
+target is visible, and is reported by \texttt{\_follow\_line} as a successful
+arrival rather than an abort, since it is a different event from being stopped.
+
+The line-follower supervisor, \texttt{\_follow\_line}, owns exactly the three
+things the stock node has no opinion about, as Section~\ref{ssec:line_follower}
+describes: arrival through the node's own \texttt{crossroads\_stop} topic,
+obstacle stopping through the polled sonar, and giving up through a wall-clock
+timeout, since the node itself will drive forward indefinitely if the line is
+lost. As of 11 October it also checks a new flag, \texttt{\_lf\_unavailable},
+set whenever either ROS service call fails: if the node's services cannot be
+reached at start-up, the supervisor waits 0.3\,s and then returns \texttt{blocked}
+with the reason \texttt{line\_follow\_unavailable}, instead of reporting a drive
+that never actually started as if it had run and simply found nothing.
+
+\mysubsection{Virtual testing: VirtualRover}{Virtual Testing}
+\label{ssec:virtual_rover}
+
+\texttt{VirtualRover} is what every run without physical hardware actually
+executes against, and it is built around one idea: \texttt{approach} is a
+navigation skill, so it plans a route and follows it, while \texttt{move} and
+\texttt{turn} are literal, so they are executed exactly as commanded with no
+obstacle avoidance of their own. A failure during \texttt{approach} can
+therefore only ever be a planning failure (no path, or a target the room does
+not have), never a collision, while a collision during \texttt{move} or
+\texttt{turn} means the chain of plan steps itself went somewhere it should
+not have, which is a meaningfully different failure for the evaluation to
+tell apart.
+
+Both halves read from the same \texttt{OccupancyGrid}
+(\texttt{nav.py}): every obstacle polygon in the room, plus the room boundary,
+inflated by the rover's footprint clearance, a single value computed once from
+the rover's length and width (18.7\,cm by 16.2\,cm by default) plus a safety
+margin. \texttt{approach} plans an A* route over this grid with
+\texttt{nav.plan\_path} and then walks it waypoint by waypoint; \texttt{move}
+and \texttt{turn} instead sweep the straight segment they are about to travel
+against the same grid with \texttt{nav.sweep\_segment} and stop at the last
+free point if it is blocked. Using one grid for both was a deliberate choice:
+a planner and a collision checker built from two different descriptions of the
+room could disagree about what is free, and a route the planner considers
+clear running straight into a wall the checker knows about would be a bug in
+the test harness, not a finding worth reporting.
+
+The room itself, a \texttt{RoomMap} loaded from JSON
+(\texttt{room\_map.py}), is hand-typed, not estimated: coordinates for every
+named landmark are measured off a sketch and a tape measure once per test
+room, in metres, with a landmark's point being the standing spot a rover can
+occupy to look at the thing, not the thing's own centroid. A target the
+command names that the room map does not resolve is not treated as a crash;
+it is logged as a hallucination event, which is exactly the RQ2 signal the
+evaluation needs, and the step still returns a normal \texttt{blocked} result
+with \texttt{reason: unresolved\_target}.
+
+Every step also applies a configurable drift: Gaussian jitter on the achieved
+position after a move, and on the achieved heading after a move or a turn,
+scaled by \texttt{VIRTUAL\_DRIFT\_FRAC} and \texttt{VIRTUAL\_DRIFT\_DEG}. Both
+are left at zero in the evaluation sweeps, so the numbers in
+Chapter~\ref{chap:evaluation} are not inflated or deflated by injected noise;
+the mechanism exists so the rover's open-loop drive can be exercised under
+slip without needing the physical chassis for every run. Simulated and
+wall-clock time are also kept apart on purpose: every action's duration is
+first computed in simulated time from the linear speed and turn rate
+configured for it, and only then divided by \texttt{VIRTUAL\_TIME\_SCALE} to
+decide how long the process actually sleeps, so a sweep of many runs can be
+played back faster than real time without changing the distances, speeds, or
+timings the evaluation reports on.
+
+Every run writes one JSON line per step to a trace file under
+\texttt{Dashboard/brain/logs}, carrying the planned and achieved pose, the
+step's status and reason, the running odometer, and, for an \texttt{approach}
+step, the whole planned path, so a run can be plotted after the fact without
+re-running it. \texttt{summary()} rolls a run's trace up into the numbers
+RQ2 is built on: step count, how many were blocked, how many targets were
+hallucinated and which ones, collisions, how often no path existed at all,
+and the run's final pose.
+
+%% ===================================================================
+\mysection{Communication protocol and dashboard}{Communication Protocol and Dashboard}
+\label{sec:protocol}
+
+The brain is a FastAPI application. The two endpoints that matter for a mission,
+\texttt{/ws/dialogue} and \texttt{/ws/execution}, are WebSockets carrying small
+JSON frames rather than a request-response API, since both sides need to push
+events the other did not ask for (a spoken prompt, a camera frame, a status
+light). Figure~\ref{fig:protocol} shows the frame types each side sends.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[node distance=1.0cm]
+    \node[hw] (pi) at (0,0)   {Pi client};
+    \node[blk] (br) at (8,0)  {Brain (FastAPI)};
+    \draw[arr] ([yshift=0.9cm]pi.east) -- node[lbl, above]{start, audio\_chunk, confirmation\_audio}([yshift=0.9cm]br.west);
+    \draw[arr] ([yshift=0.3cm]br.west) -- node[lbl, above]{session, speak, plan\_ready, execute, cancelled}([yshift=0.3cm]pi.east);
+    \draw[arr] ([yshift=-0.3cm]pi.east) -- node[lbl, below]{begin, frame, revision\_audio}([yshift=-0.3cm]br.west);
+    \draw[arr] ([yshift=-0.9cm]br.west) -- node[lbl, below]{step\_started, check, awaiting\_guidance, report}([yshift=-0.9cm]pi.east);
+  \end{tikzpicture}
+  \caption{\texttt{/ws/dialogue} (top pair) carries everything up to confirmation; \texttt{/ws/execution} (bottom pair) carries the mission. One frame per complete utterance, not a stream.}
+  \label{fig:protocol}
+\end{figure}
+
+One frame carries one complete utterance or one complete camera frame, never a
+stream of partial audio, for the same reason Section~\ref{sec:stt} gives:
+Whisper pads every clip regardless, so sending a clip in pieces would add
+reassembly complexity for no latency gain. Both connections are opened with
+\texttt{max\_size=None}. This was not the original setting; a long spoken plan
+read-back, a \texttt{speak} event carrying the base64 WAV Section~\ref{ssec:tts}
+describes, exceeded the websockets library's 1\,MiB default and closed the
+connection with code 1009, which I only found by reproducing a failure that
+happened on longer plans and not shorter ones.
+
+\texttt{/scene} accepts an uploaded walkthrough video and returns a scene id;
+\texttt{/command} and \texttt{/transcribe} exist for one-shot testing outside a
+WebSocket session; \texttt{/logs} and \texttt{/logs/\{session\_id\}} serve the run
+log listing and detail that the dashboard's Logs page reads
+(Section~\ref{sec:logging}); and \texttt{/logs/\{session\_id\}/flag} is a small
+\texttt{PUT} endpoint, added alongside the L0 to L5 test batches, that lets an
+operator mark a run good, bad or for review with a note, stored in a separate
+\texttt{run\_flags.json} rather than inside the run log itself, so flagging a run
+never touches the record the run itself wrote.
+
+The dashboard is a React and TypeScript single-page app (Vite, the components
+under \texttt{ui/src/components}) that is a thin client over these same
+endpoints: a \texttt{DialoguePanel} and \texttt{ExecutionPanel} for driving and
+watching a live session, a \texttt{GimbalControl} and \texttt{RoverMap} for
+manual testing, and a \texttt{LogsPage} for reading back past runs and setting
+the flag above. It holds no logic of its own that the evaluation depends on; it
+exists so a run can be started and watched without a terminal, and every number
+Chapter~\ref{chap:evaluation} reports comes from the JSON logs, not from the UI.
+
+The dashboard itself is not part of the project's contribution, so I leaned on
+an AI assistant to build most of its React components rather than writing them
+by hand. It is a debugging and demonstration tool, nothing more: something to
+let me upload a room walkthrough video, watch a dialogue and a mission happen
+panel by panel, and drive the rover manually, without needing a terminal and a
+stack of \texttt{curl} commands to check that the pipeline underneath was
+actually working end to end. Using AI for this piece made sense because the
+time saved on React boilerplate went into the planner, the vision model and
+the mission logic instead, which is where the actual research question lives.
+
+%% ===================================================================
+\mysection{Logging and measurement instrumentation}{Logging and Measurement Instrumentation}
+\label{sec:logging}
+
+Two logs exist side by side and serve different purposes. \texttt{brain.log} is
+a conventional application log, written through Python's \texttt{logging} module
+via \texttt{log\_setup.get\_logger}: every subsystem gets a named logger
+(\texttt{brain.planner}, \texttt{brain.vlm}, \texttt{brain.mission}, and so on)
+under one root handler, so a single file interleaves every call in time order
+with full prompts and raw model output at debug level, while the console only
+shows info level and above. This log is for debugging a run, not for the
+evaluation; it is not structured and I do not parse it programmatically.
+
+The run log, one JSON file per mission under \texttt{logs/mission\_\textit{id}.json},
+is the one the evaluation is built on, and \texttt{report.py} is what assembles
+it. It is written once, at the end of a mission, from everything the mission
+session accumulated: the plan, every check and its result, the guidance log,
+the light-state timeline, the model tag for both roles and whether the run
+was local or cloud, and a tagged \texttt{test\_level} when one is set, so a
+batch of L0 to L5 runs can be grouped without reading every command by hand.
+\texttt{report.py}'s \texttt{\_outcome\_class} is what turns the raw final
+phase into one of \texttt{completed}, \texttt{completed\_after\_guidance},
+\texttt{halted\_after\_guidance}, \texttt{halted} or \texttt{aborted}: any
+mission that needed at least one guidance turn is never reported as a plain
+\texttt{completed}, even if it finished, because Section~\ref{sec:recovery}'s
+distinction between a clean run and a recovered one is exactly what RQ1 needs
+to see. \texttt{\_reached\_after\_guidance} narrows this further for the
+\texttt{recovered} flag: it only counts as recovered if an \texttt{approach}
+step actually succeeded somewhere after the last \texttt{blocked} step, not
+merely if the mission eventually ended without halting.
+
+Every model call, in both the planner and the vision model, also writes one
+entry to a smaller usage ledger (\texttt{providers/usage.py}), holding latency,
+token counts and cost when the provider reports them; this ledger is reset at
+the start of every \texttt{/ws/dialogue} session and is what \texttt{report.py}'s
+\texttt{usage\_summary} sums over, since only one mission runs per process at a
+time.
+
+A separate, offline tool, \texttt{tools/context\_budget.py}, measures something
+the run log cannot: how many tokens a given prompt would cost before it is ever
+sent. It imports \texttt{planner.py} and \texttt{vlm.py} directly, forces
+\texttt{ROVER=virtual}, and asks Ollama for the \texttt{prompt\_eval\_count} on a
+constructed prompt with \texttt{num\_predict=1}, which counts the tokens without
+paying for a real generation. It measures the fixed instructions, the room
+digest, one clarification turn and one recovery turn separately, so the
+measurements in Chapter~\ref{chap:evaluation} can say how many turns of each kind
+fit inside the 8192-token window before it becomes the limiting factor
+(Section~\ref{ssec:split}), rather than only reporting that a run eventually
+failed.
