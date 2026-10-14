@@ -51,7 +51,7 @@ class Revision:
 
 def _normalise(value) -> str:
     text = re.sub(r"\s+", " ", str(value or "").strip().lower())
-    return _ARTICLES.sub("", text)
+    return _ARTICLES.sub("", text) #removes any articles like a the an
 
 
 def _targets(plan: dict) -> Set[str]:

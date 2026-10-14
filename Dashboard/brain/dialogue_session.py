@@ -51,7 +51,7 @@ class DialogueSession:
     confirm_retries: int = 0
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
-
+    #get the last turn in the list
     def pending_turn(self) -> Optional[Turn]:
         if self.turns and self.turns[-1].answer is None:
             return self.turns[-1]

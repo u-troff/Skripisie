@@ -85,8 +85,10 @@ def handle_voice_command(
 # front end if the WebSocket turns out to be awkward on the Pi.
 # --------------------------------------------------------------------------
 def _speak(session: DialogueSession, text: str) -> dict:
-    event = {"type": "speak", "text": text, "phase": session.phase.value,
-             "session_id": session.session_id}
+    event = {"type": "speak", 
+    "text": text, 
+    "phase": session.phase.value,
+    "session_id": session.session_id}
     try:
         event["audio"] = base64.b64encode(tts.synthesize_speech(text)).decode("ascii")
     except Exception:

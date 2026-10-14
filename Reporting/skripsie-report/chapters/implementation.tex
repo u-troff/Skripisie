@@ -1,6 +1,153 @@
 %!TEX root = ../thesis.tex
 \mychapter{Implementation}{Implementation}{}
 \label{chap:implementation}
+\tikzset{
+  blk/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+              minimum width=2.6cm, minimum height=0.95cm, inner sep=3pt},
+  mdl/.style={blk, fill=black!8},
+  hw/.style={blk, dashed},
+  st/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+             minimum width=2.7cm, minimum height=0.9cm},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  lbl/.style={font=\scriptsize, fill=white, inner sep=1pt}
+}
+
+
+In the design chapter (Chapter~\ref{chap:design}), we went over what each pat of the pipeline does at a higher level. The following chapter
+says how each of these part is actually built: the libraries, the process, layout, the message formats and how design decisions were turned instrumentation
+code. There re no specific numbers references in the design chapter. The implementation chapter is where values are defined and implemented.
+
+\mysubsection{Speech input and output}{Speech Input and Output}
+\label{sec:speech}
+
+All the audio files are transcibed using \texttt{faster-whisper}, which is a CTranslate2 reimplementation of Whisper,
+using the \texttt{digiphyte/\allowbreak fluister-turbo} model. The model was chosen over a stock Whisper model because it is transcibed
+to include South African English and Afrikans accents. That is important since I have a South African English accent. The model runs on the CPU
+with \texttt{compute\_type="int8"} and 8 threads. The reason for not running it off the GPU is to save on VRAM which can be used for the planner and
+vision models. Since the audio clips are short enough that the CPU does not become the bottleneck when transcribing the audio.
+
+Audio arriving as an encoded container (webm/mp4/wav) and is decoded to a 16kHz mono PCM waveform via FFmpeg, which is a a multimedia library before being passed to the Whisper 
+encoder. The raw samples are captured directly via sounddevice and can bypass this step.
+The \texttt{transcibe\_audio} function takes either a raw bytes (which is an encoded clip form the turboPi, and decoded using FFmpeg) or using a Numpy array
+of raw float samples. This function is called once per audio clip and not continueally as a audio streams in. This is because the rover does not have to continueally
+listen to its surroundings for feedback. The audio clip is padded to 30\,s internally. Therefore to redunce the number of chunnks you would take on the audio clip.
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)    {audio in};
+    \node[proc] (b) at (0,-0.9) {decode to float32\\(bytes: via FFmpeg)};
+    \node[proc] (c) at (0,-1.8) {\texttt{faster-whisper}\\transcribe};
+    \node[proc] (d) at (0,-2.7) {lowercase,\\strip punctuation};
+    \node[dec]  (e) at (0,-4.1) {matches a fixed\\hallucination\\phrase?};
+    \node[term] (f) at (-2.7,-5.6) {return \texttt{""}};
+    \node[term] (g) at (2.7,-5.6)  {return transcript};
+    \draw[fa] (a)-->(b); \draw[fa] (b)-->(c); \draw[fa] (c)-->(d); \draw[fa] (d)-->(e);
+    \draw[fa] (e.south west) -- node[fl,above]{yes} (f.north);
+    \draw[fa] (e.south east) -- node[fl,above]{no} (g.north);
+  \end{tikzpicture}
+  \caption{\texttt{transcribe\_audio}. The hallucination check exists because \texttt{fluister-turbo} occasionally transcribes silence or background noise as one of a handful of fixed captioning artefacts, most often ``thank you so much for watching''.}
+  \label{fig:flow-stt}
+\end{figure}
+
+A empty string is returned in place of all the phrases that are deemed to be hallucinations. It is treated as a failed command
+rather than letting the planner model fail acting on a hallucination.
+
+\mysubsection{Speech output: Piper}{Speech Output}
+\label{ssec:tts}
+
+For someone to actually hear the rover speak back. This goes through Piper, a local neural text to speech engine. which uses a 
+\texttt{een\_US-lessac-medium} voice. The \texttt{tts.py} mirrors \textt{stt.py}'s way of caching-model pattern: \texttt{get\_voice}
+will load the PiperVoice model once and keep it as a callable instance. Piper's voices are not fetched automatically the same way \texttt{faster-whipers}'s
+model is. Initially I had to download the voice using: \texttt{python -m piper.\allowbreak download\_voices
+en\_US-\allowbreak lessac-medium}. Then point the environment variable at the \texttt{.onnx} file as well as its \texttt{.onnx.json} config file. There is no 
+Afrikaanse voice available so the models were only configured in english. 
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)    {\texttt{\_speak(text)}};
+    \node[proc] (b) at (0,-0.9) {\texttt{asyncio.to\_thread}\\(\texttt{synthesize\_speech})};
+    \node[dec]  (c) at (0,-2.3) {synthesis\\throws?};
+    \node[term] (d) at (-2.7,-3.8) {event: text only\\(log a warning)};
+    \node[term] (e) at (2.7,-3.8)  {event: text +\\base64 audio};
+    \draw[fa] (a)--(b); \draw[fa] (b)--(c);
+    \draw[fa] (c.south west) -- node[fl,above]{yes} (d.north);
+    \draw[fa] (c.south east) -- node[fl,above]{no} (e.north);
+  \end{tikzpicture}
+  \caption{Synthesis runs on a worker thread because \texttt{\_speak} shares an event loop with \texttt{ingest\_frame}: synthesis is sub-second but still blocking, and perception should not stall mid-mission for a voice line. A failure degrades the mission to text-only rather than stopping it, the same soft-fail stance the pre-departure dialogue's own \texttt{\_speak} in \texttt{pipeline.py} takes.}
+  \label{fig:flow-tts}
+\end{figure}
+
+\mysection{Model inference layer}{Model Inference Layer}
+\label{sec:inference}
+
+\mysubsection{Planner}{Planner}
+\label{sec:planner}
+
+There is a \texttt{InferenceProvider} file which is an abstract class with one method, \text{complete}. This method takes lists of chat messages which as disguised as 
+prompts as well as a optional image parameter and returns a \texttt{Completion} which has the following output. The text, which model answered, the latency as well as tokens used
+as well as the cost which is seen in the report. There are currently wo providers local and cloud models. The local provider is called \texttt{OllamaProvider} and the cloud provider called \texttt{OpenAICompatibleProvider}.
+Both providers implemented the same Input and output method described above. It is used since it is easy to interchange between cloud and local models. 
+
+Every provider creation is cached by (role, provider, model), so a planner can be reused instead of reconstructin it on every call. Swapping the planner or vision model is a matter of an 
+environment variable (\texttt{PLANNER\_PROVIDER}, \texttt{VLM\_PROVIDER}), not a code change. This stays in-tune with my modular design so testing different local models comes with ease.
+
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[node distance=0.8cm]
+    \node[blk] (pl) at (0,1.2)    {\texttt{planner.py}};
+    \node[blk] (vl) at (0,-1.2)   {\texttt{vlm.py}};
+    \node[mdl] (if) at (4.0,0)    {\texttt{InferenceProvider}\\\texttt{.complete()}};
+    \node[mdl] (ol) at (8.5,1.2)  {\texttt{OllamaProvider}\\(local)};
+    \node[mdl] (oa) at (8.5,-1.2) {\texttt{OpenAICompatibleProvider}\\(OpenAI, DeepSeek)};
+    \draw[arr] (pl)--(if);
+    \draw[arr] (vl)--(if);
+    \draw[arr] (if)--(ol);
+    \draw[arr] (if)--(oa);
+  \end{tikzpicture}
+  \caption{Both roles call the same interface. \texttt{get\_provider(role)} resolves \texttt{PLANNER\_PROVIDER} or \texttt{VLM\_PROVIDER} to a concrete class and caches the instance.}
+  \label{fig:providers}
+\end{figure}
+
+
+The \texttt{OllamaProvideer} sends \texttt{num\_ctx} I defaulted this value to 8192 which I explain why in the Chapter~\ref{chap:evaluation}
+An optional \texttt{repeat\_penalty} parameter is allowed, and \texttt{format="json"} for every planner and VLM call. Ollama allows you to call 
+a model twice before it fails the missions. Two crashes which I ran into was a cold CUDA load on \texttt{gemma4:e4b} specifically and a small model loops on
+the same tokens. \texttt{build\_plan\_prompt} function assembles a prompt form the active planner profile (Section~\ref{sec:vocabulary}), the room digest when 
+one is loaded, and the conditioanl guidance block when the command contains a conditional word (Section~\ref{sec:condional}). A pure function which is seperate 
+from \texttt{generate\_plan}. The following \texttt{tools/snapshot\_ptompt.py}, can print out the exact prompt a command would produce without calling a model.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)     {command, profile,\\room digest};
+    \node[proc] (b) at (0,-0.9)  {\texttt{build\_plan\_prompt()}};
+    \node[proc] (c) at (0,-1.8)  {\texttt{provider.complete()}};
+    \node[dec]  (d) at (-3.4,-3.3) {step is a\\well-formed\\object?};
+    \node[proc] (e) at (0,-3.3)  {parse JSON reply};
+    \node[proc] (f) at (-3.4,-4.8) {drop step;\\note in plan};
+    \node[proc] (g) at (0,-5.4)  {\texttt{\_promote\_moves\_}\\\texttt{to\_approach}};
+    \node[proc] (h) at (0,-6.3)  {\texttt{validate\_steps}\\(role-specific actions)};
+    \node[term] (i) at (0,-7.2)  {return plan};
+    \draw[fa] (a)--(b); \draw[fa] (b)--(c); \draw[fa] (c)--(e); \draw[fa] (e)--(d);
+    \draw[fa] (d.west) -- node[fl,above]{no} (f.east);
+    \draw[fa] (d.south) -- node[fl,right]{yes} (g.north);
+    \draw[fa] (f) -- (g.west);
+    \draw[fa] (g)--(h); \draw[fa] (h)--(i);
+  \end{tikzpicture}
+  \caption{\texttt{generate\_plan}. A smaller model sometimes writes a step as a bare string instead of an object, or nests the list oddly, so every step is checked before anything downstream calls \texttt{.get} on it. \texttt{\_promote\_moves\_to\_approach} rewrites a \texttt{move} step whose target names an object into an \texttt{approach} step (Section~\ref{sec:vocabulary}); the retried transient failures from \texttt{provider.complete()} are omitted here for space and described in the text above.}
+  \label{fig:flow-planner}
+\end{figure}
+
+Have a look inside the Failure recovery (Section~\ref(ssec:guidance_loop)). There is an second prompt builder 
+we created called, \texttt{build\_replan\_prompt}, which is an a second entry, point on
+\texttt{generate\_plan}, because a replan is built from the command, the
+steps already done, the step that failed and why, and the guidance
+conversation so far, which a first plan has no use for.
 
 \mysection{Speech-to-text subsystem}{Speech-to-text Subsystem}
 \label{sec:stt}
