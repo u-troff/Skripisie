@@ -143,29 +143,450 @@ from \texttt{generate\_plan}. The following \texttt{tools/snapshot\_ptompt.py}, 
   \label{fig:flow-planner}
 \end{figure}
 
-Have a look inside the Failure recovery (Section~\ref(ssec:guidance_loop)). There is an second prompt builder 
-we created called, \texttt{build\_replan\_prompt}, which is an a second entry, point on
-\texttt{generate\_plan}, because a replan is built from the command, the
-steps already done, the step that failed and why, and the guidance
-conversation so far, which a first plan has no use for.
+Having a look inside the Failure recovery (Section~\ref(ssec:guidance_loop)). There is an second prompt which is built using what 
+we created called, \texttt{build\_replan\_prompt}, as well as a second ebntry point, \texttt{replan\_from\_state} used instead of 
+using a parameter on \texttt{generate\_plan}. Since a replan is built from thee command as well s the steps which have been executed as
+well as the steps which failed and why it failed. 
 
-\mysection{Speech-to-text subsystem}{Speech-to-text Subsystem}
-\label{sec:stt}
-
-\mysection{Planner}{Planner}
-\label{sec:planner}
-
-\mysection{Vision-language verification}{Vision-language Verification}
+\mysubsection{Vision-language verification}{Vision-language Verification}
 \label{sec:vlm}
 
-\mysection{Clarification manager}{Clarification Manager}
+All the calls which are made to a the local vision model go through one function, \texttt{\_ask}. This function takes a named stage,
+a prompt, an optional image and a salvage flag. It then calls the correct VLM depending on the provider, cloud or local. Ollama also comes
+with a parameter to set the output format to json using, \texttt{json\_mode=True}. Each previous function is a single shot prompt which then calls
+the \texttt{\_ask} function to execute that step. The single purpose prompts are all functions namely: \texttt{check\_ambiguity}, \texttt{verify\_plan},
+\texttt{describe\_frame}, \texttt{inventory\_frame}, \texttt{locate\_target},
+\texttt{check\_condition} and \texttt{survey\_frame}. None of the prompts used follows a particular template as this can results in
+the answer from the model having extra fields which are not intended.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)    {stage, prompt,\\image, salvage};
+    \node[proc] (b) at (0,-0.9) {\texttt{provider.complete()}\\(\texttt{json\_mode=True})};
+    \node[dec]  (c) at (0,-2.3) {parses as\\JSON?};
+    \node[term] (d) at (2.9,-2.3) {return\\parsed reply};
+    \node[dec]  (e) at (0,-3.9) {\texttt{salvage=True}?};
+    \node[term] (f) at (2.9,-3.9) {raise;\\stage fails};
+    \node[proc] (g) at (0,-5.3) {\texttt{\_salvage\_truncated\_json}:\\try last 20 cut points};
+    \node[dec]  (h) at (0,-6.9) {a cut point\\parses?};
+    \node[term] (i) at (-2.9,-8.2) {return\\partial result};
+    \node[term] (j) at (2.9,-8.2) {raise;\\stage fails};
+    \draw[fa] (a)--(b); \draw[fa] (b)--(c);
+    \draw[fa] (c.east) -- node[fl,above]{yes} (d.west);
+    \draw[fa] (c.south) -- node[fl,left]{no} (e.north);
+    \draw[fa] (e.east) -- node[fl,above]{no} (f.west);
+    \draw[fa] (e.south) -- node[fl,left]{yes} (g.north);
+    \draw[fa] (g)--(h);
+    \draw[fa] (h.south west) -- node[fl,above]{yes} (i.north);
+    \draw[fa] (h.south east) -- node[fl,above]{no} (j.north);
+  \end{tikzpicture}
+  \caption{\texttt{\_ask}. Salvage is only enabled for \texttt{inventory\_frame} and \texttt{survey\_frame}, the two calls that ask for a list of objects and sometimes hit \texttt{num\_predict} mid-list on a model that has started repeating itself; a reply with ten correct objects and one truncated one is more useful than discarding it. Every other call keeps \texttt{salvage=False}, since a truncated yes/no answer or bounding box is not something a partial parse can safely recover.}
+  \label{fig:flow-vlm}
+\end{figure}
+
+
+The \texttt{locate\_target} has the most moving parts. It is called once per cycle in the free-roam approach (Section~\ref{ssec:freeroam}).
+The prompt asks the VLM for a bounding box, how confident it is in it's answer and how far away the object is. Using \texttt{distance\_cm\_from}
+it converts whichever unit the model used inot centimetres, or if it fails it returns \texttt{None}. Any distance estimate that falls outside of
+\((0,\;\texttt{VLM\_DIST\_MAX\_CM}]\), including a \texttt{NaN}, is also treated as if it were \texttt{None}. Any value that the model outputs is handled the 
+same way. Since a model this small is small the predictions can be slightly incorrect
+
+\mysection{Clarification and mission orchestration}{Clarification and Mission Orchestration}
+\label{sec:orchestration}
+
+\mysubsection{Clarificaiton manager}{Clarification Manager}
 \label{sec:clarification_impl}
+
+The clarification loop (Section~\ref{sec:clarification_design}) is a small state machine inside of ,\texttt{DialogueSession}, with
+\texttt{Phase} as enumerator: (\texttt{CLARIFYING}, \texttt{PLANNING}, \texttt{VERIFYING},
+\texttt{AWAITING\_CONFIRMATION}, \texttt{EXECUTING}, \texttt{REPORTING},
+\texttt{CANCELLED}). There are also functions inside of \texttt{pipeline.py} which change the current Phase in which the rover is in.
+This is built this way so that everyfunction inside of pipeline reads the phase before deciding what to do with incoming messages from the rover.
+If boolean flags were used this would result in a state being missed or miss interepeted especially since most function calls inside the mission files make use of
+worker threads.This would result in flags being set errouneously.
+
+
+\texttt{effective\_command} helps to remove all the noise in the raw logs. Now the reason for there is three checks for the command 
+at different stages. The resolved command once the vision model has written one, the orginal command spoken if the dialogue sessions reaches
+its cap and the current command with the dialgue after all the clarification questions. Using only 1 function to update the command resulted in
+the dashboard, the planner and the logs always having the same updated command.
+
+
+
+The confirmation file has a smaller state machine inside of \texttt{confirmation.py}, and this is seperated from the normal Dialogue session.
+Since its only job is to turn whatever was said into a yes, no or unclear output. The \texttt{keyword\_pass} function checks the reply given again English and an
+Afrikaans phrase list. The rejected list is check first so a phrase like 'no, don't go'. Is not classified as 'yes' to go. This part of the pipeline does not
+need a model to interpret what it should do. Since either the rover should go, 'yes',  or It should stay, 'no'.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)    {\texttt{effective\_command}};
+    \node[proc] (b) at (0,-0.9) {\texttt{check\_ambiguity()}};
+    \node[dec]  (c) at (0,-2.3) {still\\ambiguous?};
+    \node[term] (d) at (-3.0,-3.9) {move to\\confirmation};
+    \node[dec]  (e) at (3.6,-2.3) {asked\\already?};
+    \node[term] (f) at (3.6,-3.9) {mark\\\texttt{capped}; stop};
+    \node[term] (g) at (7.6,-2.3) {append question;\\ask it};
+    \draw[fa] (a)--(b); \draw[fa] (b)--(c);
+    \draw[fa] (c.south west) -- node[fl,above]{no} (d.north);
+    \draw[fa] (c.east) -- node[fl,above]{yes} (e.west);
+    \draw[fa] (e.south) -- node[fl,left]{yes} (f.north);
+    \draw[fa] (e.east) -- node[fl,above]{no} (g.west);
+  \end{tikzpicture}
+  \caption{\texttt{\_advance\_to\_confirmation}, one turn of the clarification loop. The repeat-question check exists because a model that cannot think of anything new to ask would otherwise repeat the same question until the five-turn cap was reached, rather than giving up as soon as it had nothing left to add.}
+  \label{fig:flow-clarify}
+\end{figure}
+
+
+Once the back and forth dialogue between the rover and the human is done. The \texttt{DialogueSession} 
+hands the mission state off to \texttt{MissionSession}. Once that is complete the rover is no in a new state of
+executing and will only communicate back to the user if it needs help with guidance or if it has arrived. The state
+machine at play here is mission phases. 
+
+
+\mysubsection{The mission execution loop}{The Mission Execution Loop}
+\label{ssec:mission_loop}
+
+Once the plan is confirmed, \texttt{run\_mission} is one function that drives the rover, one step at a time, 
+until the mission reaches its terminal phase or it ran out of approach steps. This is kept as one function for
+simplicty since if it was written in a class with multiple methods it would complicate it more. It does 4 things in
+a loop. Read the cursor, run one step, decide what the results mean and move to the next step. If it was written in a 
+class it would mean passing in the arguements between different methods and that would be more debugging work.
+
+Which function actually runs a step depends on what the step is and on
+what the rover object in use can actually do, and that second condition
+matters just as much as the first. A \texttt{check} step goes to
+\texttt{\_run\_check}. An \texttt{approach} step goes to
+\texttt{approach\_controller} (the free-roam hop loop,
+Section~\ref{ssec:freeroam}), but only when \texttt{NAV\_MODE} is
+\texttt{free} and the rover object exposes \texttt{pivot}, \texttt{hop},
+\texttt{get\_frame} and \texttt{set\_gimbal}. Everything else, including
+every \texttt{approach} step when free roam is off, goes straight to
+\texttt{rover.execute\_step} on a worker thread. To validate if a specific 
+rover that is connected has a specific function. We used the \texttt{hasattr} function, since
+the \texttt{VirtualRover} and the \texttt{PiRoverController} has different availablility. E.g The virtual rover does not have
+a camera that it can pan and trying to code that would not solve our initial problem.
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)     {next step\\(by cursor)};
+    \node[dec]  (b) at (0,-1.4)  {conditional tag\\matches recorded\\branch?};
+    \node[proc] (c) at (-3.4,-1.4) {skip step;\\cursor++};
+    \node[proc] (d) at (0,-3.0)  {dispatch: \texttt{check} /\\free-approach /\\\texttt{execute\_step}};
+    \node[dec]  (e) at (0,-4.6)  {result\\status?};
+    \node[proc] (f) at (-3.6,-6.0) {\texttt{ok}: post-\\process; cursor++};
+    \node[proc] (g) at (0,-6.0)  {\texttt{blocked}:\\guidance loop\\(Fig.~\ref{fig:flow-guidance})};
+    \node[dec]  (h) at (0,-7.8)  {replanned?};
+    \node[term] (i) at (3.6,-6.0)  {\texttt{halted}:\\mission ends};
+    \draw[fa] (a)--(b);
+    \draw[fa] (b.west) -- node[fl,above]{no} (c.east);
+    \draw[fa] (c) |- (a);
+    \draw[fa] (b.south) -- node[fl,left]{yes} (d.north);
+    \draw[fa] (d)--(e);
+    \draw[fa] (e.south west) -- node[fl,above]{ok} (f.north);
+    \draw[fa] (e.south) -- node[fl,right]{blocked} (g.north);
+    \draw[fa] (e.south east) -- node[fl,above]{halted} (i.north);
+    \draw[fa] (g)--(h);
+    \draw[fa] (f) |- (a);
+    \draw[fa] (h.west) -- node[fl,above]{yes} ++(-5.2,0) |- (a);
+    \draw[fa] (h.south) -- node[fl,right]{no} ++(0,-1.0) node[term]{mission ends};
+  \end{tikzpicture}
+  \caption{\texttt{run\_mission}'s step loop. The conditional-tag check is what Section~\ref{sec:conditional} relies on: the planner only decides which steps carry a \texttt{when} tag, and this check is what honours it. The loop's own \texttt{finally} block (not shown) writes the report for every non-aborted outcome; an operator-triggered \texttt{asyncio.CancelledError} skips straight to \texttt{rover.halt()} instead.}
+  \label{fig:flow-mission}
+\end{figure}
+
+If a result is blocked it is handed off to the guidance loop (Section~\ref{ssec:guidance_loop}). A \texttt{halted} results
+ends the mission immediately with no guidance offered, this comes down to the step itself deciding that the mission cannot continue. This
+could be something in the way of the rover. If the mission was not aborted it will write  its report in the loop's \texttt{finally} block. It does 
+not matter if it finished cleanly or ran out of guidance, or it was halted outright. All runs are tagged to be able to compare the results 
+of why it was halted. The only path that skips writing an report is \texttt{asyncio.CancelledError}. It calls the \texttt{rover.halt()}
+immediately and writes the determinitsitc half of the report straight to the disk with \texttt{spoken=False}, stopping the rover is never delayed
+by a planner call or spoken summary. 
+
+\mysubsection{Failure reovery in code}{Failure Recovery in Code}
+\label{ssec:guidance_loop}
+
+If the rover is \texttt{blocked} it is handed to \texttt{\_guidance\_loop}, which is the recovery behaviour of Section~\ref{sec:recovery} is 
+implemented. The rover stops immediately if the \texttt{GUIDANCE\_ENABLED} flag is off. This is for testing purposes only. The guidance loop then
+builds a question from a fixed template keyed on the failure reason  (\texttt{target\_not\_found}, \texttt{obstacle},
+\texttt{arrival\_contradicted}, \texttt{cycle\_budget\_exhausted}, or a
+generic fallback) and it asks the user up to 3 times on what its next steps are. The questions for guidance are templated and not generated
+by a model for the simple fact that the model might have planned incorrectly so it is not a good idea to ask the source of the error why It
+has stopped. This makes it predictable to know that the rover is lost and needs the actual steps to get to its target.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)    {step blocked};
+    \node[dec]  (b) at (0,-1.4) {\texttt{GUIDANCE\_}\\\texttt{ENABLED}?};
+    \node[term] (c) at (3.2,-1.4) {halt;\\mission ends};
+    \node[proc] (d) at (0,-3.0) {ask question;\\wait for answer};
+    \node[dec]  (e) at (0,-4.6) {declines or\\timed out?};
+    \node[term] (f) at (3.2,-4.6) {halt with reason\\(timeout/declined);\\mission ends};
+    \node[proc] (g) at (0,-6.2) {\texttt{replan\_from\_state}};
+    \node[dec]  (h) at (0,-7.8) {usable steps\\returned?};
+    \node[term] (i) at (-3.2,-9.2) {stage\\\texttt{pending\_swap};\\return \texttt{True}};
+    \node[term] (j) at (3.2,-9.2) {3 turns\\used up?};
+    \draw[fa] (a)--(b);
+    \draw[fa] (b.east) -- node[fl,above]{no} (c.west);
+    \draw[fa] (b.south) -- node[fl,left]{yes} (d.north);
+    \draw[fa] (d)--(e);
+    \draw[fa] (e.east) -- node[fl,above]{yes} (f.west);
+    \draw[fa] (e.south) -- node[fl,left]{no} (g.north);
+    \draw[fa] (g)--(h);
+    \draw[fa] (h.south west) -- node[fl,above]{yes} (i.north);
+    \draw[fa] (h.east) -- node[fl,above]{no} (j.west);
+    \draw[fa] (j.north) |- ++(0,0.6) -| (d.east);
+  \end{tikzpicture}
+  \caption{\texttt{\_guidance\_loop}. A ``no'' out of the turn-count check on the right loops back to ask again rather than ending the mission; running out of turns is itself a third halt reason (\texttt{guidance\_exhausted}), alongside timeout and decline, so a batch of failed runs can be told apart by why they failed.}
+  \label{fig:flow-guidance}
+\end{figure}
+
+%====================postential section for _declines that needs to come in
+
+\mysubsection{Mid-mission revision}{Mid-mission Revision}
+\label{ssec:revision_impl}
+
+The frames sent from the rover during a mission is sent through \texttt{ingest\_frame}, which has 3 checks to limit the amount of
+calls to a bigger model. The VLM is not asked to look at every single frame. this is used since the rate at which the camera produces
+frames is higher than the rate at which the VLM can process images. The three tiers in Figure~\ref{fig:flow-revision} let cheap, local checks
+filter out the frames which are very similar and the VLM can prioritize the frames which are unique.
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)    {frame arrives};
+    \node[dec]  (b) at (0,-1.4) {tier 0: sharp\\and changed\\enough?};
+    \node[term] (c) at (3.0,-1.4) {drop frame};
+    \node[proc] (d) at (0,-3.0) {tier 1: caption\\(always recorded)};
+    \node[dec]  (e) at (0,-4.4) {mission is\\\texttt{EXECUTING}?};
+    \node[term] (f) at (3.0,-4.4) {stop here};
+    \node[proc] (g) at (0,-6.0) {tier 2: \texttt{revise\_plan}};
+    \node[dec]  (h) at (0,-7.4) {change\\proposed?};
+    \node[term] (i) at (3.0,-7.4) {no action};
+    \node[proc] (j) at (0,-9.0) {\texttt{revision.classify}:\\NO\_CHANGE / REROUTE /\\MATERIAL / BLOCKED};
+    \node[term] (k) at (0,-10.4) {apply, confirm,\\or halt accordingly};
+    \draw[fa] (a)--(b);
+    \draw[fa] (b.east) -- node[fl,above]{no} (c.west);
+    \draw[fa] (b.south) -- node[fl,left]{yes} (d.north);
+    \draw[fa] (d)--(e);
+    \draw[fa] (e.east) -- node[fl,above]{no} (f.west);
+    \draw[fa] (e.south) -- node[fl,left]{yes} (g.north);
+    \draw[fa] (g)--(h);
+    \draw[fa] (h.east) -- node[fl,above]{no} (i.west);
+    \draw[fa] (h.south) -- node[fl,left]{yes} (j.north);
+    \draw[fa] (j)--(k);
+  \end{tikzpicture}
+  \caption{\texttt{ingest\_frame}'s three tiers, feeding \texttt{revision.classify}. Tier 0 is a 32$\times$32 greyscale thumbnail diff plus a Laplacian-variance blur score (\texttt{PERCEPTION\_MIN\_SHARPNESS}, \texttt{PERCEPTION\_MIN\_INTERVAL\_S}, \texttt{PERCEPTION\_CHANGE\_THRESHOLD}); tier 1 is one \texttt{describe\_frame} caption; tier 2 only fires while executing.}
+  \label{fig:flow-revision}
+\end{figure}
+
+
+
+The \texttt{revisioin.classify} is a plain rule, no model calls at all. It compares
+the confirmed plan's targets against the proposed plan's. Using the action vocabulary for 
+the specific rover. If you add a target, removing a confirmed target or a new action is introduced that is outside of the 
+fixed navigation whitelist of tartgets. These all count as \texttt{MATERIAL} changes and stops the mission for a yes confirmation.
+Then \texttt{handle\_revision\_confirmation} applies it. If there is an empty revised plan is \texttt{BLOCKED} it ends the mission as 
+well since there is nothing to revise. If the goal and every target is unchanged, and the only new actions are navigation such as a different
+route around an obstacle. This is treated as a small \texttt{REROUTE} that the rover can follow without confirmation.
+
 
 \mysection{Rover client and reactive layer}{Rover Client and Reactive Layer}
 \label{sec:rover_client}
 
+\mysubsection{Real hardware: PiRoverController}{Real Hardware}
+\label{ssec:pi_rover}
+
+
+Inside of the \texttt{RoverController} is an abstract class with two required methods,
+\texttt{execute\_step} and \texttt{halt}, as well as a optional \texttt{status\_light},
+which is only available on rovers which have the status light hardware installed. 
+This functionality is simple.  Every rover implementation has to run a step
+and has to be able to stop. There are interfaces the physics-free simulator,
+and a rover which communicates over ROS2 over a network socket. There are two main
+rovers the \texttt{VirtualRover}, describe in Section~\ref{ssec:virtual_rover},
+and \texttt{PiRoverController}, which controls the real TurboPi using roslibpy.
+
+The \texttt{PiRoverController} opens one \texttt{roslibpy.Ros} connection,
+advertises a \texttt{/cmd\_vel} topic for driving and a PWM-servo topic for the
+gimbal. It also opents two ROS2 services to access \texttt{/line\_follow/cmd} and
+\texttt{/line\_follow/set\_runnning}. These services control the stock line-follower
+node rather than reimplementing line following from scratch. 
+
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)    {drive forward\\(stock line node)};
+    \node[dec]  (b) at (0,-1.4) {services\\reachable?};
+    \node[term] (c) at (3.3,-1.4) {wait 0.3\,s;\\\texttt{blocked}:\\\texttt{line\_follow\_}\\\texttt{unavailable}};
+    \node[dec]  (d) at (0,-3.2) {arrived\\(\texttt{crossroads\_stop}\\or confirmed)?};
+    \node[term] (e) at (3.3,-3.2) {\texttt{ok}: arrived};
+    \node[dec]  (f) at (0,-5.0) {sonar below\\threshold?};
+    \node[term] (g) at (3.3,-5.0) {\texttt{blocked}:\\obstacle};
+    \node[dec]  (h) at (0,-6.8) {timeout\\exceeded?};
+    \node[term] (i) at (3.3,-6.8) {\texttt{blocked}:\\timeout};
+    \draw[fa] (a)--(b);
+    \draw[fa] (b.east) -- node[fl,above]{no} (c.west);
+    \draw[fa] (b.south) -- node[fl,left]{yes} (d.north);
+    \draw[fa] (d.east) -- node[fl,above]{yes} (e.west);
+    \draw[fa] (d.south) -- node[fl,left]{no} (f.north);
+    \draw[fa] (f.east) -- node[fl,above]{yes} (g.west);
+    \draw[fa] (f.south) -- node[fl,left]{no} (h.north);
+    \draw[fa] (h.east) -- node[fl,above]{yes} (i.west);
+    \draw[fa] (h.south) -- node[fl,left]{no} ++(0,-0.6) -- ++(-2.4,0) |- (d.west);
+  \end{tikzpicture}
+  \caption{\texttt{\_follow\_line}, the supervisor added around the stock line-follower node. It owns exactly the three things the node has no opinion about: arrival, obstacle stopping through the polled sonar (using \texttt{\_sonar\_seq} to tell two fresh readings from one stale one read twice), and a wall-clock give-up, since the node itself drives forward indefinitely if the line is lost. The \texttt{\_lf\_unavailable} check (added 11 October) means a drive that never started is reported as blocked rather than as a drive that ran and found nothing.}
+  \label{fig:flow-followline}
+\end{figure}
+
+
+\mysubsubsection{Virtual testing: Virtual Rover}{Virtual Testing}
+\label{ssec:virtual_rover}
+
+This is where almost every piece of evaluation data comes from. the \texttt{VirtualRover} is what every
+single run without physical hardware actually executes on. The virtual rover is built
+around one idea: \texttt{approach} is a navigation skill, It plans a routes and follows
+it, while the normal \texttt{move} and \texttt{turn} are commands which execute as give 
+like drive forward, or turn right. The approach step hands over the target to the
+rover and expects it to work out how to get there, while a \texttt{move} and \texttt{turn} step only 
+hands over a specific distance or angle.
+
+Both halves read from the same OccupancyGrid (nav.py), built once per room with the rover's footprint 
+clearance baked in, so the planner and the collision checker can never silently disagree about what's free.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[dec]  (a) at (0,0)      {step\\action?};
+    \node[proc] (b) at (-5.2,-1.6) {\texttt{approach}: resolve\\target, A* plan\\(\texttt{nav.plan\_path}),\\walk waypoints};
+    \node[proc] (c) at (-1.7,-1.6) {\texttt{move}/\texttt{turn}:\\magnitude + drift,\\\texttt{nav.sweep\_segment}};
+    \node[proc] (d) at (1.7,-1.6) {\texttt{scan}/\texttt{stop}/\\\texttt{report}:\\fixed dwell};
+    \node[proc] (e) at (5.2,-1.6)  {unknown\\action};
+    \node[term] (f) at (0,-3.2)   {return \texttt{ok} /\\\texttt{blocked} /\\\texttt{halted}};
+    \draw[fa] (a) -- node[fl,above,sloped]{approach} (b.north);
+    \draw[fa] (a) -- node[fl,above,sloped]{move/turn} (c.north);
+    \draw[fa] (a) -- node[fl,above,sloped]{scan etc.} (d.north);
+    \draw[fa] (a) -- node[fl,above,sloped]{else} (e.north);
+    \draw[fa] (b)--(f); \draw[fa] (c)--(f); \draw[fa] (d)--(f); \draw[fa] (e)--(f);
+  \end{tikzpicture}
+  \caption{\texttt{VirtualRover.execute\_step}'s dispatch. An \texttt{approach} step can only fail by planning (no path, or an unresolved target logged as a hallucination for RQ2), never by collision; a \texttt{move} or \texttt{turn} step is swept against the same grid and stops at the last free point if blocked, so a collision there means the chain of plan steps itself went somewhere it should not have.}
+  \label{fig:flow-virtualrover}
+\end{figure}
+
+The room itself, a \texttt{RoomMap} loaded from JSON
+(\texttt{room\_map.py}), is hand-typed, not estimated. I measured
+coordinates for every named landmark off a sketch and a tape measure once
+per test room. A landmark's point is the standing spot a rover can occupy to look
+at the thing. This is needed so the navigation code knows where the rover should end
+up. The simulated and wall-clock time are kept apart the
+same way: every action's duration is computed in simulated time first and
+only then divided by \texttt{VIRTUAL\_TIME\_SCALE}. So a sweep of many runs
+can be played back faster than real time without changing the distances,
+speeds, or timings the evaluation actually reports on.
+
+Every run writes one JSON line per step to a file to trace it and \texttt{summary()}
+is able to derive statistics used for the second research question. Things like how many steps
+counted, how many steps were blocked, how many targets were hallucinated and which ones. These
+results are logged after each step rather than after the final outcome. Since a single 
+pass/fail number does not contain the why it has that certain outcome.
+
 \mysection{Communication protocol and dashboard}{Communication Protocol and Dashboard}
 \label{sec:protocol}
 
+The brain is a FastAPI application backend server. The two endpoints that matter for a
+mission, \texttt{/ws/dialogue} and \texttt{/ws/execution}, are WebSockets
+carrying small JSON frames rather than a request-response API, since both
+sides need to push events the other did not ask for, the brain needs to
+tell the Pi client a step started without the client polling for it, and
+the client needs to tell the brain a frame arrived without the brain asking
+for one on a timer. A request-response API would have meant one side
+constantly polling the other for events that have no fixed schedule, which
+is wasteful and adds latency. This is a
+message protocol rather than a branching algorithm, so
+Figure~\ref{fig:protocol} below is a sequence diagram, not a flowchart: it
+shows who sends what, not a decision to be made.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[node distance=1.0cm]
+    \node[hw] (pi) at (0,0)   {Pi client};
+    \node[blk] (br) at (8,0)  {Brain (FastAPI)};
+    \draw[arr] ([yshift=0.9cm]pi.east) -- node[lbl, above]{start, audio\_chunk, confirmation\_audio}([yshift=0.9cm]br.west);
+    \draw[arr] ([yshift=0.3cm]br.west) -- node[lbl, above]{session, speak, plan\_ready, execute, cancelled}([yshift=0.3cm]pi.east);
+    \draw[arr] ([yshift=-0.3cm]pi.east) -- node[lbl, below]{begin, frame, revision\_audio}([yshift=-0.3cm]br.west);
+    \draw[arr] ([yshift=-0.9cm]br.west) -- node[lbl, below]{step\_started, check, awaiting\_guidance, report}([yshift=-0.9cm]pi.east);
+  \end{tikzpicture}
+  \caption{\texttt{/ws/dialogue} (top pair) carries everything up to confirmation; \texttt{/ws/execution} (bottom pair) carries the mission. One frame per complete utterance, not a stream.}
+  \label{fig:protocol}
+\end{figure}
+
+ Both connections are opened with \texttt{max\_size=None}. This was not the
+original setting. A long spoken plan read-back,
+a \texttt{speak} event carrying the base64 WAV Section~\ref{ssec:tts}
+describes, exceeded the websockets library's 1\,MiB default size and closed the
+connection. A few smaller endpoints round out the API. The \texttt{/scene} endpoint accepts an
+uploaded walkthrough video and returns a scene id. The \texttt{/logs} endpoint and
+\texttt{/logs/\{session\_id\}} endpoint serve the run log listing and detail that
+the dashboard's Logs page reads from. There is a small \texttt{/logs/\{session\_id\}/flag}
+endpoint that lets an operator mark a run good, bad
+or for review with a note
+
+The dashboard is a React and TypeScript single-page app, a thin client over
+these same endpoints, and it holds no logic of its own that the evaluation
+depends on, every number Chapter~\ref{chap:evaluation} reports comes from
+the JSON logs, never from anything the UI computed on its own. It is a debugging and
+demonstration tool and nothing more. Something that lets me upload a room
+walkthrough video, watch a dialogue and a mission happen panel by panel,
+and drive the rover manually, all without needing a terminal open
+
 \mysection{Logging and measurement instrumentation}{Logging and Measurement Instrumentation}
 \label{sec:logging}
+
+
+There are two logging methods used here. The \texttt{brain.log} is a conventional application log, written
+through Python's \texttt{logging} module,interleaving every call in time
+order with full prompts and raw model output at debug level. Then we have the run log, one JSON file per executed mission.
+This is the run log our evaluaiton secition gets the information it needs. The \texttt{report.py} file assembles: he plan, every check and its
+result, the guidance log, the light-state timeline, the model tag for both
+roles, and a tagged \texttt{test\_level} when one is set.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[term] (a) at (0,0)    {mission ends};
+    \node[dec]  (b) at (0,-1.4) {guidance turns $>$ 0\\and phase \texttt{completed}\\or \texttt{halted}?};
+    \node[term] (c) at (-3.2,-2.9) {outcome =\\phase};
+    \node[term] (d) at (3.2,-2.9) {outcome = phase +\\\texttt{\_after\_guidance}};
+    \node[dec]  (e) at (3.2,-4.6) {\texttt{approach}\\succeeded after\\last \texttt{blocked}\\step?};
+    \node[term] (f) at (6.4,-4.6) {\texttt{recovered}\\= True};
+    \node[term] (g) at (3.2,-6.2) {\texttt{recovered}\\= False};
+    \draw[fa] (a)--(b);
+    \draw[fa] (b.south west) -- node[fl,above]{no} (c.north);
+    \draw[fa] (b.south east) -- node[fl,above]{yes} (d.north);
+    \draw[fa] (d)--(e);
+    \draw[fa] (e.east) -- node[fl,above]{yes} (f.west);
+    \draw[fa] (e.south) -- node[fl,left]{no} (g.north);
+  \end{tikzpicture}
+  \caption{\texttt{report.py}'s outcome classification. A mission that needed at least one guidance turn is never reported as a plain \texttt{completed}, even if it finished, because the distinction between a clean run and a recovered one (Section~\ref{sec:recovery}) is exactly what RQ1 needs to see; \texttt{recovered} only counts a run that actually reached its target afterwards, not merely one that ended without halting.}
+  \label{fig:flow-outcome}
+\end{figure}
+
+Every model call also writes one entry to a smaller usage ledger
+(\texttt{providers/usage.py}), holding latency, token counts and cost when
+the provider reports them, and this is reset at the start of every session.
+A separate, offline tool, \texttt{tools/context\_budget.py}, measures something the run log on
+its own cannot. How many tokens a given prompt would cost before it is
+ever actually sent to a model. If you  ask ollama for the \texttt{prompt\_eval\_count} and send in a prompt with
+the parameter \texttt{num\_predict=1}. It counts the tokens the
+model would have to read without paying for a real generation afterward. It can measure the fixed instructions, t
+he room digest, one clarification turn
+and one recovery turn separately. This allows you to see a prompt's
+token budget is actually going before running a mission to see if it would fail.

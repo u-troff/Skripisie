@@ -242,7 +242,7 @@ makes a wrong answer harder to trace back to a cause.
 \end{figure}
 
 \texttt{locate\_target} is the one with the most moving parts, since it is
-called once per cycle of the free-roam approach (Section~\ref{ssec:freeroam}).
+called once per cycle of the free-roam approach (Section~\ref{ssec:freeroam})
 It asks for a bounding box, a confidence label, and a distance estimate;
 \texttt{distance\_cm\_from} converts whichever unit the model used into
 centimetres, or returns \texttt{None} for any value outside

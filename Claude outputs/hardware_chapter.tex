@@ -1,0 +1,156 @@
+%!TEX root = ../thesis.tex
+% ===================================================================
+% Chapter: Hardware (sits between System Design and Implementation)
+% Uses the same tikzset as design_chapter.tex. If design.tex already defines
+% it, delete the \tikzset block below to avoid a duplicate-definition
+% warning; otherwise keep it, since this chapter draws one block diagram.
+% ===================================================================
+\mychapter{Hardware}{Hardware}{}
+\label{chap:hardware}
+
+\tikzset{
+  blk/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+              minimum width=2.6cm, minimum height=0.95cm, inner sep=3pt},
+  mdl/.style={blk, fill=black!8},
+  hw/.style={blk, dashed},
+  st/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+             minimum width=2.7cm, minimum height=0.9cm},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  lbl/.style={font=\scriptsize, fill=white, inner sep=1pt}
+}
+
+Chapter~\ref{chap:design} explained why the brain and the rover are split
+across two machines. This short chapter fills in the half of that split I
+left out there on purpose: what the rover itself actually is, what runs on
+it out of the box, and how the brain's one line, ``the brain reaches the
+Pi over rosbridge on port 9090 using roslibpy,'' turns into an actual
+working connection. None of this is my own contribution, the rover is an
+off-the-shelf Hiwonder kit and the ROS2 stack on it is Hiwonder's, but a
+reader cannot make sense of \texttt{PiRoverController} in
+Chapter~\ref{chap:implementation} without knowing what it is talking to.
+
+\mysection{The TurboPi platform}{The TurboPi Platform}
+\label{sec:turbopi_platform}
+
+The rover is a Hiwonder TurboPi, Advanced kit, built around a Raspberry
+Pi~5. The only actuators on this specific unit are a four-wheel mecanum
+base, which can strafe sideways as well as drive and turn, and a
+two-servo pan/tilt gimbal carrying the camera. A sonar module with its own
+RGB ring sits on the front of the chassis, and a row of infrared
+line-detection sensors sits underneath it. There is no arm and no
+gripper on this build, and I want to be explicit about that, because the
+shared ROS2 codebase Hiwonder ships still launches an
+\texttt{/arm\_controller/follow\_joint\_trajectory} action server and a
+\texttt{servo\_controller\_msgs/ServosPosition} topic regardless, left
+over from kit variants that do have one. I confirmed with the physical
+unit that neither exists here, and \texttt{PiRoverController} never
+touches either topic, so I am not describing a capability the rover does
+not have.
+
+Out of the box the Advanced kit does not run a lightweight Python SDK
+calling motor functions directly, it runs ROS2 Humble inside a Docker
+container on the Pi, and every piece of hardware, driving, the gimbal,
+the sonar RGB ring, is reached through a ROS2 topic or service rather
+than a function call. A single launch file, \texttt{bringup.launch.py},
+starts the nodes that matter for this project: a \texttt{mecanum}
+controller that turns a velocity command into wheel speeds, a
+\texttt{ros\_robot\_controller} node that is the only thing on the Pi
+that actually talks to the motor and servo hardware, over a serial link
+to an STM32 co-processor on the expansion board, a camera node and a
+small HTTP video server, and \texttt{rosbridge\_websocket}, which is the
+one node the brain ever talks to.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[node distance=1.1cm]
+    \node[blk] (brain) at (0,0) {Brain\\(laptop)};
+    \node[hw] (bridge) at (5.2,1.1) {\texttt{rosbridge\_}\\\texttt{websocket}\\:9090};
+    \node[hw] (video) at (5.2,-1.1) {\texttt{web\_video\_}\\\texttt{server}\\:8080};
+    \node[mdl] (mec) at (9.6,1.9) {\texttt{mecanum}};
+    \node[mdl] (cam) at (9.6,0.3) {\texttt{usb\_cam}};
+    \node[mdl] (rrc) at (9.6,-1.5) {\texttt{ros\_robot\_}\\\texttt{controller}};
+    \node[hw] (stm) at (13.4,-1.5) {STM32\\(serial)};
+    \draw[arr] (brain.east) -- node[lbl,above]{roslibpy} (bridge.west);
+    \draw[arr] (brain.east) -- node[lbl,below]{HTTP} (video.west);
+    \draw[arr] (bridge) -- (mec);
+    \draw[arr] (video) -- (cam);
+    \draw[arr] (bridge.east) -- (rrc.west);
+    \draw[arr] (mec) -- (rrc);
+    \draw[arr] (rrc) -- (stm);
+  \end{tikzpicture}
+  \caption{What the brain actually reaches on the Pi. Everything above
+  \texttt{rosbridge\_websocket} and \texttt{web\_video\_server} is
+  Hiwonder's stock ROS2 stack, started as one unit by
+  \texttt{bringup.launch.py} inside the Pi's Docker container.}
+  \label{fig:hw-bridge}
+\end{figure}
+
+\mysection{The bridge the brain actually uses}{The Bridge the Brain Actually Uses}
+\label{sec:hw_bridge}
+
+\texttt{rosbridge\_websocket} is a stock ROS2 package that exposes topics
+and services as plain JSON over a WebSocket, which is the only reason
+\texttt{roslibpy} works at all, it is a Python client for that JSON
+protocol, not a ROS2 client in the usual sense, so the brain machine
+never needs ROS2, a DDS stack, or any of Hiwonder's own packages
+installed on it. I picked this over having the brain run \texttt{rclpy}
+directly for a practical reason rather than a principled one: the brain
+already speaks WebSocket for its own \texttt{/ws/dialogue} and
+\texttt{/ws/execution} endpoints (Section~\ref{sec:protocol}), so one
+more asynchronous WebSocket client sitting next to those fits the
+architecture it already has, instead of asking the laptop to join the
+Pi's ROS2 graph over DDS discovery across what might be a flaky Wi-Fi
+link.
+
+Driving the rover means publishing a \texttt{geometry\_msgs/Twist} on the
+\texttt{cmd\_vel} topic. \texttt{linear.x} and \texttt{linear.y} are
+forward and strafe speed, and \texttt{angular.z} is turn rate, but none
+of the three are physical units in the way the names suggest. The
+\texttt{mecanum} node sums the angular term directly into the per-wheel
+inverse kinematics before scaling to a motor speed, so
+\texttt{angular.z} is not radians per second, and treating it as one
+would have meant guessing. I settled on working ranges by testing rather
+than by calculation, roughly 3 to 8 for a turn that actually moves the
+rover a sensible amount, which is also the range Hiwonder's own stock
+demo code uses. The gimbal is driven the same way, a
+\texttt{SetPWMServoState} message on
+\texttt{/ros\_robot\_controller/pwm\_servo/set\_state} naming a servo id,
+1 for tilt and 2 for pan on this unit, and a target position around a
+centre of 1500. Camera frames do not go through rosbridge at all. The
+brain pulls them from \texttt{web\_video\_server}'s plain HTTP snapshot
+endpoint on port 8080 instead of subscribing to the raw
+\texttt{sensor\_msgs/Image} topic, which means the brain needs no image
+codec or ROS2 message types on its side either, a single HTTP request
+returns a JPEG.
+
+\mysection{Reusing the stock line follower}{Reusing the Stock Line Follower}
+\label{sec:hw_lf}
+
+The line-follower node \texttt{\_follow\_line} supervises
+(Section~\ref{ssec:pi_rover}) is Hiwonder's own
+\texttt{line\_following}, not something I wrote from scratch, and I want
+to record why, because at first glance it looked unusable for this
+project. Running \texttt{ros2 node info} on it shows no subscribers at
+all until it is actually triggered, which looks like it might be
+button-gated hardware rather than something a remote client can drive.
+Reading the node's source settled that: it is dormant by design, the
+camera subscription is only created inside its own \texttt{enter}
+service callback, and every control point, entering, exiting, starting
+or stopping the drive, and setting which line colour to follow, is a
+plain ROS2 service, each one callable over rosbridge exactly like a
+topic publish. Rewriting that vision pipeline myself would have meant
+reimplementing a LAB colour threshold, contour extraction and a PID
+steering loop for no real benefit, so \texttt{PiRoverController} drives
+the stock node through its service interface instead and layers the
+arrival, obstacle and timeout logic in Figure~\ref{fig:flow-followline}
+on top of it.
+
+One property of the stock node shaped that supervisor directly. It
+carries its own 5-second heartbeat and exits on its own if nothing pings
+it, which is sensible for a node meant to be driven from a one-shot demo
+script, but it means anything that wants to keep a line-follow step
+alive for longer than five seconds has to service that heartbeat itself.
+\texttt{\_follow\_line} does this by polling rather than letting the
+heartbeat lapse, which is also why it owns a wall-clock timeout of its
+own on top of the node's: a hang on the brain's side should stop the
+drive, not rely on the Pi's own node to notice first.
