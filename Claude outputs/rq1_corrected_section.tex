@@ -1,0 +1,164 @@
+% ============================================================
+% DRAFT — corrected "Plan correctness under vague commands" (RQ1)
+% section, to replace the current \mysection{...}{...}
+% \label{sec:rq1_results} ... block in evaluation.tex (currently
+% the block running from "Table~\ref{tab:rq1_levels} summarises..."
+% down to the paragraph ending "...dialogue state carry-over is
+% fixed." right before \mysection{Executability on the Physical
+% Chassis}).
+%
+% This file is a draft for review, not a finished chapter section.
+% Read it next to the current evaluation.tex, copy over whatever
+% you're happy with, and edit the rest — nothing here has been
+% written into the actual chapter file.
+%
+% What changed from the current chapter text, and why:
+%   1. The table now covers all 41 tagged physical runs, not 23.
+%      The other 18 were already sitting in the logs with a
+%      test_level set; they just weren't in the table.
+%   2. Three L0 "describe scene" rows are actually named-target
+%      search commands ("go to the orange box", "go to the orange
+%      box in the room") or a guidance-loop continuation utterance
+%      ("can you please continue the plan") and move to L3.
+%      Three more L0 rows combine a named target with a relative
+%      direction ("on your left", "to your right") and move to L5.
+%      This is the only recoding done; nothing else changed level.
+%   3. The table caption said Gemma 4 E4B was used throughout. Of
+%      the 41 runs, 34 used Gemma for both roles and 7 used
+%      Qwen2.5-VL 3B as the vision model, so the caption is
+%      corrected.
+%   4. A second pair of columns reports the operator's own
+%      good/bad call from run_flags.json next to the pipeline's
+%      outcome label, because the two disagree often enough to be
+%      a finding on their own.
+%   5. The per-level paragraphs are rewritten against the
+%      corrected counts and quote the operator notes that actually
+%      explain the halts, rather than leaving candidatetodo
+%      placeholders.
+% ============================================================
+
+\mysection{Plan correctness under vague commands}{Plan Correctness under Vague Commands}
+\label{sec:rq1_results}
+
+Table~\ref{tab:rq1_levels} covers all 41 physical runs that carry a command-level tag in the logs, recorded between
+8 and 11 October: 34 with Gemma~4 E4B as both planner and vision model, 7 with Qwen2.5-VL~3B as the vision model.
+The previous version of this table used only 23 of these runs and misfiled six of them. Three commands that name a
+target directly (``go to the orange box'', ``go to the orange box in the room'', and ``can you please continue the
+plan'', which resumes an approach already in progress) were logged as level~0 but are perception-dependent
+searches, so I moved them to level~3. Three more combine a named target with a relative direction (``go to the
+black bag on your left'', ``\ldots{} the orange box on the right of the black bag'', ``\ldots{} to the orange box
+to your right'') and belong at level~5, not level~0. No other run changed level. I also added a column for the
+operator's own good/bad call from \texttt{run\_flags.json}, next to the pipeline's own outcome label, because the
+two do not always agree, and where they disagree is informative.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Physical rover outcomes per command level, all 41 tagged runs (34 Gemma~4 E4B, 7 Qwen2.5-VL~3B for vision), against the pipeline's own outcome label and the operator's recorded verdict.}
+    \label{tab:rq1_levels}
+    \small
+    \setlength{\tabcolsep}{4.5pt}
+    \begin{tabular}{lp{2.9cm}rrrrrr}
+        \toprule
+        Level & Type & Runs & Done & After guid. & Halted/ aborted & Op.\ good & Op.\ bad \\
+        \midrule
+        L0 & Describe scene (control) & 6 & 5 & 0 & 1 & 4 & 0 \\
+        L1 & Single action & 4 & 4 & 0 & 0 & 4 & 0 \\
+        L2 & Sequence of actions & 4 & 4 & 0 & 0 & 4 & 0 \\
+        L3 & Perception-dependent & 8 & 3 & 2 & 3 & 5 & 1 \\
+        L4 & Conditional & 9 & 7 & 1 & 1 & 4 & 2 \\
+        L5 & Vague & 10 & 3 & 3 & 4 & 5 & 2 \\
+        \midrule
+        & Total & 41 & 26 & 6 & 9 & 26 & 5 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+\candidatetodo{10 of the 41 runs have no operator flag at all (good+bad only add to 31). Say that explicitly rather
+than let the reader subtract it themselves, or go back and flag the remaining 10 before hand-in.}
+
+\paragraph{Levels 1 and 2.} All eight runs produced the expected plan on the first attempt and finished without
+intervention. These levels need no perception, so they show the planner maps simple action chains onto the
+capability vocabulary without help, though eight runs is still too few to call it a rate. The runs did surface a
+hardware issue worth flagging here even though it sits outside plan correctness: in the earliest L1/L2 runs the
+rover turned about 118\textdegree{} where 90\textdegree{} was commanded, which the operator noted happened ``even
+though I calibrated it''. The turn timing was retuned partway through testing (one note records changing it to
+0.76\,s), and later runs in the same batch turn at close to 90\textdegree{}. \candidatetodo{This is an open-loop
+timing calibration issue, not a planning or vision one, so it probably belongs in Section~\ref{sec:executability}
+next to the sonar and distance results rather than here. Move it there, and say whether the 0.76\,s value is what
+the final build uses.}
+
+\paragraph{Level 0.} Of the six genuine describe-scene runs, five completed and one (``so tell me what you can
+see'') halted after guidance with no operator note explaining why. \candidatetodo{Check this run's log directly
+(session 2d9a17236f51) before writing a cause for it; I don't want to guess.}
+
+\paragraph{Level 3.} Of the eight runs, three completed directly, two completed after a guidance turn, and three
+halted or aborted. Two of the three failures trace to the room's lighting rather than to planning: in session
+2824ea8048bb (``please don't do the black bag'', which the pipeline resolved to driving at the bag — the negation
+loss already noted in earlier drafts of this chapter) the operator wrote that the model ``locked onto another black
+object since it is hard to distinguish a black bag in the dark room''. In session caf25eb230ef the rover found the
+box, drove into an obstacle on the way, and reported the mission complete anyway because the box was still visible
+in the background frame — the arrival check accepted a frame that happened to contain the target without checking
+that the rover had actually stopped in front of it. That one is a genuine false positive: the operator flagged it
+``review'', not ``good'', for exactly this reason. The third, session f13aa9ac3c8d, is more a success than a
+failure: the rover lost the box, did a 360\textdegree{} search, got three guidance turns, relocated it, and drove
+there, and only ended on \texttt{guidance\_exhausted} because the arrival check could not confirm the final frame
+(the operator's note: the box ``blended into the cupboard door behind it''). The operator flagged this run ``good''
+despite the halted outcome, which is the clearest case in the batch of the pipeline's own outcome label and the
+operator's judgement disagreeing: the guidance loop did what it was supposed to do, and the pipeline's label still
+reads as a failure.
+
+\paragraph{Level 4.} Seven of nine runs completed outright, one completed after guidance, and one aborted at an
+obstacle. The two operator-flagged failures are a dropped condition and a misidentified target rather than a
+hallucinated plan: in session abe08c4094f1 the operator's note is simply ``needed to check for condition'', meaning
+the \texttt{check} step the command asked for was skipped; in session 1dddfd8d1f6a the rover ``went to the wrong
+object and thought a jersey was the black bag''. A third run (f8811861d4e0, flagged ``review'') reported completion
+with almost no information back, which the operator recorded as ``it did nothing, could not view correctly''. None
+of these three is the condition itself failing to resolve correctly, which is closer to what I'd expect to be the
+hard part of level~4 — they are a skipped step, a vision misclassification, and a near-empty report.
+
+\paragraph{Level 5.} Ten runs, the most of any level and the most mixed: three completed, three completed after
+guidance, four halted or aborted. Lighting shows up here again and more directly than at level~3. In session
+2acdffb1c7c1 the operator wrote that the model ``kept skipping the frame as it cannot actually see the box due to
+the light in the room not being enough'', and in session 794bd92f55de (``go to the black bag and then go to the
+orange box after'') the rover reached the bag, then stalled at the box in the dark and only succeeded once the
+operator ``moved it into the light and it could see it better'' — a direct, causal demonstration that the failure
+was illumination, not planning, because moving the same object into better light fixed it mid-run. Session
+26285fd30325, one of the three reclassified into this level, halted for the same reason without a note explaining
+it. Session 0df36e214a46 completed but under-reported, telling the operator only that it had arrived rather than
+what it found there. Session e39230867caa shows the clarification loop working as intended on a badly garbled
+transcript (``go towards the rn fox and then come to see a rally'' resolved to ``go to the orange box and tell me
+what you see around it''), which is the one unambiguous success story at this level. Taken together, level~5's
+problems are less about the planner inventing structure for a vague command — the plans themselves were reasonable
+in every run I read — and more about the vision model running out of light to work with once the rover is close
+enough to need a fine judgement.
+
+\paragraph{Lighting as the dominant failure cause.} Across levels~3 and~5, every halt with an operator note
+attached to it names poor lighting or low contrast as the proximate cause: a black bag against a dark floor, an
+orange box blending into a cupboard door, a frame rejected as ``too blurry'' because the room was too dim, and one
+case where moving the object into better light fixed the run on the spot. The one clear exception is the
+obstacle-collision-reported-as-complete case at level~3, which is an arrival-check problem rather than a perception
+one. \candidatetodo{This is worth a sentence in the Limitations section too: the test room's lighting wasn't
+controlled or measured, so the 41 runs are really a test of the pipeline under whatever light happened to be in the
+room that day, not a controlled low-light condition.}
+
+\paragraph{Where the pipeline's own label and the operator's verdict disagree.} Five runs are flagged ``bad'' and
+five more ``review'', for ten flagged problems on top of (not always matching) the nine pipeline-labelled halts and
+aborts. The two don't line up one-to-one: session f13aa9ac3c8d is labelled \texttt{halted\_after\_guidance} by the
+pipeline but ``good'' by the operator, because the recovery behaviour was correct even though the mission didn't
+finish; session caf25eb230ef is labelled \texttt{completed} by the pipeline but ``review'' by the operator, because
+the mission finished on a technicality the arrival check should have caught. A pipeline-outcome count alone would
+have reported this batch as 32 of 41 successful (26 completed plus 6 after guidance); the operator's count says 26
+good against 5 explicit bad, with 10 runs never reviewed at all. \candidatetodo{Decide which number is the headline
+result and say why. I'd lean toward reporting both, the way this paragraph does, rather than picking one — the gap
+between them is itself a finding about how much the raw outcome label can be trusted.}
+
+\paragraph{Exploratory runs.} Earlier runs between 7 and 9 October used different model pairs and are not part of
+Table~\ref{tab:rq1_levels} (these predate the command-level tagging, which is why they have no \texttt{test\_level}
+in the logs). In six search-and-approach runs with Gemma~4 E4B as the vision model, five halted after guidance with
+the target not found and one completed. In seven search-and-approach runs with Qwen2.5-VL~3B as the vision model,
+three completed directly, two completed after guidance, and two aborted. Six further runs on 9 October (levels 0 to
+4, Qwen as the vision model) gave four direct completions, one completion after guidance and one halt after
+guidance. One of those completions is excluded because the spoken ``Thank you.'' was resolved to the previous
+command's plan, which shows that the dialogue state carried over between runs. These runs differ in command,
+planner and scene, so they are not a controlled comparison, and the final batch reached its targets with Gemma as
+the vision model, so the 8~October failures were not a permanent limit of that model.
+

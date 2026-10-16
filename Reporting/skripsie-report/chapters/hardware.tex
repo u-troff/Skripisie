@@ -1,0 +1,96 @@
+\mychapter{Hardware}{Hardware}{}
+\label{chap:hardware}
+
+\tikzset{
+  blk/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+              minimum width=2.6cm, minimum height=0.95cm, inner sep=3pt},
+  mdl/.style={blk, fill=black!8},
+  hw/.style={blk, dashed},
+  st/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+             minimum width=2.7cm, minimum height=0.9cm},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  lbl/.style={font=\scriptsize, fill=white, inner sep=1pt}
+}
+
+In the design Chapter~\ref{chap:design} was where the conversation went about how to split
+the decisions between the rover and the brain. In this chapter we will discuss how the rover
+connects to the brain and how it is controlled by the brain. Translating the plan from the planner
+into actions a rover can execute. The rover is an off-the-shelf Hiwonder advanced turboPi kit. It uses the
+open source Robot operating system 2 to execute motion commands. 
+
+
+\mysection{The Turbopi platform}{The TurboPi Platform}
+\label{sec:turbopi_platform}
+
+The rover is a Hiwonder TurboPi, Advanced kit, built around a Raspberry
+Pi~5. The only actuators on this specific unit are a four-wheel mecanum
+base, which can strafe sideways as well as drive and turn, and a
+two-servo pan/tilt gimbal carrying the camera. A ultrasonic sensor (sonar) with an RGB ring, 
+sits on the front of the chassis, and a row of infrared
+line-detection sensors sits underneath the chassis. There is no arm and no
+gripper on this build.
+
+The Advanced kit does not run a lightweight Python SDK, which is usually on the base robot kit.
+It can call motor functions directly. Instead it runs ROS2 inside a Docker
+container on the Pi, and every piece of hardware, driving, the gimbal,
+the sonar RGB ring, is reached through a ROS2 topic or service rather
+than a function call. As the rover starts up it lauches \texttt{bringup.launch.py},
+It launches the \texttt{mecanum} node which can turn the velocity command into wheel speeds. 
+Then the important \texttt{ros\_robot\_controller} which. talks to the motor and servo hardware. 
+There is a serial link connected to a STM32 co-processor on the expansion board, a camera connected over USB,
+a small HTTP video server and  The main contact point into the rover is over the \texttt{rosbridge\_websocket}.
+
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[node distance=1.1cm]
+    \node[blk] (brain) at (0,0) {Brain\\(laptop)};
+    \node[hw] (bridge) at (5.2,1.1) {\texttt{rosbridge\_}\\\texttt{websocket}\\:9090};
+    \node[hw] (video) at (5.2,-1.1) {\texttt{web\_video\_}\\\texttt{server}\\:8080};
+    \node[mdl] (mec) at (9.6,1.9) {\texttt{mecanum}};
+    \node[mdl] (cam) at (9.6,0.3) {\texttt{usb\_cam}};
+    \node[mdl] (rrc) at (9.6,-1.5) {\texttt{ros\_robot\_}\\\texttt{controller}};
+    \node[hw] (stm) at (13.4,-1.5) {STM32\\(serial)};
+    \draw[arr] (brain.east) -- node[lbl,above]{roslibpy} (bridge.west);
+    \draw[arr] (brain.east) -- node[lbl,below]{HTTP} (video.west);
+    \draw[arr] (bridge) -- (mec);
+    \draw[arr] (video) -- (cam);
+    \draw[arr] (bridge.east) -- (rrc.west);
+    \draw[arr] (mec) -- (rrc);
+    \draw[arr] (rrc) -- (stm);
+  \end{tikzpicture}
+  \caption{What the brain actually reaches on the Pi. Everything above
+  \texttt{rosbridge\_websocket} and \texttt{web\_video\_server} is
+  Hiwonder's stock ROS2 stack, started as one unit by
+  \texttt{bringup.launch.py} inside the Pi's Docker container.}
+  \label{fig:hw-bridge}
+\end{figure}
+
+
+\mysection{The bridge the brain actually uses}{The Bridge the Brain Actually Uses}
+\label{sec:hw_bridge}
+
+
+The \texttt{rosbridge\_websocket} is a stock ROS2 package that exposes topics
+and services as plain JSON over a WebSocket. The brain never needs to read DDS stack or
+and of Hiwonders Actual packages for control. This was chosen over the brain running \texttt{rclpy}
+since the brain already has existing WebSockets for \texttt{/ws/dialogue} and \texttt{/ws/execution}
+
+To actually drive the rover you need to send values to the \texttt{geometry\_msgs/Twist} message on the
+\texttt{cmd\_vel} topic. \texttt{linear.x} and \texttt{linear.y} are
+forward and strafe speed, and \texttt{angular.z} is turn rate. The angular term is summed into each of the
+wheels kinematics before scaling to a motor speed, so it is not treat as a radian per second value. To figure out
+what range of values actually turn the rover accurately I chose a range of 3 to 8 which is used in the Hiwonder's
+own stock code. The gimbal is driven the same way, a
+\texttt{SetPWMServoState} message on
+\texttt{/ros\_robot\_controller/pwm\_servo/set\_state} naming a servo id,
+1 for tilt and 2 for pan on this unit, and a target position around a
+centre of 1500.
+
+The frames from the camera are pulled directly from the websocket running on the Pi which had a port of 8080. The
+endpoint was at \texttt{web\_video\_server}.
+
+
+%ask lecturere if I need to add this section
+\mysection{Reusing the stock line follower}{Reusing the Stock Line Follower}
+\label{sec:hw_lf}
