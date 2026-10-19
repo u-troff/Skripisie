@@ -43,22 +43,7 @@ a small HTTP video server and  The main contact point into the rover is over the
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}[node distance=1.1cm]
-    \node[blk] (brain) at (0,0) {Brain\\(laptop)};
-    \node[hw] (bridge) at (5.2,1.1) {\texttt{rosbridge\_}\\\texttt{websocket}\\:9090};
-    \node[hw] (video) at (5.2,-1.1) {\texttt{web\_video\_}\\\texttt{server}\\:8080};
-    \node[mdl] (mec) at (9.6,1.9) {\texttt{mecanum}};
-    \node[mdl] (cam) at (9.6,0.3) {\texttt{usb\_cam}};
-    \node[mdl] (rrc) at (9.6,-1.5) {\texttt{ros\_robot\_}\\\texttt{controller}};
-    \node[hw] (stm) at (13.4,-1.5) {STM32\\(serial)};
-    \draw[arr] (brain.east) -- node[lbl,above]{roslibpy} (bridge.west);
-    \draw[arr] (brain.east) -- node[lbl,below]{HTTP} (video.west);
-    \draw[arr] (bridge) -- (mec);
-    \draw[arr] (video) -- (cam);
-    \draw[arr] (bridge.east) -- (rrc.west);
-    \draw[arr] (mec) -- (rrc);
-    \draw[arr] (rrc) -- (stm);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig4_1_hw_bridge.png}
   \caption{What the brain actually reaches on the Pi. Everything above
   \texttt{rosbridge\_websocket} and \texttt{web\_video\_server} is
   Hiwonder's stock ROS2 stack, started as one unit by

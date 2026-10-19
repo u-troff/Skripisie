@@ -206,26 +206,7 @@ servers all the communication during the mission run. I keep them apart so that 
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}[scale=0.82, transform shape]
-    \node[mdl] (scene) at (7.0,2.4) {Scene digest\\(video $\rightarrow$ keyframes\\$\rightarrow$ vision model $\rightarrow$ text)};
-    \node[blk] (voice) at (0,0)    {Spoken\\command};
-    \node[mdl] (stt)   at (3.5,0)  {Speech\\recognition};
-    \node[mdl] (clar)  at (7.0,0)  {Ambiguity check\\(asks until clear)};
-    \node[mdl] (plan)  at (10.5,0) {Planner};
-    \node[mdl] (ver)   at (10.5,-2){Plan\\check};
-    \node[blk] (conf)  at (7.0,-2) {Read-back and\\confirmation};
-    \node[hw]  (exec)  at (3.5,-2) {Mission loop\\(rover steps)};
-    \node[blk] (rep)   at (0,-2)   {Report\\(spoken, logged)};
-    \draw[arr] (voice)--(stt);
-    \draw[arr] (stt)--(clar);
-    \draw[arr] (clar)--node[lbl]{clear}(plan);
-    \draw[arr] (plan)--(ver);
-    \draw[arr] (ver)--(conf);
-    \draw[arr] (conf)--node[lbl]{yes}(exec);
-    \draw[arr] (exec)--(rep);
-    \draw[arr, dashed] (scene.south) -- (clar.north);
-    \draw[arr, dashed] (scene.east) -| (12.3,-2) -- (ver.east);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig3_2_pipeline_redesign.png}
   \caption{One command from speech to report. Shaded blocks call a model. The dashed block drives the rover. Dashed arrows show the scene digest feeding the two checks that need to know what is in the room.}
   \label{fig:pipeline}
 \end{figure}
@@ -343,29 +324,9 @@ questions or it can result in a endless ambiguous loop of questions and answers.
 If the vision model ever fails to load. It is retired once and if it fails again, the person is told and asked to repeat their
 command again. Not having this fall back coould result in letting every command through.
 
-%prelimanary drawing please come back here to fix it
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}[scale=0.9, transform shape]
-    \node[st] (cl) at (0,0)    {CLARIFYING};
-    \node[st] (pl) at (4.2,0)  {PLANNING};
-    \node[st] (ve) at (8.4,0)  {VERIFYING};
-    \node[st] (aw) at (4.2,-2.6){AWAITING\_\\CONFIRMATION};
-    \node[st] (ca) at (8.4,-2.6){CANCELLED};
-    \node[st] (ex) at (4.2,-5.0){EXECUTING};
-    \node[st] (re) at (8.4,-5.0){REPORTING};
-    \draw[arr] (cl)--node[lbl]{clear}(pl);
-    \path (cl) edge[arr, loop above, min distance=7mm]
-          node[lbl, above]{ambiguous: ask} (cl);
-    \draw[arr] (pl)--(ve);
-    \draw[arr] (ve.north) to[out=120,in=60]
-          node[lbl, above]{unworkable: replan once} (pl.north);
-    \draw[arr] (ve.south west)--node[lbl, right]{plan ready}(aw.north east);
-    \draw[arr] (aw)--node[lbl, right]{yes}(ex);
-    \draw[arr] (ex)--(re);
-    \draw[arr] (aw.west) -| node[lbl, pos=0.3, below]{no: ``What should I change?''} (cl.south);
-    \draw[arr] (aw)--node[lbl]{cancel}(ca);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig_dialogue_states.png}
   \caption{The dialogue phases up to the start of a mission. A rejection returns to \texttt{CLARIFYING} with the person's reason added to the history.}
   \label{fig:states}
 \end{figure}
@@ -429,22 +390,7 @@ If both  checks pass then the mission carries on from where the rover is, and th
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[st] (bl) at (0,0)    {Step returns\\\texttt{blocked}};
-    \node[st] (aw) at (4.0,0)  {Speak reason,\\ask what next};
-    \node[dec] (an) at (8.0,0) {answer?};
-    \node[st] (rp) at (8.0,-2.2){Replan from\\current state};
-    \node[dec] (ok) at (4.0,-2.2){steps pass\\\texttt{validate\_steps}?};
-    \node[st] (go) at (0,-2.2) {Resume mission\\(EXECUTING)};
-    \node[st] (hl) at (8.0,2.2) {HALTED\\``I cannot continue''};
-    \draw[arr] (bl)--(aw);
-    \draw[arr] (aw)--(an);
-    \draw[arr] (an)--node[lbl, right]{an instruction}(rp);
-    \draw[arr] (rp)--(ok);
-    \draw[arr] (ok)--node[lbl]{yes}(go);
-    \draw[arr] (ok.north) -- node[lbl, left]{no: ask again}(aw.south);
-    \draw[arr] (an)--node[lbl, right]{stop, timeout, or 3 turns used}(hl);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig_recovery_loop.png}
   \caption{The recovery loop. The turn counter is shared across the whole mission, so it cannot be used to drag a failing mission on.}
   \label{fig:guidance}
 \end{figure}
@@ -506,17 +452,7 @@ as skipped. The run record now can show which branch ran and which did not.
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}[scale=0.9, transform shape]
-    \node[st] (ck) at (0,0)     {\texttt{check} step:\\look once, centred};
-    \node[dec] (an) at (4.4,0)  {answer?};
-    \node[st] (ys) at (8.6,1.5) {Run steps tagged\\\texttt{yes}, skip \texttt{no}};
-    \node[st] (no) at (8.6,0)   {Run steps tagged\\\texttt{no}, skip \texttt{yes}};
-    \node[st] (bl) at (8.6,-1.7){\texttt{blocked}:\\ask the person};
-    \draw[arr] (ck)--(an);
-    \draw[arr] (an)--node[lbl, above]{yes}(ys.west);
-    \draw[arr] (an)--node[lbl, above]{no}(no.west);
-    \draw[arr] (an)--node[lbl, below]{unsure or error}(bl.west);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig_condition_check.png}
   \caption{How a condition is resolved. An answer the camera cannot support does not pick a branch. It stops the step and goes to the recovery loop.}
   \label{fig:cond}
 \end{figure}
@@ -546,26 +482,7 @@ The sonar readings and the final vision model decision decides if the rover has 
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}[scale=0.9, transform shape]
-    \node[st] (s) at (0,0)      {Search:\\pan the gimbal};
-    \node[st] (l) at (4.0,0)    {Lock: one pivot,\\then verify};
-    \node[st] (h) at (8.0,0)    {Hop toward\\target};
-    \node[st] (b) at (0,-2.6)   {\texttt{blocked}\\with a reason};
-    \node[dec] (a) at (4.0,-2.6){arrived?};
-    \node[st] (c) at (8.0,-2.6) {Look again,\\gate the box};
-    \node[st] (o) at (4.0,-4.8) {Second look\\cross-check};
-    \node[st] (d) at (8.0,-4.8) {\texttt{ok}};
-    \draw[arr] (s)--(l);
-    \draw[arr] (l)--(h);
-    \draw[arr] (h)--(c);
-    \draw[arr] (c)--(a);
-    \draw[arr] (a)--node[lbl, right]{yes}(o);
-    \draw[arr] (o)--node[lbl]{confirmed}(d);
-    \draw[arr] (a.north east)--node[lbl, above left]{no}(h.south west);
-    \draw[arr] (s)--node[lbl, right]{not found}(b);
-    \draw[arr] (a)--node[lbl, below]{obstacle, budget}(b);
-    \draw[arr] (o.west) -| node[lbl, pos=0.2, above]{contradicted} (b.south);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig_freeroam_approach.png}
   \caption{The free-roam approach. Each cycle is one hop and one look. Every exit that is not \texttt{ok} returns \texttt{blocked} with a reason, and that is what starts recovery.}
   \label{fig:approach}
 \end{figure}

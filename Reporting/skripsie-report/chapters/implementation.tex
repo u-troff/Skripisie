@@ -35,18 +35,7 @@ listen to its surroundings for feedback. The audio clip is padded to 30\,s inter
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)    {audio in};
-    \node[proc] (b) at (0,-0.9) {decode to float32\\(bytes: via FFmpeg)};
-    \node[proc] (c) at (0,-1.8) {\texttt{faster-whisper}\\transcribe};
-    \node[proc] (d) at (0,-2.7) {lowercase,\\strip punctuation};
-    \node[dec]  (e) at (0,-4.1) {matches a fixed\\hallucination\\phrase?};
-    \node[term] (f) at (-2.7,-5.6) {return \texttt{""}};
-    \node[term] (g) at (2.7,-5.6)  {return transcript};
-    \draw[fa] (a)-->(b); \draw[fa] (b)-->(c); \draw[fa] (c)-->(d); \draw[fa] (d)-->(e);
-    \draw[fa] (e.south west) -- node[fl,above]{yes} (f.north);
-    \draw[fa] (e.south east) -- node[fl,above]{no} (g.north);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_1_flow_stt.png}
   \caption{\texttt{transcribe\_audio}. The hallucination check exists because \texttt{fluister-turbo} occasionally transcribes silence or background noise as one of a handful of fixed captioning artefacts, most often ``thank you so much for watching''.}
   \label{fig:flow-stt}
 \end{figure}
@@ -66,16 +55,7 @@ Afrikaanse voice available so the models were only configured in english.
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)    {\texttt{\_speak(text)}};
-    \node[proc] (b) at (0,-0.9) {\texttt{asyncio.to\_thread}\\(\texttt{synthesize\_speech})};
-    \node[dec]  (c) at (0,-2.3) {synthesis\\throws?};
-    \node[term] (d) at (-2.7,-3.8) {event: text only\\(log a warning)};
-    \node[term] (e) at (2.7,-3.8)  {event: text +\\base64 audio};
-    \draw[fa] (a)--(b); \draw[fa] (b)--(c);
-    \draw[fa] (c.south west) -- node[fl,above]{yes} (d.north);
-    \draw[fa] (c.south east) -- node[fl,above]{no} (e.north);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_2_flow_tts.png}
   \caption{Synthesis runs on a worker thread because \texttt{\_speak} shares an event loop with \texttt{ingest\_frame}: synthesis is sub-second but still blocking, and perception should not stall mid-mission for a voice line. A failure degrades the mission to text-only rather than stopping it, the same soft-fail stance the pre-departure dialogue's own \texttt{\_speak} in \texttt{pipeline.py} takes.}
   \label{fig:flow-tts}
 \end{figure}
@@ -98,17 +78,7 @@ environment variable (\texttt{PLANNER\_PROVIDER}, \texttt{VLM\_PROVIDER}), not a
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}[node distance=0.8cm]
-    \node[blk] (pl) at (0,1.2)    {\texttt{planner.py}};
-    \node[blk] (vl) at (0,-1.2)   {\texttt{vlm.py}};
-    \node[mdl] (if) at (4.0,0)    {\texttt{InferenceProvider}\\\texttt{.complete()}};
-    \node[mdl] (ol) at (8.5,1.2)  {\texttt{OllamaProvider}\\(local)};
-    \node[mdl] (oa) at (8.5,-1.2) {\texttt{OpenAICompatibleProvider}\\(OpenAI, DeepSeek)};
-    \draw[arr] (pl)--(if);
-    \draw[arr] (vl)--(if);
-    \draw[arr] (if)--(ol);
-    \draw[arr] (if)--(oa);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_3_providers.png}
   \caption{Both roles call the same interface. \texttt{get\_provider(role)} resolves \texttt{PLANNER\_PROVIDER} or \texttt{VLM\_PROVIDER} to a concrete class and caches the instance.}
   \label{fig:providers}
 \end{figure}
@@ -123,22 +93,7 @@ from \texttt{generate\_plan}. The following \texttt{tools/snapshot\_ptompt.py}, 
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)     {command, profile,\\room digest};
-    \node[proc] (b) at (0,-0.9)  {\texttt{build\_plan\_prompt()}};
-    \node[proc] (c) at (0,-1.8)  {\texttt{provider.complete()}};
-    \node[dec]  (d) at (-3.4,-3.3) {step is a\\well-formed\\object?};
-    \node[proc] (e) at (0,-3.3)  {parse JSON reply};
-    \node[proc] (f) at (-3.4,-4.8) {drop step;\\note in plan};
-    \node[proc] (g) at (0,-5.4)  {\texttt{\_promote\_moves\_}\\\texttt{to\_approach}};
-    \node[proc] (h) at (0,-6.3)  {\texttt{validate\_steps}\\(role-specific actions)};
-    \node[term] (i) at (0,-7.2)  {return plan};
-    \draw[fa] (a)--(b); \draw[fa] (b)--(c); \draw[fa] (c)--(e); \draw[fa] (e)--(d);
-    \draw[fa] (d.west) -- node[fl,above]{no} (f.east);
-    \draw[fa] (d.south) -- node[fl,right]{yes} (g.north);
-    \draw[fa] (f) -- (g.west);
-    \draw[fa] (g)--(h); \draw[fa] (h)--(i);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_4_flow_planner.png}
   \caption{\texttt{generate\_plan}. A smaller model sometimes writes a step as a bare string instead of an object, or nests the list oddly, so every step is checked before anything downstream calls \texttt{.get} on it. \texttt{\_promote\_moves\_to\_approach} rewrites a \texttt{move} step whose target names an object into an \texttt{approach} step (Section~\ref{sec:vocabulary}); the retried transient failures from \texttt{provider.complete()} are omitted here for space and described in the text above.}
   \label{fig:flow-planner}
 \end{figure}
@@ -161,26 +116,7 @@ the answer from the model having extra fields which are not intended.
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)    {stage, prompt,\\image, salvage};
-    \node[proc] (b) at (0,-0.9) {\texttt{provider.complete()}\\(\texttt{json\_mode=True})};
-    \node[dec]  (c) at (0,-2.3) {parses as\\JSON?};
-    \node[term] (d) at (2.9,-2.3) {return\\parsed reply};
-    \node[dec]  (e) at (0,-3.9) {\texttt{salvage=True}?};
-    \node[term] (f) at (2.9,-3.9) {raise;\\stage fails};
-    \node[proc] (g) at (0,-5.3) {\texttt{\_salvage\_truncated\_json}:\\try last 20 cut points};
-    \node[dec]  (h) at (0,-6.9) {a cut point\\parses?};
-    \node[term] (i) at (-2.9,-8.2) {return\\partial result};
-    \node[term] (j) at (2.9,-8.2) {raise;\\stage fails};
-    \draw[fa] (a)--(b); \draw[fa] (b)--(c);
-    \draw[fa] (c.east) -- node[fl,above]{yes} (d.west);
-    \draw[fa] (c.south) -- node[fl,left]{no} (e.north);
-    \draw[fa] (e.east) -- node[fl,above]{no} (f.west);
-    \draw[fa] (e.south) -- node[fl,left]{yes} (g.north);
-    \draw[fa] (g)--(h);
-    \draw[fa] (h.south west) -- node[fl,above]{yes} (i.north);
-    \draw[fa] (h.south east) -- node[fl,above]{no} (j.north);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_5_flow_vlm.png}
   \caption{\texttt{\_ask}. Salvage is only enabled for \texttt{inventory\_frame} and \texttt{survey\_frame}, the two calls that ask for a list of objects and sometimes hit \texttt{num\_predict} mid-list on a model that has started repeating itself; a reply with ten correct objects and one truncated one is more useful than discarding it. Every other call keeps \texttt{salvage=False}, since a truncated yes/no answer or bounding box is not something a partial parse can safely recover.}
   \label{fig:flow-vlm}
 \end{figure}
@@ -221,20 +157,7 @@ need a model to interpret what it should do. Since either the rover should go, '
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)    {\texttt{effective\_command}};
-    \node[proc] (b) at (0,-0.9) {\texttt{check\_ambiguity()}};
-    \node[dec]  (c) at (0,-2.3) {still\\ambiguous?};
-    \node[term] (d) at (-3.0,-3.9) {move to\\confirmation};
-    \node[dec]  (e) at (3.6,-2.3) {asked\\already?};
-    \node[term] (f) at (3.6,-3.9) {mark\\\texttt{capped}; stop};
-    \node[term] (g) at (7.6,-2.3) {append question;\\ask it};
-    \draw[fa] (a)--(b); \draw[fa] (b)--(c);
-    \draw[fa] (c.south west) -- node[fl,above]{no} (d.north);
-    \draw[fa] (c.east) -- node[fl,above]{yes} (e.west);
-    \draw[fa] (e.south) -- node[fl,left]{yes} (f.north);
-    \draw[fa] (e.east) -- node[fl,above]{no} (g.west);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_6_flow_clarify.png}
   \caption{\texttt{\_advance\_to\_confirmation}, one turn of the clarification loop. The repeat-question check exists because a model that cannot think of anything new to ask would otherwise repeat the same question until the five-turn cap was reached, rather than giving up as soon as it had nothing left to add.}
   \label{fig:flow-clarify}
 \end{figure}
@@ -272,29 +195,7 @@ a camera that it can pan and trying to code that would not solve our initial pro
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)     {next step\\(by cursor)};
-    \node[dec]  (b) at (0,-1.4)  {conditional tag\\matches recorded\\branch?};
-    \node[proc] (c) at (-3.4,-1.4) {skip step;\\cursor++};
-    \node[proc] (d) at (0,-3.0)  {dispatch: \texttt{check} /\\free-approach /\\\texttt{execute\_step}};
-    \node[dec]  (e) at (0,-4.6)  {result\\status?};
-    \node[proc] (f) at (-3.6,-6.0) {\texttt{ok}: post-\\process; cursor++};
-    \node[proc] (g) at (0,-6.0)  {\texttt{blocked}:\\guidance loop\\(Fig.~\ref{fig:flow-guidance})};
-    \node[dec]  (h) at (0,-7.8)  {replanned?};
-    \node[term] (i) at (3.6,-6.0)  {\texttt{halted}:\\mission ends};
-    \draw[fa] (a)--(b);
-    \draw[fa] (b.west) -- node[fl,above]{no} (c.east);
-    \draw[fa] (c) |- (a);
-    \draw[fa] (b.south) -- node[fl,left]{yes} (d.north);
-    \draw[fa] (d)--(e);
-    \draw[fa] (e.south west) -- node[fl,above]{ok} (f.north);
-    \draw[fa] (e.south) -- node[fl,right]{blocked} (g.north);
-    \draw[fa] (e.south east) -- node[fl,above]{halted} (i.north);
-    \draw[fa] (g)--(h);
-    \draw[fa] (f) |- (a);
-    \draw[fa] (h.west) -- node[fl,above]{yes} ++(-5.2,0) |- (a);
-    \draw[fa] (h.south) -- node[fl,right]{no} ++(0,-1.0) node[term]{mission ends};
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig_mission_loop.png}
   \caption{\texttt{run\_mission}'s step loop. The conditional-tag check is what Section~\ref{sec:conditional} relies on: the planner only decides which steps carry a \texttt{when} tag, and this check is what honours it. The loop's own \texttt{finally} block (not shown) writes the report for every non-aborted outcome; an operator-triggered \texttt{asyncio.CancelledError} skips straight to \texttt{rover.halt()} instead.}
   \label{fig:flow-mission}
 \end{figure}
@@ -320,28 +221,7 @@ has stopped. This makes it predictable to know that the rover is lost and needs 
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)    {step blocked};
-    \node[dec]  (b) at (0,-1.4) {\texttt{GUIDANCE\_}\\\texttt{ENABLED}?};
-    \node[term] (c) at (3.2,-1.4) {halt;\\mission ends};
-    \node[proc] (d) at (0,-3.0) {ask question;\\wait for answer};
-    \node[dec]  (e) at (0,-4.6) {declines or\\timed out?};
-    \node[term] (f) at (3.2,-4.6) {halt with reason\\(timeout/declined);\\mission ends};
-    \node[proc] (g) at (0,-6.2) {\texttt{replan\_from\_state}};
-    \node[dec]  (h) at (0,-7.8) {usable steps\\returned?};
-    \node[term] (i) at (-3.2,-9.2) {stage\\\texttt{pending\_swap};\\return \texttt{True}};
-    \node[term] (j) at (3.2,-9.2) {3 turns\\used up?};
-    \draw[fa] (a)--(b);
-    \draw[fa] (b.east) -- node[fl,above]{no} (c.west);
-    \draw[fa] (b.south) -- node[fl,left]{yes} (d.north);
-    \draw[fa] (d)--(e);
-    \draw[fa] (e.east) -- node[fl,above]{yes} (f.west);
-    \draw[fa] (e.south) -- node[fl,left]{no} (g.north);
-    \draw[fa] (g)--(h);
-    \draw[fa] (h.south west) -- node[fl,above]{yes} (i.north);
-    \draw[fa] (h.east) -- node[fl,above]{no} (j.west);
-    \draw[fa] (j.north) |- ++(0,0.6) -| (d.east);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_8_flow_guidance.png}
   \caption{\texttt{\_guidance\_loop}. A ``no'' out of the turn-count check on the right loops back to ask again rather than ending the mission; running out of turns is itself a third halt reason (\texttt{guidance\_exhausted}), alongside timeout and decline, so a batch of failed runs can be told apart by why they failed.}
   \label{fig:flow-guidance}
 \end{figure}
@@ -359,29 +239,7 @@ filter out the frames which are very similar and the VLM can prioritize the fram
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)    {frame arrives};
-    \node[dec]  (b) at (0,-1.4) {tier 0: sharp\\and changed\\enough?};
-    \node[term] (c) at (3.0,-1.4) {drop frame};
-    \node[proc] (d) at (0,-3.0) {tier 1: caption\\(always recorded)};
-    \node[dec]  (e) at (0,-4.4) {mission is\\\texttt{EXECUTING}?};
-    \node[term] (f) at (3.0,-4.4) {stop here};
-    \node[proc] (g) at (0,-6.0) {tier 2: \texttt{revise\_plan}};
-    \node[dec]  (h) at (0,-7.4) {change\\proposed?};
-    \node[term] (i) at (3.0,-7.4) {no action};
-    \node[proc] (j) at (0,-9.0) {\texttt{revision.classify}:\\NO\_CHANGE / REROUTE /\\MATERIAL / BLOCKED};
-    \node[term] (k) at (0,-10.4) {apply, confirm,\\or halt accordingly};
-    \draw[fa] (a)--(b);
-    \draw[fa] (b.east) -- node[fl,above]{no} (c.west);
-    \draw[fa] (b.south) -- node[fl,left]{yes} (d.north);
-    \draw[fa] (d)--(e);
-    \draw[fa] (e.east) -- node[fl,above]{no} (f.west);
-    \draw[fa] (e.south) -- node[fl,left]{yes} (g.north);
-    \draw[fa] (g)--(h);
-    \draw[fa] (h.east) -- node[fl,above]{no} (i.west);
-    \draw[fa] (h.south) -- node[fl,left]{yes} (j.north);
-    \draw[fa] (j)--(k);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig_perception_tiers.png}
   \caption{\texttt{ingest\_frame}'s three tiers, feeding \texttt{revision.classify}. Tier 0 is a 32$\times$32 greyscale thumbnail diff plus a Laplacian-variance blur score (\texttt{PERCEPTION\_MIN\_SHARPNESS}, \texttt{PERCEPTION\_MIN\_INTERVAL\_S}, \texttt{PERCEPTION\_CHANGE\_THRESHOLD}); tier 1 is one \texttt{describe\_frame} caption; tier 2 only fires while executing.}
   \label{fig:flow-revision}
 \end{figure}
@@ -423,26 +281,7 @@ node rather than reimplementing line following from scratch.
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)    {drive forward\\(stock line node)};
-    \node[dec]  (b) at (0,-1.4) {services\\reachable?};
-    \node[term] (c) at (3.3,-1.4) {wait 0.3\,s;\\\texttt{blocked}:\\\texttt{line\_follow\_}\\\texttt{unavailable}};
-    \node[dec]  (d) at (0,-3.2) {arrived\\(\texttt{crossroads\_stop}\\or confirmed)?};
-    \node[term] (e) at (3.3,-3.2) {\texttt{ok}: arrived};
-    \node[dec]  (f) at (0,-5.0) {sonar below\\threshold?};
-    \node[term] (g) at (3.3,-5.0) {\texttt{blocked}:\\obstacle};
-    \node[dec]  (h) at (0,-6.8) {timeout\\exceeded?};
-    \node[term] (i) at (3.3,-6.8) {\texttt{blocked}:\\timeout};
-    \draw[fa] (a)--(b);
-    \draw[fa] (b.east) -- node[fl,above]{no} (c.west);
-    \draw[fa] (b.south) -- node[fl,left]{yes} (d.north);
-    \draw[fa] (d.east) -- node[fl,above]{yes} (e.west);
-    \draw[fa] (d.south) -- node[fl,left]{no} (f.north);
-    \draw[fa] (f.east) -- node[fl,above]{yes} (g.west);
-    \draw[fa] (f.south) -- node[fl,left]{no} (h.north);
-    \draw[fa] (h.east) -- node[fl,above]{yes} (i.west);
-    \draw[fa] (h.south) -- node[fl,left]{no} ++(0,-0.6) -- ++(-2.4,0) |- (d.west);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_10_flow_followline.png}
   \caption{\texttt{\_follow\_line}, the supervisor added around the stock line-follower node. It owns exactly the three things the node has no opinion about: arrival, obstacle stopping through the polled sonar (using \texttt{\_sonar\_seq} to tell two fresh readings from one stale one read twice), and a wall-clock give-up, since the node itself drives forward indefinitely if the line is lost. The \texttt{\_lf\_unavailable} check (added 11 October) means a drive that never started is reported as blocked rather than as a drive that ran and found nothing.}
   \label{fig:flow-followline}
 \end{figure}
@@ -464,19 +303,7 @@ clearance baked in, so the planner and the collision checker can never silently 
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[dec]  (a) at (0,0)      {step\\action?};
-    \node[proc] (b) at (-5.2,-1.6) {\texttt{approach}: resolve\\target, A* plan\\(\texttt{nav.plan\_path}),\\walk waypoints};
-    \node[proc] (c) at (-1.7,-1.6) {\texttt{move}/\texttt{turn}:\\magnitude + drift,\\\texttt{nav.sweep\_segment}};
-    \node[proc] (d) at (1.7,-1.6) {\texttt{scan}/\texttt{stop}/\\\texttt{report}:\\fixed dwell};
-    \node[proc] (e) at (5.2,-1.6)  {unknown\\action};
-    \node[term] (f) at (0,-3.2)   {return \texttt{ok} /\\\texttt{blocked} /\\\texttt{halted}};
-    \draw[fa] (a) -- node[fl,above,sloped]{approach} (b.north);
-    \draw[fa] (a) -- node[fl,above,sloped]{move/turn} (c.north);
-    \draw[fa] (a) -- node[fl,above,sloped]{scan etc.} (d.north);
-    \draw[fa] (a) -- node[fl,above,sloped]{else} (e.north);
-    \draw[fa] (b)--(f); \draw[fa] (c)--(f); \draw[fa] (d)--(f); \draw[fa] (e)--(f);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_11_flow_virtualrover.png}
   \caption{\texttt{VirtualRover.execute\_step}'s dispatch. An \texttt{approach} step can only fail by planning (no path, or an unresolved target logged as a hallucination for RQ2), never by collision; a \texttt{move} or \texttt{turn} step is swept against the same grid and stops at the last free point if blocked, so a collision there means the chain of plan steps itself went somewhere it should not have.}
   \label{fig:flow-virtualrover}
 \end{figure}
@@ -516,14 +343,7 @@ shows who sends what, not a decision to be made.
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}[node distance=1.0cm]
-    \node[hw] (pi) at (0,0)   {Pi client};
-    \node[blk] (br) at (8,0)  {Brain (FastAPI)};
-    \draw[arr] ([yshift=0.9cm]pi.east) -- node[lbl, above]{start, audio\_chunk, confirmation\_audio}([yshift=0.9cm]br.west);
-    \draw[arr] ([yshift=0.3cm]br.west) -- node[lbl, above]{session, speak, plan\_ready, execute, cancelled}([yshift=0.3cm]pi.east);
-    \draw[arr] ([yshift=-0.3cm]pi.east) -- node[lbl, below]{begin, frame, revision\_audio}([yshift=-0.3cm]br.west);
-    \draw[arr] ([yshift=-0.9cm]br.west) -- node[lbl, below]{step\_started, check, awaiting\_guidance, report}([yshift=-0.9cm]pi.east);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_12_protocol.png}
   \caption{\texttt{/ws/dialogue} (top pair) carries everything up to confirmation; \texttt{/ws/execution} (bottom pair) carries the mission. One frame per complete utterance, not a stream.}
   \label{fig:protocol}
 \end{figure}
@@ -560,21 +380,7 @@ roles, and a tagged \texttt{test\_level} when one is set.
 
 \begin{figure}[htbp]
   \centering
-  \begin{tikzpicture}
-    \node[term] (a) at (0,0)    {mission ends};
-    \node[dec]  (b) at (0,-1.4) {guidance turns $>$ 0\\and phase \texttt{completed}\\or \texttt{halted}?};
-    \node[term] (c) at (-3.2,-2.9) {outcome =\\phase};
-    \node[term] (d) at (3.2,-2.9) {outcome = phase +\\\texttt{\_after\_guidance}};
-    \node[dec]  (e) at (3.2,-4.6) {\texttt{approach}\\succeeded after\\last \texttt{blocked}\\step?};
-    \node[term] (f) at (6.4,-4.6) {\texttt{recovered}\\= True};
-    \node[term] (g) at (3.2,-6.2) {\texttt{recovered}\\= False};
-    \draw[fa] (a)--(b);
-    \draw[fa] (b.south west) -- node[fl,above]{no} (c.north);
-    \draw[fa] (b.south east) -- node[fl,above]{yes} (d.north);
-    \draw[fa] (d)--(e);
-    \draw[fa] (e.east) -- node[fl,above]{yes} (f.west);
-    \draw[fa] (e.south) -- node[fl,left]{no} (g.north);
-  \end{tikzpicture}
+  \includegraphics[width=\linewidth]{figures/fig5_13_flow_outcome.png}
   \caption{\texttt{report.py}'s outcome classification. A mission that needed at least one guidance turn is never reported as a plain \texttt{completed}, even if it finished, because the distinction between a clean run and a recovered one (Section~\ref{sec:recovery}) is exactly what RQ1 needs to see; \texttt{recovered} only counts a run that actually reached its target afterwards, not merely one that ended without halting.}
   \label{fig:flow-outcome}
 \end{figure}
