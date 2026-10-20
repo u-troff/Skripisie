@@ -1,0 +1,105 @@
+% ============================================================
+% DRAFT — proposed additions to chapters/introduction.tex, aimed
+% at the specific examiner questions you flagged from your own
+% voice notes: "why didn't you just use an 8/10GB Jetson on the
+% rover" and "why did you make the laptop/desktop smart and the
+% rover dumb instead of distributing intelligence onboard".
+%
+% The intro already motivates local-only processing (privacy,
+% cost, no LiDAR/IMU) via the "private home" framing in
+% Section~\ref{sec:background}. What it does NOT yet do is name
+% the rejected alternative (an onboard embedded accelerator) and
+% say explicitly why the split was chosen instead. That's what
+% these blocks add. Nothing here has been written into the actual
+% chapter file — read it next to introduction.tex and merge
+% whatever you're happy with.
+%
+% J1. New paragraph at the end of Section~\ref{sec:background},
+%     right before "\mysection{Problem Statement...}", naming the
+%     rejected onboard-Jetson alternative and giving the four
+%     reasons it was rejected: already-owned-hardware premise,
+%     compute headroom, benchmark validity (RQ1 needs the model to
+%     be the only variable), and generality (rover as instrument,
+%     not as the thing under test).
+% J2. Small wording change to RQ1 so the host/rover split is
+%     baked into the question itself, not just the surrounding
+%     prose — so it can't be read as an oversight.
+% J3. New paragraph in Section~\ref{sec:scope-and-limitations},
+%     stating plainly that the rover's own onboard computer
+%     (the Pi) is treated as instrumentation, not as part of the
+%     system under test.
+% J4. A couple of phrases in J1 are flagged [[VERIFY]] — specific
+%     cost/TOPS figures for Jetson Orin Nano/NX 8-16GB modules
+%     at time of writing. I didn't want to assert numbers I
+%     can't verify from here; the qualitative argument holds
+%     without them, but citing a real spec sheet or current price
+%     would make it land harder in the oral.
+% ============================================================
+
+
+% ---------- J1. New paragraph, end of Section~\ref{sec:background} ----------
+% CURRENT, this is the last paragraph of sec:background (currently ends the
+% section right before "\mysection{Problem Statement and Research Questions}"):
+%   ...and the robot has to rely on its camera to know whether its plan is working. Where privacy is not
+%   a concern and a reliable internet connection is available, a cloud-hosted model remains the
+%   better choice, since it is larger and more capable than any model that fits on consumer
+%   hardware.
+% INSERT the following as a NEW paragraph immediately after that one (still
+% inside sec:background, still before the Problem Statement section header):
+
+An alternative to running the models on a separate host machine would be to mount a dedicated
+embedded AI accelerator, such as an NVIDIA Jetson Orin Nano or Orin NX, directly on the rover and
+run the entire pipeline on board. This project deliberately does not do that, for four reasons.
+First, it would undercut the premise that motivates local processing in the first place: the home
+robot framing above assumes the household already owns the compute the system needs, in the form
+of a desktop or laptop; requiring the purchase of a separate embedded accelerator module
+[[VERIFY: current price, e.g.\ USD~X--Y]] on top of the rover itself reintroduces exactly the kind
+of extra, specialised hardware cost this project is trying to avoid. Second, even the larger
+embedded modules in this class have a fraction of the memory and raw throughput of a consumer
+desktop GPU [[VERIFY: e.g.\ Jetson Orin NX 16GB TOPS vs.\ the GTX~Titan~X's compute, or simply
+cite both spec sheets]], so moving the same models onto the rover itself would force either a
+smaller, weaker model, or a slower response time, or both, confounding what RQ1 and RQ2 are
+actually trying to measure: the capability limits of the models, not the engineering limits of an
+embedded board. Third, keeping inference off the rover, on a host machine that can run the same
+planner locally or swap to a cloud API, is what makes the local-versus-cloud comparison in RQ1 an
+apples-to-apples comparison of model capability alone; if the rover itself hosted the model,
+switching the benchmark to a cloud API would also change the hardware story, confounding the
+comparison. Fourth, it keeps the result general: the rover's own on-board computer, a Raspberry
+Pi, only has to stream camera frames and relay drive and sensor commands over the local network,
+so the same rover would work unchanged with a different host machine entirely, a laptop today, a
+household's existing desktop tomorrow, rather than being tied to whatever accelerator happens to
+be bolted onto this specific rover.
+
+
+% ---------- J2. RQ1 wording — bake the host/rover split into the question itself ----------
+% CURRENT (inside the \begin{enumerate} block under
+% "\mysection{Problem Statement and Research Questions}"):
+%   \item[\textbf{RQ1}] Can locally hosted models, running on the consumer hardware defined
+%       above, turn a vague spoken command into a plan that the rover can execute, and which
+%       levels of command in Table~\ref{tab:command-levels} can they handle reliably?
+% REPLACE WITH:
+
+\item[\textbf{RQ1}] Can locally hosted models, running on the consumer host machine defined
+    above rather than on the rover's own on-board computer, turn a vague spoken command into a
+    plan that the rover can execute, and which levels of command in Table~\ref{tab:command-levels}
+    can they handle reliably?
+
+
+% ---------- J3. New paragraph in Section~\ref{sec:scope-and-limitations} ----------
+% CURRENT, the paragraph that currently reads:
+%   The rover is deliberately limited to a camera, an ultrasonic distance sensor and a line sensor,
+%   with no wheel encoders, \ac{imu} or \acs{lidar}. This reflects the low-cost home robot described
+%   in Section~\ref{sec:background}, and forces the pipeline to rely on the camera to determine
+%   whether a plan is succeeding, which is the capability this project sets out to test. As a result,
+%   movement is carried out without precise measurement of distance or heading, and commands that
+%   require precise distances beyond what the ultrasonic sensor can measure are not supported.
+% INSERT the following as a NEW paragraph immediately after that one:
+
+In the same spirit, the rover's own on-board computer is treated as instrumentation rather than
+as part of the system under test. It streams camera frames to the host machine and relays the
+drive and sensor commands it receives back, but performs no part of the planning, perception or
+clarification pipeline itself. The language and vision models that answer RQ1 and RQ2 all run on
+the host machine defined in Section~\ref{sec:background}, so that both research questions probe
+the capability of those models on fixed, known hardware, rather than being confounded by whatever
+embedded computer happens to be fitted to the rover.
+

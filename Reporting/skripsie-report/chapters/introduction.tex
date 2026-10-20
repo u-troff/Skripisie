@@ -7,24 +7,30 @@
 \label{sec:background}
 
 A robot that takes spoken instructions removes two obstacles that make most mobile robots
-difficult to operate day to day. Typically a mobile robot operates using a screen to navigate, and an operator trained on its command
+difficult to operate day to day. Typically a mobile robot operates using a screen to navigate, 
+and an operator trained on its command
 set. This matters even more for a small indoor rover, because the tasks it can be
-asked to do, such as checking whether a door is open or looking at what is on a shelf are exactly the kind of tasks a person would rather say out loud
+asked to do, such as checking whether a door is open or looking at what is on a 
+shelf are exactly the kind of tasks a person would rather say out loud
 than type into an application.
 
 \Acp{llm} are neural networks which are based on the transformer architecture, and are trained on very
 large collections of text. Through this training the LLM's learns to generate the next word in the
 sequence of text given the previous words in the sequence. This makes LLM's well suited to interpreting
-everyday instructions as well as have a huge general knowledge base of the world. For example, when given a natural-language command and a description of what a robot can do, an
-\ac{llm} can break the command into a sequence of simple actions called a \ac{robotactionprimitive} (RAP). This RAP can be used by any robot, and can be made up of actions that the robot is able to
+everyday instructions as well as have a huge general knowledge base of the world. 
+For example, when given a natural-language command and a description of what a robot can do, an
+\ac{llm} can break the command into a sequence of simple actions called a \ac{robotactionprimitive} (RAP). 
+This RAP can be used by any robot, and can be made up of actions that the robot is able to
 perform, without a developer having to hand-code a fixed list of recognised
-phrases~\cite{ahn2022saycan}. Ambiguous commands can also be resolved through clarifying questions, when a command leaves out information, the model can ask the
+phrases~\cite{ahn2022saycan}. Ambiguous commands can also be resolved through clarifying questions,
+when a command leaves out information, the model can ask the
 user follow-up questions before it commits to a plan. This exchange, in which the user and the
 robot take turns to communicate until the task is clear, is referred to in this report as a
 \emph{multi-turn dialogue}~\cite{hori2025longhorizon}.
 
 Handing the planning to a language model introduces two problems. The first problem is that spoken commands are
-often ambiguous. So systems that always acts on its first interpretation will act on the wrong one often enough to matter~\cite{ren2023knowno}. 
+often ambiguous. So systems that always acts on its first interpretation will act on the wrong one 
+often enough to matter~\cite{ren2023knowno}. 
 The second problem is that language models hallucinate. They
 produce fluent, confident output that does not correspond to anything real, and this becomes
 more likely as a task is broken into more steps~\cite{liang2024introspective}. The techniques
@@ -40,17 +46,34 @@ voice-commanded robot would be useful.
 
 A use case of running local only models on a robot is in a private home. Every command sent to a cloud-hosted model, and
 every camera frame used to check the robot's progress. These commands and images leaves the home and is processed on a
-third party's servers, which many households would not accept for a device that moves through
+third party's server, which many households would not accept for a device that moves through
 their living space and records it. A home robot also has to be affordable, which rules out
 \acs{lidar} and a powerful on-board computer and leaves a camera as the most practical source of
 information about its surroundings. Low-cost drive platforms often also lack wheel encoders and
-an \ac{imu}, and their wheels slip enough that a command such as ``drive forward one metre''
+an \ac{imu}, and their wheels slip enough that a command such as `drive forward one metre'
 cannot be trusted to be carried out accurately. In this setting, the language models must run on
 hardware the household already owns, such as a desktop computer with a consumer graphics card,
 and the robot has to rely on its camera to know whether its plan is working. Where privacy is not
 a concern and a reliable internet connection is available, a cloud-hosted model remains the
 better choice, since it is larger and more capable than any model that fits on consumer
 hardware.
+
+An alternative to running the models on a separate host machine would be to mount a dedicated
+embedded AI accelerator, such as an NVIDIA Jetson Orin Nano or Orin NX, directly on the rover and
+run the entire pipeline on board. This project deliberately does not do that, for four reasons.
+First, the home
+robot framing above assumes the household already owns the compute the system needs, in the form
+of a desktop or laptop. Requiring to purchase of a separate embedded accelerator module
+on top of the rover itself reintroduces exactly the kind
+of extra, specialised hardware cost this project is trying to avoid. 
+
+Second, keeping inference off the rover and on a host machine that can run the same
+planner locally or swap to a cloud API, is what makes the local-versus-cloud comparison closer to 
+apples-to-apples of model capability alone. If the rover itself hosted the model,
+switching the benchmark to a cloud API would also change the hardware story and the not a fair comparison. 
+Third, it keeps the result general: the rover's own on-board computer, a Raspberry
+Pi, only has to stream camera frames and relay drive and sensor commands over the local network.
+Using the same rover would work unchanged with a different host machine entirely.
 
 \mysection{Problem Statement and Research Questions}{Problem Statement and Research Questions}
 \label{sec:problem-statement}
@@ -59,16 +82,15 @@ There is not a full understanding of whether language and vision models small en
 desktop computer and can reliably turn a vague spoken command
 into a plan that a low-cost indoor rover can carry out using only its camera and simple on-board
 sensors. It is also not known how much complexity such a command can contain before the locally
-hosted models begin to produce plans that do not match the command, the room or the rover's
-capabilities. Existing work either assumes large, cloud-hosted models, or does not connect a
+hosted models begin to produce plans that do not match the command or visiting objects which are not present.
+Existing work either assumes large, cloud-hosted models, or only uses text-based interfaces, and none connects a
 spoken clarification dialogue to a physical robot that must wait for the user's confirmation
 before it moves.
 
-In my skripsie, consumer hardware refers to a gaming desktop computer with an AMD Ryzen~5~3600
+In my project, consumer hardware refers to desktop computers, with an AMD Ryzen~5~3600
 processor, 16~GB of system memory and an NVIDIA GeForce GTX TITAN~X graphics card with 12~GB of
-video memory, representative of a mid-range gaming computer several years old. All locally
-hosted models, for speech recognition, planning and vision. This all must run within the memory of this
-machine.
+video memory, representative of a mid-range gaming computer several years old. Needs to host and run locally
+hosted models, for speech recognition, planning and vision. 
 
 To make these questions measurable, the commands the rover must handle are grouped into the
 levels of increasing complexity listed in Table~\ref{tab:command-levels}.
@@ -81,19 +103,20 @@ levels of increasing complexity listed in Table~\ref{tab:command-levels}.
         \toprule
         Level & Type & Example \\
         \midrule
-        L1 & Single action & ``Turn left.'' \\
-        L2 & Sequence of actions & ``Drive forward, turn left, then drive forward again.'' \\
-        L3 & Perception-dependent & ``Drive forward until you see the door.'' \\
-        L4 & Conditional & ``Check whether the door is open. If it is, go through it; otherwise, come back.'' \\
-        L5 & Vague & ``Go and see who is in the kitchen.'' \\
+        L1 & Single action & `Turn left.' \\
+        L2 & Sequence of actions & `Drive forward, turn left, then drive forward again.' \\
+        L3 & Perception-dependent & `Drive forward until you see the door.' \\
+        L4 & Conditional logic check & `Check whether the door is open. If it is, go through it; otherwise, come back.' \\
+        L5 & Vague goal & `Go and see who is in the kitchen.' \\
         \bottomrule
     \end{tabular}
 \end{table}
 
 \begin{enumerate}
-    \item[\textbf{RQ1}] Can locally hosted models, running on the consumer hardware defined
-        above, turn a vague spoken command into a plan that the rover can execute, and which
-        levels of command in Table~\ref{tab:command-levels} can they handle reliably?
+    \item[\textbf{RQ1}] Can locally hosted models, running on the consumer host machine defined
+    above rather than on the rover's own on-board computer, turn a vague spoken command into a
+    plan that the rover can execute, and which levels of command in Table~\ref{tab:command-levels}
+    can they handle reliably?
     \item[\textbf{RQ2}] For each level of command that the models can handle, how many steps can
         be chained into a single command before the plan starts to include hallucinations,
         meaning actions, objects or locations that are not supported by the command, the room
@@ -141,7 +164,8 @@ the project must:
 \label{sec:scope-and-limitations}
 
 Since this project is concerned with turning vague spoken commands into robot action plans. 
-Its scope is limited to the pipeline from speech to executed plan. This includes the transcription of speech, the clarification of ambiguous commands through spoken dialogue, plan generation and verification, and the spoken confirmation step.
+Its scope is limited to the pipeline from speech to executed plan. This includes the transcription of speech, 
+the clarification of ambiguous commands through spoken dialogue, plan generation and verification, and the spoken confirmation step.
  Navigation is used only as a means of carrying out and testing the plans, and improving navigation itself is not an aim of this project.
 
 Before the rover is used in a room, the room is recorded once in a short walkthrough video. A
@@ -162,6 +186,14 @@ in Section~\ref{sec:background}, and forces the pipeline to rely on the camera t
 whether a plan is succeeding, which is the capability this project sets out to test. As a result,
 movement is carried out without precise measurement of distance or heading, and commands that
 require precise distances beyond what the ultrasonic sensor can measure are not supported.
+
+In the same spirit, the rover's own on-board computer is treated as instrumentation rather than
+as part of the system under test. It streams camera frames to the host machine and relays the
+drive and sensor commands it receives back. It does not perform no part of the planning, perception or
+clarification in the pipeline itself. The language and vision models that answer RQ1 and RQ2 runs on
+the host machine defined in Section~\ref{sec:background}. So that both research questions probes
+the capability of those models on fixed, known hardware, rather than being confounded by whatever
+embedded computer happens to be fitted to the rover.
 
 Similarly, the system is not designed to operate in arbitrary rooms or with arbitrary commands.
 Evaluation is limited to a small number of test rooms and a fixed set of test commands at each

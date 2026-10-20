@@ -1,0 +1,143 @@
+RQ2 compositional-depth sweep — findings from the new CSVs
+(tools/sweeps/ctx_1024_d120.csv, ctx_2048_d120.csv, ctx_8192_d120.csv)
+Analysed 20 Oct 2026, from the three files you added today.
+
+WHAT WAS RUN
+-------------
+Same virtual room (room_tour1), same chained "approach" command pattern
+("Go to the couch, then the coffee table, then the desk, ..."), Gemma 4
+E4B as both planner and VLM, local/ollama. Depth swept 4 -> 120 in steps
+of 4 (30 depth values), 3 repeats each = 90 runs per file, 270 runs
+total. The only thing varied across the three files is planner_num_ctx:
+1024, 2048, 8192 tokens.
+
+HEADLINE: ZERO HALLUCINATIONS, BUT A DIFFERENT, CLEAN FAILURE MODE
+--------------------------------------------------------------------
+The `hallucinations` column is 0 for all 270 runs, at every depth,
+at every context size. `outcome` is "completed" for all 270 runs too
+— nothing crashes, nothing halts, `halt_reason` is empty and
+`recovered` is False throughout (the guidance-reprompt path never
+fires, because nothing ever flags that something went wrong).
+
+But the plan itself breaks down. Looking at `plan_steps` vs the
+requested `depth`, and at `visits_match` / `first_divergence`:
+
+  - Up to depth ~28-32, every run matches exactly: plan_steps == depth,
+    visits_actual == expected_visits, visits_match=True.
+  - From depth 36 a few runs start to come up short.
+  - From depth 40 onward, EVERY run in all three files has
+    visits_match=False, for the rest of the sweep (depth 40 through
+    120). It never recovers at any higher depth.
+  - Critically: `first_divergence` always lands exactly at the step
+    where the plan stops (e.g. plan_steps=34, first_divergence=34).
+    The plan is a correct, in-order prefix of the requested sequence
+    right up until it just stops — it does not substitute a wrong
+    object, location or action anywhere. That's the literal
+    definition of hallucination used elsewhere in the report
+    (actions/objects/locations not supported by the command), and
+    it genuinely doesn't happen. The planner just stops producing
+    steps once the plan gets long enough.
+
+So the actual result is: hallucination rate stays at 0% across the
+whole depth range tested, but a second, distinct failure mode —
+silent truncation of the plan, not substitution of a wrong one — sets
+in consistently around depth ~36-40 and is total for every run from
+depth 40 on. This is worth stating as its own finding rather than
+folding it into "no hallucinations" or lumping it in with hallucination
+as if it's the same thing.
+
+CONTEXT SIZE: DOESN'T MOVE THE ONSET POINT, BUT CHANGES HOW BADLY IT FAILS
+----------------------------------------------------------------------------
+first depth with any mismatch / first depth where ALL 3 runs mismatch:
+
+  num_ctx=1024:  first mismatch at depth 32  | fully broken from depth 40
+  num_ctx=2048:  first mismatch at depth 40  | fully broken from depth 40
+  num_ctx=8192:  first mismatch at depth 36  | fully broken from depth 40
+
+Going from 1024 to 8192 tokens of context (8x) does NOT push the
+breakdown point out — all three collapse to "every run fails" by
+depth 40. If this were purely a context-window / token-budget
+problem, 8192 should have bought noticeably more headroom than 1024.
+It doesn't, at least not in terms of WHEN things start going wrong.
+
+What context size DOES change is HOW BADLY it fails once it starts,
+looking at plan_steps for every run at depth >= 40:
+
+  num_ctx=1024:  plan_steps ranges 0-52,  mean 24.6,  26/63 runs = 0 steps
+  num_ctx=2048:  plan_steps ranges 0-54,  mean 23.7,  27/63 runs = 0 steps
+  num_ctx=8192:  plan_steps ranges 1-108, mean 46.7,   0/63 runs = 0 steps
+
+At 1024 and 2048 tokens, over 40% of the deep runs produce a
+completely empty plan (plan_steps=0 — total collapse, not just
+truncation). At 8192 tokens this never happens once, and the average
+surviving plan is roughly double the length. So the bigger context
+window doesn't delay WHEN degradation starts, but it does raise the
+ceiling on how much of the plan survives once degradation starts, and
+it rules out the worst-case total collapse entirely in this sweep.
+
+That's a genuinely useful way to frame it for the write-up: context
+budget is not what's gating "does the plan still match the room and
+the command" at these depths (that breaks at ~36-40 regardless) — it's
+gating "if something starts to go wrong, how much of the mission is
+still salvageable afterwards."
+
+WHY THIS MATTERS FOR THE LITERATURE/DESIGN FRAMING
+----------------------------------------------------
+This result lines up with (and is good evidence for) the distinction
+made in literature_chapter2_advisor_feedback_edits.tex (E8): a model's
+context-window CAPACITY is a different failure axis from its REASONING
+quality. This sweep is pretty direct evidence that the ~depth-40
+breakdown here is NOT primarily a context-capacity effect (ctx size
+didn't move the onset point), which supports treating it as a
+reasoning/generation-length limitation of the planner instead — and
+the context-size effect that does show up (ceiling on severity, not
+onset) is worth stating precisely rather than conflating the two.
+
+A SEPARATE GAP THIS SURFACES: NOTHING CATCHES THE TRUNCATION
+----------------------------------------------------------------
+Every one of these runs is logged with outcome="completed",
+halt_reason="", recovered=False. The pipeline has no check, after
+plan generation, that the plan it produced actually covers every
+target the command asked for. A truncated plan that silently
+"completes" having only done 1/3 of what was asked is arguably a worse
+failure than a hallucination that at least shows up as "halted" or
+"uncertain" somewhere in the logs — this one is invisible unless you
+specifically compare plan length against the command's depth, which is
+exactly what visits_match/first_divergence do here but nothing in the
+live pipeline currently checks for. Worth a line in Limitations /
+Future Work: a plan-length-vs-command-coverage check, parallel to the
+existing ambiguity and anomaly checks, would catch this class of
+failure the way the current guidance-reprompt mechanism catches halts.
+
+NUMBERS YOU CAN DROP STRAIGHT INTO A TABLE
+---------------------------------------------
+Per-context, per-depth-band summary (n=3 runs per depth; 10 depth
+values per band: 4,8,...,36 = "shallow"; 40,...,120 = "deep"):
+
+  num_ctx | depths 4-28 (n=24) | depth 32-36 (n=6, transition) | depth 40-120 (n=63, deep)
+  1024    | 0/24 mismatch      | 1/6 mismatch                   | 63/63 mismatch, mean plan_steps=24.6, 26 runs=0 steps
+  2048    | 0/24 mismatch      | 0/6 mismatch                   | 63/63 mismatch, mean plan_steps=23.7, 27 runs=0 steps
+  8192    | 0/24 mismatch      | 1/6 mismatch                   | 63/63 mismatch, mean plan_steps=46.7, 0 runs=0 steps
+
+Hallucinations: 0/270 runs, all depths, all context sizes.
+Outcome: "completed" for 270/270 runs (no halts, no crashes, no
+guidance turns triggered).
+
+SUGGESTED RQ2 ANSWER (for you to word properly in evaluation.tex)
+----------------------------------------------------------------------
+Within this sweep, the planner never hallucinates — it does not
+invent actions, objects or locations unsupported by the command or the
+room, at any tested depth up to 120 chained steps. Compositional depth
+does have a hard limit, but the failure mode is plan truncation rather
+than hallucination: starting around 36-40 chained steps, the planner
+stops generating further steps partway through an otherwise-correct
+plan, and by 40 steps every tested run (independent of planner context
+size) falls short of the full command. Context window size does not
+change where this onset occurs, but does change its severity: a
+1024-token context collapses to an empty plan in over 40% of deep
+runs, while an 8192-token context never produces an empty plan and
+sustains roughly double the plan length on average once truncation
+starts. This suggests the ~40-step compositional limit observed here
+is closer to a generation-length ceiling in the planner's own decoding
+behaviour than to the model running out of context-window capacity to
+track the room and the command.

@@ -1,0 +1,349 @@
+% ============================================================
+% DRAFT — proposed edits to chapters/literature.tex from Theart's
+% walkthrough of Chapter 2 (recorded feedback, 20 Oct 2026).
+%
+% This file is a draft for review, not a finished chapter section.
+% Each block below is: a short header comment naming the anchor
+% text in the CURRENT literature.tex, a note on what feedback
+% point it answers, and the replacement text. Nothing here has
+% been written into the actual chapter file — copy over whatever
+% you're happy with, section by section, and edit the rest.
+%
+% Feedback points covered, roughly in the order Theart raised them:
+%   E1. sec:grounding opens abruptly with "SayCan and Code as
+%       Policies set the standard way..." — needs a grounding
+%       paragraph, and shouldn't imply these are the only two
+%       methods.
+%   E2. SayCan's affordance/value function is used but never
+%       explained: where does p(c|s,l) actually come from, how
+%       is it trained?
+%   E3. Code as Policies is vague about what the LLM's code
+%       generation is actually conditioned on (a prompt-level API
+%       + examples), both where CaP is first introduced
+%       (sec:llm_planners) and the shorter repeat in sec:grounding.
+%   E4. "This project's mid-mission execution follows the same
+%       loop" / "this project's capability vocabulary in
+%       planner.py" — these are Chapter 3 design claims sitting in
+%       Chapter 2. Deferred to a forward-reference instead.
+%   E5. Quote direction: two straight "..." pairs need to become
+%       LaTeX `` '' pairs (lines 64 and 128 in the current file).
+%       I didn't find any others in literature.tex or
+%       introduction.tex — grep -n '"' both files to confirm.
+%   E6. KnowNo's "raw confidence score" is passed through
+%       conformal prediction, but where does the score itself come
+%       from? (It's not a separate trained model — see E2's answer
+%       for why this matters.)
+%   E7. Section~\ref{sec:local_models}'s opening overclaims: none
+%       of Sections 2.1-2.3's methods *require* a cloud-hosted LLM,
+%       they were just evaluated with one.
+%   E8. sec:hallucination_lit conflates two distinct failure modes
+%       under "reasoning degrades over a long chain of steps": a
+%       context-window capacity limit vs. one-shot-vs-reasoning
+%       answer quality. Split into two, and renumbered the "second
+%       problem" (now third) later in the same section + added a
+%       short gap statement in the Research Gap section about the
+%       un-addressed capacity limit.
+%   E9. Awkward phrasing at the end of 2.4 (now 2.4's closing
+%       paragraph) — reworded for clarity.
+%   E10. STT section (2.5) trimmed, and rebalanced towards stating
+%        the solution (in-domain/in-accent fine-tuning,
+%        digiphyte/fluister-turbo) rather than only the problem —
+%        with the hedge Theart gave from his own experience (a
+%        full-weight general Whisper model sometimes beats it).
+%
+% Also includes one unprompted grammar catch (A0): a stray period
+% breaks a sentence mid-clause in the very first SayCan paragraph.
+% ============================================================
+
+
+% ---------- A0. Stray period, sec:llm_planners (first SayCan paragraph) ----------
+% CURRENT (around line 18-19):
+%   ...but each candidate is re-scored by a separately learned affordance function.
+%   that estimates how likely that skill is to succeed given the robot's current state. The action
+% REPLACE WITH:
+
+...but each candidate is re-scored by a separately learned affordance function
+that estimates how likely that skill is to succeed given the robot's current state. The action
+
+
+% ---------- E1. sec:grounding opening — needs a grounding paragraph + hedge ----------
+% CURRENT (lines 56-60):
+%   \mysection{Grounding plans in a bounded action set}{Grounding Plans in a Bounded Action Set}
+%   \label{sec:grounding}
+%
+%   SayCan and Code as Policies set the standard way to connect an LLM's plan to what a robot can
+%   actually do. SayCan~\cite{ahn2022saycan} pairs the LLM with a separately learned value function for
+% REPLACE WITH:
+
+\mysection{Grounding plans in a bounded action set}{Grounding Plans in a Bounded Action Set}
+\label{sec:grounding}
+
+Section~\ref{sec:llm_planners} introduced SayCan, Code as Policies and Inner Monologue at a high
+level, as three systems that connect an LLM's plan to what a robot can actually do. This section
+looks more closely at how the first two of those three perform that grounding step mechanically,
+since the way each one scores or constrains a candidate action is what the rest of this chapter
+builds on. At least two prominent methods set a standard way of doing this: SayCan~\cite{ahn2022saycan}
+pairs the LLM with a separately learned value function for
+
+
+% ---------- E2. How is SayCan's affordance value function obtained? ----------
+% INSERT as a new paragraph right after the SayCan equation block, i.e. after
+% the current line ending "...and the 0.6/0.2/0.1/0.8 values are
+% $p(c_\pi \mid s, \ell_\pi)$." and before "Code as Policies~\cite{liang2023codeaspolicies}
+% solves the same problem a different way: ...".
+
+Ahn et al.\ do not get $p(c_\pi \mid s, \ell_\pi)$ for free. Each skill's affordance value function
+is trained separately from the language model, as a reinforcement-learning critic fitted on
+logged robot trajectories: many attempts at that skill are recorded from a range of starting
+states, each ending in a success or failure outcome, and the critic is trained to predict that
+outcome's probability from the observation alone. Obtaining $p(c_\pi \mid s, \ell_\pi)$ is
+therefore not a property of the language model at all; it requires a separate, per-skill dataset
+of practiced attempts and their outcomes before any value function exists to score against.
+
+
+% ---------- E3a. Code as Policies vagueness, sec:llm_planners (first mention) ----------
+% CURRENT (lines 26-32):
+%   Code as Policies \cite{liang2023codeaspolicies} takes a different route. Rather than picking
+%   from a fixed skill library, the LLM writes code, calling perception functions, control
+%   primitives, and other functions it has been shown examples of, composed however the
+%   instruction requires. This lets it handle instructions no one anticipated in advance and
+%   assign precise parameters (a velocity, a threshold) to descriptions that were only ever given
+%   in words, at the cost of needing a language model capable of writing correct, composable code
+%   rather than just picking from a short list.
+% REPLACE WITH:
+
+Code as Policies \cite{liang2023codeaspolicies} takes a different route. Rather than picking
+from a fixed skill library, the LLM writes code against a small, hand-written API of perception
+functions, control primitives and helper utilities, whose signatures and example usage are given
+to the model directly in its prompt, alongside a handful of worked examples pairing an instruction
+with the code that solves it. Composing calls to only that API, in whatever order and nesting the
+instruction requires, is what lets it handle instructions no one anticipated in advance and assign
+precise parameters (a velocity, a threshold) to descriptions that were only ever given in words,
+at the cost of needing a language model capable of writing correct, composable code against that
+API rather than just picking from a short list.
+
+
+% ---------- E3b. Code as Policies, sec:grounding (shorter repeat mention) ----------
+% CURRENT (around what is currently lines 106-108):
+%   Code as Policies~\cite{liang2023codeaspolicies} solves the same problem a different way: the LLM
+%   writes Python that calls a fixed set of perception and control functions directly. If the code does
+%   not compile against that API, the step cannot run.
+% REPLACE WITH:
+
+Code as Policies~\cite{liang2023codeaspolicies} solves the same problem a different way: as
+Section~\ref{sec:llm_planners} described, the LLM writes Python against the fixed API of
+perception and control functions given to it in its prompt. If the code does not compile against
+that API, the step cannot run.
+
+
+% ---------- E4a. "capability vocabulary in planner.py" — Ch3 design claim in Ch2 ----------
+% CURRENT (around what is currently lines 110-112):
+%   Both approaches give the planner a fixed set of actions it cannot go outside of. This project's
+%   capability vocabulary in \texttt{planner.py} plays the same role: a step whose target or action
+%   falls outside that vocabulary is rejected rather than passed through to the rover.
+% REPLACE WITH:
+
+Both approaches give the planner a fixed set of actions it cannot go outside of, a property
+Chapter~\ref{chap:design} returns to when this project's own capability vocabulary is introduced.
+
+
+% ---------- E4b. "mid-mission execution follows the same loop" — Ch3 design claim in Ch2 ----------
+% CURRENT (around what is currently lines 114-121):
+%   Neither approach checks what happens after a step runs. Inner Monologue~\cite{huang2023innermonologue}
+%   adds that check on top of a SayCan-style setup: after each action, the robot gets an observation
+%   back, a success or failure signal, a scene description, or something the human said, and the next
+%   step is planned using that observation instead of the original plan alone. Plan a step, act, observe,
+%   replan. This project's mid-mission execution follows the same loop: each frame sent over
+%   \texttt{/ws/execution} is what the plan gets checked against after each step, not only before the
+%   mission starts, allowing the plan to respond to drift the rover has actually accumulated rather than
+%   committing to a path decided before departure.
+% REPLACE WITH:
+
+Neither approach checks what happens after a step runs. Inner Monologue~\cite{huang2023innermonologue}
+adds that check on top of a SayCan-style setup: after each action, the robot gets an observation
+back, a success or failure signal, a scene description, or something the human said, and the next
+step is planned using that observation instead of the original plan alone. Plan a step, act,
+observe, replan. Chapter~\ref{chap:design} returns to this plan-act-observe-replan loop when
+motivating this project's own mid-mission execution design.
+
+
+% ---------- E5. Quote direction fixes ----------
+% Line 64, CURRENT:
+%   with a concrete instruction, "how would you put an apple on the table?" The LLM alone ranks
+% REPLACE WITH:
+
+with a concrete instruction, ``how would you put an apple on the table?'' The LLM alone ranks
+
+% Line 128, CURRENT:
+%   observations rule out every other reading of it. "Bring the bowl" is unambiguous with one bowl on the counter
+% REPLACE WITH:
+
+observations rule out every other reading of it. ``Bring the bowl'' is unambiguous with one bowl on the counter
+
+
+% ---------- E6. KnowNo's "raw confidence score" — where does it come from? ----------
+% CURRENT (around what is currently lines 136-140):
+%   \citet{ren2023knowno} give active modification a statistical guarantee, in a method called KnowNo, and \citeauthor{hori2025longhorizon} cite it directly as a working example of the approach.
+%   KnowNo does not let the planner commit to its single highest-scoring next step. The planner's raw confidence scores for each candidate step are passed through a conformal prediction layer,
+%   which converts them into a calibrated set of steps that are all plausible enough to keep. A singleton set means the rover proceeds on its own. A set with more than one step means the instruction was ambiguous
+%   given what the rover can observe, and the rover asks a clarifying question instead of guessing.
+% REPLACE WITH:
+
+\citet{ren2023knowno} give active modification a statistical guarantee, in a method called
+KnowNo, and \citeauthor{hori2025longhorizon} cite it directly as a working example of the
+approach. KnowNo does not let the planner commit to its single highest-scoring next step. The
+planner's raw confidence scores for each candidate step are passed through a conformal prediction
+layer. These raw scores are not a separately trained model: Ren et al.\ take them straight from
+the planning LLM itself, normalising its softmax probability over the candidate next steps
+(optionally combined with a SayCan-style affordance score, Equation~\ref{eq:saycan_selection},
+when one is available), so KnowNo adds no new model to train, only a calibration step on top of
+whatever scoring mechanism the base planner already produces. Conformal prediction then converts
+these scores into a calibrated set of steps that are all plausible enough to keep. A singleton set
+means the rover proceeds on its own. A set with more than one step means the instruction was
+ambiguous given what the rover can observe, and the rover asks a clarifying question instead of
+guessing.
+
+
+% ---------- E7. sec:local_models opening overclaims cloud-hosting as a requirement ----------
+% CURRENT (around what is currently lines 184-189):
+%   \mysection{Locally hosted models}{Locally hosted and quantised models}
+%   \label{sec:local_models}
+%
+%   Sections~\ref{sec:llm_planners} to \ref{sec:clarification_lit} assume the rover can call out to a large, cloud-hosted LLM. A rover cannot always guarantee that access: network connectivity is not
+%   reliable in every test environment, and the round-trip latency to a cloud endpoint works against the response time a voice-commanded system needs to feel usable. Running the planner locally,
+%   on hardware the rover carries itself, removes both problems, but restricts the model to whatever fits in on-board memory.
+% REPLACE WITH:
+
+\mysection{Locally hosted models}{Locally hosted and quantised models}
+\label{sec:local_models}
+
+None of the grounding, coding or clarification mechanisms in Sections~\ref{sec:llm_planners} to
+\ref{sec:clarification_lit} assume cloud hosting as a requirement; each needs an LLM, not
+specifically a large, cloud-hosted one. In practice, however, every one of them was evaluated in
+its original paper using a large model accessed over the internet, so how a smaller, locally
+hosted model performs on the same task is not something that body of work establishes either way.
+A rover cannot always guarantee cloud access regardless: network connectivity is not reliable in
+every test environment, and the round-trip latency to a cloud endpoint works against the response
+time a voice-commanded system needs to feel usable. Running the planner locally, on hardware the
+rover carries itself or a machine on the same network, removes both problems, but restricts the
+model to whatever fits in on-board or local memory, with an expected drop in capability relative
+to the cloud-scale models these methods were evaluated with.
+
+
+% ---------- E8a. Conflated failure modes, sec:hallucination_lit opening ----------
+% CURRENT (around what is currently lines 218-221):
+%   The methods discussed in Sections~\ref{sec:llm_planners} to \ref{sec:clarification_lit} treat each planning step largely on its own.
+%   As a task plan grows longer and more compositional, two further problems appear that a single-step clarification mechanism does not cover: the LLM's reasoning can degrade over a long chain of steps,
+%   producing a confidently stated plan that is simply wrong, and the rover can encounter a scene it was never prepared for, one that no single faulty component causes
+%   but that the plan as a whole fails to account for.
+% REPLACE WITH:
+
+The methods discussed in Sections~\ref{sec:llm_planners} to \ref{sec:clarification_lit} treat each
+planning step largely on its own. As a task plan grows longer and more compositional, three
+further problems appear that a single-step clarification mechanism does not cover. The first is a
+capacity limit rather than a reasoning one: a model's effective context window, how much of the
+conversation and scene history its architecture and memory budget let it hold onto at once,
+eventually forces it to lose track of earlier parts of a long mission, independent of how well it
+reasons about what it can still see. The second is a reasoning-quality problem: scoring a
+candidate action directly, in a single pass, is less reliable than first reasoning explicitly
+about why that action is or is not appropriate, and skipping that reasoning step is what produces
+a confidently stated plan that is simply wrong. The third is that the rover can encounter a scene
+it was never prepared for, one that no single faulty component causes but that the plan as a whole
+fails to account for.
+
+
+% ---------- E8b. Renumber "first problem" -> "second", liang2024introspective paragraph ----------
+% CURRENT, first sentence of the next paragraph:
+%   \citet{liang2024introspective} address the first problem by extending the conformal prediction procedure from Section~\ref{sec:clarification_lit} with a retrieval step. Rather than scoring each candidate plan from the LLM's raw confidence alone,
+% REPLACE WITH:
+
+\citet{liang2024introspective} address the second of these, the reasoning-quality problem, by
+extending the conformal prediction procedure from Section~\ref{sec:clarification_lit} with a
+retrieval step. Rather than scoring each candidate plan from the LLM's raw confidence alone,
+
+
+% ---------- E8c. Renumber "second problem" -> "third", AESOP/semantic-anomaly paragraph ----------
+% CURRENT:
+%   The second problem, an unanticipated scene rather than an unreliable plan,
+%   is addressed by \citet{sinha2024aesop} and \citet{elhafsi2023semantic} from the
+%    direction of runtime monitoring rather than planning.
+% REPLACE WITH:
+
+The third problem, an unanticipated scene rather than an unreliable plan,
+is addressed by \citet{sinha2024aesop} and \citet{elhafsi2023semantic} from the
+ direction of runtime monitoring rather than planning.
+
+
+% ---------- E8d. New gap statement for the un-addressed context-window problem ----------
+% INSERT in the Research Gap section (sec:gap), as a new paragraph. Current flow has
+% a paragraph ending "...is not addressed by either strand of work." followed by a
+% paragraph starting "Similarly, none of the planning or clarification methods...".
+% Insert the new paragraph BETWEEN those two.
+
+A related gap concerns compositional length directly. Section~\ref{sec:hallucination_lit}
+distinguished a model's context-window capacity, how much mission history it can hold onto at
+once, from the quality of its reasoning once given everything it needs. Introspective planning
+and the anomaly-detection methods in that section address the second; none address the first. How
+many steps a long-horizon command can be chained into before context-window capacity, rather than
+reasoning quality, becomes the limiting factor is not quantified by any of the work reviewed in
+this chapter.
+
+
+% ---------- E9. Awkward phrasing, closing paragraph of sec:hallucination_lit ----------
+% CURRENT:
+%   Together, these three methods extend the single-step clarification of
+%   Section~\ref{sec:clarification_lit} along a different axis: introspective planning
+%   improves the confidence estimate feeding a single decision, while AESOP and semantic anomaly
+%   detection catch failures a confidence score never gets the chance to be wrong about, because the
+%    plan itself is being carried out against a scene the planner misjudged.
+% REPLACE WITH:
+
+Together, these three methods extend the single-step clarification of
+Section~\ref{sec:clarification_lit} along a different axis: introspective planning sharpens the
+confidence estimate feeding a single decision, while AESOP and semantic anomaly detection catch a
+kind of failure a confidence score could never flag in the first place, because every individual
+decision can be scored with full confidence and still fail, when the scene being reasoned about is
+not the scene the planner assumed it was.
+
+
+% ---------- E10. STT section (sec:stt_lit): trim + lead with the solution + Fluister hedge ----------
+% REPLACE THE WHOLE SECTION, from "\mysection{Speech recognition for local languages}..."
+% down to (but not including) the following "\mysection{Research gap}...".
+
+\mysection{Speech recognition for local languages}{Speech recognition for South African English and Afrikaans}
+\label{sec:stt_lit}
+
+Every method discussed so far assumes the instruction $d_i$ handed to the LLM planner is already
+correct text. For a voice-commanded rover, that text comes from a speech-to-text stage first, and
+an error there becomes an error in the planner's input before any clarification mechanism gets a
+chance to act on it. South African English and Afrikaans are both under-represented in the
+training data of general-purpose speech recognisers, which makes this an upstream risk specific to
+a South African test environment.
+
+\citet{kamper2012multiaccent} quantify this cost directly: across five South African English
+accents, a single acoustic model shared across all accents performs about as well as one trained
+per accent (around 81.5\% word accuracy either way), while a multi-accent model that shares
+structure across accents but keeps accent-specific distinctions where they help reaches 82.8\%, a
+statistically significant improvement over both. Black South African English was the one accent
+that still benefited from being modelled separately, which the authors attribute to it being
+acoustically the most distinct of the five.
+
+\citet{jacobs2025afrikaans} report the same conclusion from a lower-resource direction:
+fine-tuning Whisper on Afrikaans and isiXhosa child speech with only five minutes of transcribed
+in-domain audio still gives a large accuracy gain, and that gain grows further when in-domain
+adult speech and voice-conversion-based data augmentation are added.
+
+Both results point the same way: off-the-shelf speech recognition degrades measurably on South
+African English and Afrikaans, and the literature's fix is not more general-purpose training data
+but a small amount of in-domain or in-accent fine-tuning, in the spirit of
+\texttt{digiphyte/fluister-turbo}, a faster-whisper checkpoint fine-tuned specifically for South
+African English and Afrikaans. Whether that advantage holds up against a larger general-purpose
+model in this project's own setting is not guaranteed by either result above: a full-weight
+multilingual Whisper model, run at a size the accent-specific checkpoint does not need to match,
+can still win on raw transcription accuracy even without any accent-specific tuning. This is a
+design constraint on the speech-to-text stage that sits upstream of every planning method
+discussed in Sections~\ref{sec:llm_planners} to~\ref{sec:hallucination_lit}, not something those
+methods can correct for after the fact, which is why this project evaluates the in-domain and
+general-purpose options against each other directly rather than assuming the literature's
+conclusion carries over unchanged.
+
