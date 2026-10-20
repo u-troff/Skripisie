@@ -1,0 +1,265 @@
+{
+  "session_id": "79dda711b02c",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "virtual",
+  "test_level": "L5",
+  "command": "Go to the couch, then the coffee table, then the desk, and finally the bookshelf.",
+  "resolved_command": "go to the couch, then the coffee table, then the desk, and finally the bookshelf",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The plan assumes that sequentially using 'approach' on subsequent targets (coffee table, desk, bookshelf) after reaching the previous one (couch) will successfully navigate between them, despite them all being listed as floor obstacles. 'Approach' is used to move close to each named object as requested by the command."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The plan assumes that sequentially using 'approach' on subsequent targets (coffee table, desk, bookshelf) after reaching the previous one (couch) will successfully navigate between them, despite them all being listed as floor obstacles. 'Approach' is used to move close to each named object as requested by the command."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.79
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.86
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.77
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.66
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "conditions": [],
+  "scan_looks": [],
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 3.08,
+    "per_step_s": [
+      0.79,
+      0.86,
+      0.77,
+      0.66
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 2,
+    "seed": 1971910010,
+    "steps": 4,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 9.143,
+    "sim_time_s": 59.461,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf"
+    ],
+    "final_pose": {
+      "x": 4.2,
+      "y": 1.0,
+      "theta": -71.57
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261020-173719.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 3,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot can only drive and look. The 'approach' action implies movement towards an obstacle (couch, coffee table, desk, bookshelf), and since the robot cannot pick up or touch anything, these movements are potentially fine, but the plan relies on an assumption about how 'approach' works sequentially without intermediate navigation/pathfinding between the targets. More critically, if the targets are considered obstacles for navigation (as they are listed under floor obstacles), a sequential 'approach' without checking for traversable paths is risky. Assuming 'approach' means driving close to but not *into* the object, the plan seems plausible based on the available actions (drive/look), but the strong assumption in the notes should be addressed.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 3.38,
+      "latency_mean_s": 1.69,
+      "prompt_tokens_total": 584,
+      "completion_tokens_total": 201,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 4.535,
+      "latency_mean_s": 2.268,
+      "prompt_tokens_total": 1061,
+      "completion_tokens_total": 320,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 3.08,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [],
+  "spoken_summary": "Command completed. Rover traveled 9.143 meters in 4 steps. The route was a single straight run."
+}

@@ -1,0 +1,177 @@
+{
+  "session_id": "7c7b296e35ff",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "virtual",
+  "test_level": "L5",
+  "command": "Go to the couch, then the coffee table, then the desk, then the bookshelf, then the door, then the window, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, and finally the window again.",
+  "resolved_command": "Go to the couch, then the coffee table, then the desk, then the bookshelf, then the door, then the window, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, then the window again, then the couch again, then the coffee table again, then the desk again, then the bookshelf again, then the door again, and finally the window again.",
+  "plan": {
+    "steps": [],
+    "notes": "planner returned unparseable output"
+  },
+  "confirmed_plan": {
+    "steps": [],
+    "notes": "planner returned unparseable output"
+  },
+  "plan_was_revised": false,
+  "steps": [],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "conditions": [],
+  "scan_looks": [],
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 0.0,
+    "per_step_s": [],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 41,
+    "seed": 1971910010,
+    "steps": 38,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 94.032,
+    "sim_time_s": 615.367,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf",
+      "door",
+      "window",
+      "couch",
+      "coffee table"
+    ],
+    "final_pose": {
+      "x": 2.5,
+      "y": 1.0,
+      "theta": -15.8
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261020-173719.jsonl"
+  },
+  "grounding": [],
+  "grounding_summary": {
+    "targets": [],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot can only drive and look. The plan consists entirely of 'approach' actions. While 'approach' might imply movement, without explicit 'move' or 'turn' commands, the sequence of approaches might not correctly navigate between the specified objects, especially since several are noted as floor obstacles. The plan also repeats the sequence of approaches many times, which is inefficient but technically possible if 'approach' implies navigating to the target from the current location.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 5.652,
+      "latency_mean_s": 2.826,
+      "prompt_tokens_total": 1618,
+      "completion_tokens_total": 444,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 18.792,
+      "latency_mean_s": 9.396,
+      "prompt_tokens_total": 1520,
+      "completion_tokens_total": 2080,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [],
+  "spoken_summary": "The mission outcome was completed. The rover took 38 steps, covering 94.032 meters. No obstacles were detected."
+}

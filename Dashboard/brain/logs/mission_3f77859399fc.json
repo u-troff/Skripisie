@@ -1,0 +1,265 @@
+{
+  "session_id": "3f77859399fc",
+  "outcome": "completed",
+  "model_tag": "planner=ollama/gemma4:e4b vlm=ollama/gemma4:e4b",
+  "local": true,
+  "rover": "virtual",
+  "test_level": "L5",
+  "command": "Go to the couch, then the coffee table, then the desk, and finally the bookshelf.",
+  "resolved_command": "go to the couch, then the coffee table, then the desk, and finally the bookshelf",
+  "plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The command required navigation to each object sequentially. Each 'approach' serves as the navigation step to the specified target."
+  },
+  "confirmed_plan": {
+    "steps": [
+      {
+        "id": 1,
+        "action": "approach",
+        "target": "couch"
+      },
+      {
+        "id": 2,
+        "action": "approach",
+        "target": "coffee table"
+      },
+      {
+        "id": 3,
+        "action": "approach",
+        "target": "desk"
+      },
+      {
+        "id": 4,
+        "action": "approach",
+        "target": "bookshelf"
+      }
+    ],
+    "notes": "The command required navigation to each object sequentially. Each 'approach' serves as the navigation step to the specified target."
+  },
+  "plan_was_revised": false,
+  "steps": [
+    {
+      "index": 0,
+      "action": "approach",
+      "target": "couch",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.78
+    },
+    {
+      "index": 1,
+      "action": "approach",
+      "target": "coffee table",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.86
+    },
+    {
+      "index": 2,
+      "action": "approach",
+      "target": "desk",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.77
+    },
+    {
+      "index": 3,
+      "action": "approach",
+      "target": "bookshelf",
+      "status": "ok",
+      "detail": null,
+      "elapsed_s": 0.66
+    }
+  ],
+  "checks": [],
+  "look_left": null,
+  "arrival": null,
+  "target_confirmed": null,
+  "bends": [],
+  "route_summary": "no bends taken; the route was a single straight run",
+  "approach_summary": null,
+  "looked": {},
+  "conditions": [],
+  "scan_looks": [],
+  "scene_id": "room:room_tour1",
+  "room_grounding": {
+    "known": [],
+    "seen": [],
+    "never_seen": [],
+    "unexpected": [],
+    "grounded": false
+  },
+  "sonar_obstacle_events": 0,
+  "rover_telemetry": {},
+  "digest": [],
+  "revisions": [],
+  "timings": {
+    "total_s": 3.07,
+    "per_step_s": [
+      0.78,
+      0.86,
+      0.77,
+      0.66
+    ],
+    "vlm_latency_mean_s": null,
+    "vlm_latency_max_s": null,
+    "checks_completed": 0,
+    "checks_skipped": 0,
+    "checks_failed": 0
+  },
+  "models": {
+    "planner": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "vlm": {
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "local": true
+    },
+    "planner_profile": {
+      "profile": "virtual",
+      "prompt_sha": "483f095654e4",
+      "actions": {
+        "approach": "go to a named thing in the room; the rover finds its own way around obstacles",
+        "move": "drive straight forward or backward by a distance, with no obstacle avoidance",
+        "turn": "rotate on the spot, left or right, by an angle",
+        "scan": "sweep the camera around without moving the base",
+        "observe": "turn to face a named thing and look at it",
+        "stop": "halt",
+        "report": "say what was found"
+      }
+    }
+  },
+  "rover_summary": {
+    "run": 3,
+    "seed": 1971910010,
+    "steps": 4,
+    "blocked": 0,
+    "hallucinations": 0,
+    "unresolved_targets": [],
+    "odometer_m": 9.143,
+    "sim_time_s": 59.461,
+    "collisions": 0,
+    "no_path_count": 0,
+    "visits": [
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf"
+    ],
+    "final_pose": {
+      "x": 4.2,
+      "y": 1.0,
+      "theta": -71.57
+    },
+    "trace": "C:\\Users\\Utroff\\OneDrive\\Desktop\\Skripsie\\Dashboard\\brain\\logs\\virtual_run_20261020-173719.jsonl"
+  },
+  "grounding": [
+    {
+      "step_id": 1,
+      "action": "approach",
+      "target": "couch",
+      "resolved": true,
+      "matched": "couch",
+      "how": "exact"
+    },
+    {
+      "step_id": 2,
+      "action": "approach",
+      "target": "coffee table",
+      "resolved": true,
+      "matched": "coffee table",
+      "how": "exact"
+    },
+    {
+      "step_id": 3,
+      "action": "approach",
+      "target": "desk",
+      "resolved": true,
+      "matched": "desk",
+      "how": "exact"
+    },
+    {
+      "step_id": 4,
+      "action": "approach",
+      "target": "bookshelf",
+      "resolved": true,
+      "matched": "bookshelf",
+      "how": "exact"
+    }
+  ],
+  "grounding_summary": {
+    "targets": [
+      "couch",
+      "coffee table",
+      "desk",
+      "bookshelf"
+    ],
+    "unresolved": [],
+    "out_of_vocab_actions": []
+  },
+  "dialogue": {
+    "turn_count": 0,
+    "capped": false,
+    "verified": false,
+    "concerns": "The robot is restricted to only driving and looking. The 'approach' action implies navigation toward an object, which is fine for driving, but since the robot cannot pick up or touch anything, the entire sequence seems permissible, *unless* 'approach' is interpreted as an action that requires interaction beyond simple navigation/viewing. Given the constraints, the plan only uses navigation towards objects. However, if 'approach' is interpreted as an action that requires a specific close-range interaction not covered by 'look', it might be a concern. Assuming 'approach' strictly means navigating to a location where the robot can then 'look' (which is not explicitly in the plan), the plan is structurally sound for navigation, but the overall goal might be incomplete. Since the prompt doesn't specify the ultimate goal, and the actions listed are within the allowed capabilities (driving to a spot), I will focus on feasibility. All targets are traversable, and the action is valid for a mobile robot. The plan is *logically* feasible based on the capabilities listed (driving/looking), but a 'look' action is missing after 'approach'. If 'approach' is sufficient to satisfy the mission intent, it is valid. I will flag it as false because the plan only approaches but never actually 'looks' at the items.",
+    "replan_count": 0
+  },
+  "usage_summary": {
+    "vlm": {
+      "calls": 2,
+      "latency_total_s": 5.522,
+      "latency_mean_s": 2.761,
+      "prompt_tokens_total": 617,
+      "completion_tokens_total": 330,
+      "cost_usd_total": null
+    },
+    "planner": {
+      "calls": 2,
+      "latency_total_s": 4.088,
+      "latency_mean_s": 2.044,
+      "prompt_tokens_total": 1183,
+      "completion_tokens_total": 315,
+      "cost_usd_total": null
+    }
+  },
+  "guidance_turns": 0,
+  "guidance_log": [],
+  "halt_reason": null,
+  "recovered": false,
+  "light_states": [
+    {
+      "t_rel_s": 0.0,
+      "state": "executing"
+    },
+    {
+      "t_rel_s": 3.07,
+      "state": "arrived"
+    }
+  ],
+  "uncertainties": [],
+  "spoken_summary": "The command sequence of couch, coffee table, desk, and bookshelf was completed. Total time taken was 3.07 seconds. The rover covered an odometer distance of 9.143 meters."
+}
