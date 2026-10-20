@@ -529,7 +529,8 @@ def _repeats_for(condition: str, override: Optional[int]) -> int:
 def _history_mean_wall(condition: str) -> Optional[float]:
     """Mean wall_clock_s for this condition across earlier sweep CSVs."""
     values = []
-    for path in (Path(__file__).parent / "sweeps").glob("sweep_*.csv"):
+    sweeps_dir = Path(__file__).parent / "sweeps"
+    for path in list(sweeps_dir.glob("sweep_*.csv")) + list(sweeps_dir.glob("ctx_*.csv")):
         try:
             with path.open(newline="", encoding="utf-8") as handle:
                 for row in csv.DictReader(handle):
@@ -537,7 +538,8 @@ def _history_mean_wall(condition: str) -> Optional[float]:
                         values.append(float(row["wall_clock_s"]))
         except (OSError, ValueError):
             continue
-    return statistics.mean(values) if values else None
+    return statistics.median(values) if values else None
+
 
 
 def _estimate(conditions: List[str], entries: List[dict], repeats: Optional[int]) -> None:
