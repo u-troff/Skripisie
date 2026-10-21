@@ -5,11 +5,84 @@
 \mysection{Answers to the research questions}{Answers to the Research Questions}
 \label{sec:answers}
 
+\paragraph{RQ1.} On the physical rover, the local pipeline handled levels 0 to 2
+without help in all ten runs, and levels 3 to 5 ended in a completed mission in
+11 of 13 runs (nine directly and two after guidance), with one run halted after
+guidance at level~3 and one aborted at level~4. Its main weakness at level~4 was
+dropping the condition in two of seven plans, and its main weakness at level~3
+was speech-to-text noise, which twice changed or lost the meaning of the
+command. Reliability at levels 3 to 5 is therefore supported by a handful of
+runs and should be reported as a demonstration of capability, not as a rate.
+The part of the design that earns its place is the guidance loop, which turned
+several runs that would have ended with `target not found' into completed
+missions.
+
+\paragraph{RQ2.} In the virtual tests no hallucinated step appeared at any
+depth tested, including the extended context sweep run out to 120 chained
+instructions. Across all 270 of those runs, the planner never substitutes a
+wrong object, location or action. Compositional depth does have a hard limit,
+but the failure mode is truncation, not hallucination. As seen from depth 40 onward,
+every run at every context setting tested (1024, 2048 and 8192 tokens) stops
+generating steps partway through an otherwise-correct plan, and none recovers
+at any depth up to 120. Context window size does not the outcome. 
+The smaller context settings produce a completely
+empty plan in roughly 40\% of deep runs, while the largest setting never does
+and sustains close to double the plan length on average. This points to a
+generation-length ceiling in the planner's own decoding behaviour rather than
+the model running out of context-window capacity to track the room and the
+command. Neither this truncation nor the silent dropping of unresolvable steps
+is caught by the pipeline at plan time. This argues for a capability and
+coverage check on the plan before departure as the most useful next
+improvement.
+
 \mysection{Contributions}{Contributions}
 \label{sec:contributions}
 
 \mysection{Limitations}{Limitations}
 \label{sec:limitations}
+
+\paragraph{Evidence base.} The evidence is one room, one rover, and three to
+seven runs per physical level. Level~5 was the least settled of the six. Looking at 
+its ten runs, three completed outright, three only completed after a guidance
+turn, and four halted or aborted. That is the most mixed result of any level,
+so I do not consider it adequately covered yet. The virtual tests has no odometry drift
+and use typed text, so they separate plan quality from perception and
+speech, and they are not directly comparable to the physical runs. The
+ultrasonic stop does not protect against low obstacles approached at an
+angle.
+
+\paragraph{Camera and lighting.} The camera, not the planner, was the weak
+point of the physical setup. Across levels~3 and~5, every halt with an
+operator note attached names poor lighting or low contrast as the reason. These were the following
+issues, a black bag invisible against a dark floor, an orange box blending into a
+cupboard door, a frame thrown out as too blurry because the room was too dim,
+and one run that only worked once the operator physically moved the target
+into better light. Level~5 shows this best: the plans themselves were judged
+good in every run I reviewed, and the failures were the vision model running
+out of usable light once the rover got close enough to need a fine judgement.
+This is a limitation of the webcam-and-lighting setup I tested with, not of
+the planning pipeline. A better-lit room, or a camera that actually works in
+low light, would probably fix most of it.
+
+\paragraph{Reference comparison scope.} The cloud-model comparison
+(Section~\ref{sec:cloud_comparison}) only covers the depth-1-to-12 virtual
+chains. It was never run on the depth-4-to-120 context sweep, and I never ran
+a cloud model on the physical rover. So the finding that a small local model
+matches a cloud model on correctness and latency only holds for short virtual
+chains. It says nothing about the compositional-depth ceiling, or about real
+perception and speech.
+
+\paragraph{Silent plan modification.} The probe chains showed that when a
+step can't be carried out, the pipeline's default behaviour is to just drop
+it from the plan without saying so: in all 9 cloud runs and 12 of 15 local
+runs, not one got flagged to the operator. None of those dropped steps was
+recorded as unresolved by the pipeline's own logging either
+(\texttt{probe\_logged} came back false every time), so right now the system
+has no way to tell a silently shortened plan apart from one that actually
+finished. That is as much a gap in my logging as it is in the plan itself,
+and it is the clearest concrete thing the capability check proposed under RQ2
+above should catch.
+
 
 \mysection{Recommendations for future work}{Recommendations for Future Work}
 \label{sec:future_work}

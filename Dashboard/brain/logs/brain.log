@@ -185161,3 +185161,4 @@ Respond ONLY with JSON: {"verified": true/false, "concerns": "..." or null}
 2026-10-20 18:44:45 INFO  brain.mission  [mission bb1ff1d0d814] end — completed
 2026-10-20 18:44:48 INFO  brain.report   [bench] role=planner stage=spoken_summary provider=ollama model=gemma4:e4b latency=2.232 prompt_tokens=1852 completion_tokens=28 cost_usd=
 2026-10-20 18:44:48 INFO  brain.mission  [mission bb1ff1d0d814] run log -> C:\Users\Utroff\OneDrive\Desktop\Skripsie\Dashboard\brain\logs\mission_bb1ff1d0d814.json
+2026-10-21 14:58:25 INFO  brain          logging to /Users/utroff/Desktop/Skripsie/Dashboard/brain/logs/brain.log
