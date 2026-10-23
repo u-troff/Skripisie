@@ -1,0 +1,150 @@
+% ============================================================
+% DRAFT — Appendix B: Graduate Attribute Outcome Compliance.
+%
+% Not something the framework spells out as mandatory text, but every
+% past report I could check (Wait 2020, Baas 2020, Theron 2025) has
+% exactly this appendix, and it's the easiest way to hand the examiner
+% a quick-reference tickbox. Required GAs, confirmed from your own
+% signed PE448 2026 framework PDF (Project E 448_2026_Framework_Eng_
+% signed.pdf): GA 1, 2, 3, 4, 5, 6, 8, 9. GA 7 is NOT on your module's
+% list -- don't add it, every reference report I checked also skips it.
+%
+% IMPORTANT things to check before you use this:
+%   1. Section references below are written as plain chapter/section
+%      NAMES, not \ref{} labels, because I don't have your final label
+%      names for Design/Implementation (and you're still restructuring
+%      those -- cutting Table 3.5, maybe merging the Hardware chapter).
+%      Swap each one for a real \ref{} once your structure is locked,
+%      or just leave them as prose if that's easier.
+%   2. GA 6 explicitly requires BOTH the written report AND a
+%      satisfactory oral exam, per the framework text ("GA 6: The
+%      project report (written communication) AND a satisfactory oral
+%      (oral communication)") -- that's different from GA 1-5/8/9,
+%      which the report alone can satisfy. Said explicitly below.
+%   3. GA 8 (Individual Work): I have NOT written a specific claim
+%      about your own use of AI tools in drafting this report -- that's
+%      a factual statement about your own process, not mine to write
+%      for you. I left a placeholder. Worth knowing: Theron's 2025
+%      report (one you just had me read) states this plainly in its
+%      own GA8 entry: "The use of AI tools was used to refine language
+%      in the report, but the content itself was done by the student."
+%      If that's roughly true for you too, say so in your own words --
+%      an honest, specific disclosure here is safer than silence,
+%      given how much drafting work has gone through this chat.
+%   4. GA 9: your own status notes (16 Sept) flagged this one as "still
+%      needs a project-specific draft" -- meaning you hadn't started it
+%      yet as of then. I've drafted a first pass below from what I know
+%      of the project, but check it's actually true to your experience.
+%   5. Every example report I read is specific -- it names actual
+%      libraries, algorithms and numbers, not generic claims. I've
+%      tried to match that (Ollama, Gemma 4 E4B, ROS2/rosbridge, the
+%      actual run counts) rather than write something generic that
+%      could apply to any project. Keep that specificity when you edit.
+%
+% This is a draft for review. Nothing here has been written into your
+% actual chapter/appendix files.
+% ============================================================
+
+\chapter{Graduate Attribute Outcome Compliance}
+\label{app:ga}
+
+All required ECSA exit-level outcomes were achieved while executing this
+project and writing this report. This section describes how each one was
+achieved, with references to where the evidence appears in the report.
+
+\section*{GA 1. Problem Solving}
+
+The core problem -- turning an ambiguous spoken command into a safe,
+executable plan for a resource-constrained rover -- is genuinely
+under-specified: commands range from a single literal action to a vague,
+multi-step request with no fixed target (Table~1.1, command levels L0--L5).
+I had to define my own taxonomy of command complexity and a bounded
+capability vocabulary to make the problem tractable at all (Chapter~1,
+Chapter~3 System Design). Solving it meant working within real constraints
+that forced creative compromises rather than textbook solutions: no onboard
+compute budget for a large model, an unreliable vision-based distance
+estimate that had to be abandoned mid-project in favour of a fixed hop
+length once testing showed it wasn't usable (Chapter~6, ``Distance from
+vision''), and a rover with no wheel encoders, which shaped the
+stop-look-hop and ultrasonic-gating approach (Chapter~3, Chapter~5).
+
+\section*{GA 2. Application of Scientific and Engineering Knowledge}
+
+Mathematics and statistics were used to define the correctness metrics used
+throughout Chapter~6 (\texttt{visits\_match}, \texttt{first\_divergence},
+per-depth and per-context breakdowns over 270 virtual runs). Sensor and
+control reasoning underpins the ultrasonic-stop threshold and the rejected
+vision-distance approach (Chapter~6, ``Executability on the Physical
+Chassis''). Computer science and machine learning fundamentals --
+prompt construction, local LLM inference behaviour, context-window
+capacity versus generation-length limits -- underpin the planner design
+and are reasoned about explicitly in Chapter~6 rather than assumed.
+
+\section*{GA 3. Engineering Design}
+
+The overall system architecture is a deliberate, justified design choice:
+compute-heavy planning and vision run on a laptop/desktop (``the brain''),
+while the TurboPi is treated as instrumentation only (Chapter~1 Background,
+Chapter~3, Figure~3.1 ``The compute split''). Alternatives were considered
+and explicitly rejected with reasons, not just assumed away: an onboard
+Jetson was rejected on cost/compute/generality grounds (Chapter~1); a
+variable hop length driven by the vision model's distance estimate was
+designed, tested, and then rejected once testing showed neither vision
+model gave a usable absolute distance (Chapter~6). Component-level design
+work includes the capability vocabulary, the multi-turn clarification state
+machine (Chapter~3, Figure~3.3), and the guidance/recovery loop
+(Chapter~3, Figure~3.4).
+
+\section*{GA 4. Investigations, Experiments and Data Analysis}
+
+Chapter~6 (Experimental Evaluation) is the primary evidence for this
+outcome. Two designed experiments were run: a physical command-level test
+across levels L0--L5 (41 tagged runs on the physical TurboPi), and a virtual
+compositional-depth sweep (depths 4 to 120, three context-window settings,
+270 runs in total). Every run was logged programmatically to CSV rather than
+assessed by eye, with defined outcome and correctness metrics stated in
+advance (Chapter~6, ``Evaluation Metrics''), and the results were analysed
+quantitatively: per-depth and per-context breakdowns, and an explicit
+comparison between the pipeline's own outcome label and the human
+operator's recorded verdict where the two disagreed.
+
+\section*{GA 5. Engineering Methods, Skills and Tools, Including Information
+Technology}
+
+The project required competent use of a wide tool stack: ROS2 (Humble)
+running inside Docker on the TurboPi, a FastAPI backend, local LLM serving
+via Ollama (Gemma~4~E4B as the primary planner and vision model, with
+Qwen2.5-VL~3B evaluated as an alternative), a React/TypeScript frontend, and
+a Python-based experiment harness for logging and analysing results.
+Limitations of these tools were recognised and reported rather than hidden
+-- for example, the open question of whether the Ollama server actually
+enforced a reduced \texttt{num\_ctx} setting is stated explicitly as an
+open item in Chapter~6, rather than silently assumed to be true.
+
+\section*{GA 6. Professional and Technical Communication}
+
+This outcome is demonstrated by the written report (this document) and by
+the internal oral examination, both of which are required by the module
+framework for this specific GA.
+
+\section*{GA 8. Individual Work}
+
+This project was completed through the work of an individual student,
+with input from my advisor limited to our scheduled weekly meetings.
+[[VERIFY -- state here, in your own words, your actual level of AI-tool
+use in drafting the report, following the honest-disclosure precedent set
+by other 2025 reports in this module.]]
+
+\section*{GA 9. Independent Learning Ability}
+
+The project required independent acquisition of knowledge well outside
+undergraduate coursework: working with ROS2 topics, services, and
+\texttt{rosbridge\_websocket} to drive the physical rover; understanding
+local LLM serving behaviour and context-window/generation-length limits
+well enough to design and interpret the depth sweep in Chapter~6; and
+reverse-engineering the TurboPi's own ROS2 node graph and service interface
+directly from its Docker image and source code, which was not documented
+for this use case anywhere I could find. None of this was fully specified
+in the original project brief and had to be learned independently over the
+course of the project (Chapter~2 Literature Review; Chapter~5
+Implementation).

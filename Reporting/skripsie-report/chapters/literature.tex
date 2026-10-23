@@ -2,6 +2,8 @@
 \mychapter{Literature Study}{Literature Study}{}
 \label{chap:literature}
 
+%max 7 pages
+
 \mysection{Language models as robot task planners}{Language Models as Robot Task Planners}
 \label{sec:llm_planners}
 
@@ -46,12 +48,7 @@ modification. This is where the model asks clarifying questions before committin
 passive modification, refining the plan afterwards against visual feedback. This is the most
 direct description of the clarification loop this project builds. Extending plan length by first
 closing the information gap in the command, rather than by making the underlying model larger or its skill library richer.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{figures/figure1.drawio.png}
-    \caption{Process overview of RAP generation before rover departures}
-    \label{fig:your_label}
-\end{figure}
+
 
 Last point Code as Policies'
 approach assumes a language model capable of writing correct, composable code against a rich API, which is a 
@@ -322,14 +319,12 @@ adult speech and voice-conversion-based data augmentation are added.
 
 Both results point the same way: off-the-shelf speech recognition degrades measurably on South
 African English and Afrikaans, and the literature's fix is not more general-purpose training data
-but a small amount of in-domain or in-accent fine-tuning, in the spirit of
-\texttt{digiphyte/fluister-turbo}, a faster-whisper model fine-tuned specifically for South
-African English and Afrikaans. This is a
-design constraint on the speech-to-text stage that sits upstream of every planning method
-discussed in Sections~\ref{sec:llm_planners} to~\ref{sec:hallucination_lit}, not something those
-methods can correct for after the fact, which is why this project evaluates the in-domain and
-general-purpose options against each other directly rather than assuming the literature's
-conclusion carries over unchanged.
+but a small amount of in-domain or in-accent fine-tuning. This is a design constraint on the
+speech-to-text stage that sits upstream of every planning method discussed in
+Sections~\ref{sec:llm_planners} to~\ref{sec:hallucination_lit}, not something those methods can
+correct for after the fact, which is why this project evaluates the in-domain and general-purpose
+options against each other directly rather than assuming the literature's conclusion carries over
+unchanged.
 \mysection{Research gap}{Research gap}
 \label{sec:gap}
 

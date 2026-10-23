@@ -1,0 +1,10 @@
+%!TEX root = ../thesis.tex
+\DeclareAcronym{llm}{short = LLM, long = large language model, alt = Large Language Model}
+\DeclareAcronym{vlm}{short = VLM, long = vision-language model, alt = Vision-Language Model}
+\DeclareAcronym{stt}{short = STT, long = speech-to-text, alt = Speech-to-Text}
+\DeclareAcronym{hri}{short = HRI, long = human-robot interaction, alt = Human-Robot Interaction}
+\DeclareAcronym{slam}{short = SLAM, long = simultaneous localisation and mapping}
+\DeclareAcronym{api}{short = API, long = application programming interface}
+\DeclareAcronym{fps}{short = FPS, long = frames per second}
+\DeclareAcronym{imu}{short = IMU, long = inertial measurement unit}
+\DeclareAcronym{cpu}{short = CPU, long = central processing unit}

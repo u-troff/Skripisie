@@ -1,0 +1,83 @@
+% ============================================================
+% DRAFT ONLY — do not merge automatically. Read this whole header,
+% then copy the REPLACE-WITH text into introduction.tex by hand.
+%
+% WHAT THIS IS FOR
+% I read the slide deck "ECSA - New GAs only.pdf" (the one you put in
+% "Skripsie/New GA's/"). It's a lecture deck from Prof Arnold Rix on
+% ECSA's revised Graduate Attribute (GA) definitions, explicitly flagged
+% as relevant to PE448 for GA 1-6, 8 and 9 (GA7, 10, 11 are not required
+% for PE448, same as before). The numbering of the GAs you already know
+% about hasn't changed — it's the WORDING/scope of each one that has.
+% The two shifts that actually land on your project, out of all nine:
+%
+% - GA5 (Use of engineering tools) used to be about using tools
+%   competently. The new wording explicitly adds "recognise limitations
+%   of appropriate techniques, resources and modern engineering and IT
+%   tools" — i.e. an engineer is now expected to know and show WHERE a
+%   tool breaks down, not just how to drive it. That is, almost word for
+%   word, what RQ1/RQ2 and your whole evaluation chapter already do:
+%   you're not just using a locally hosted LLM, you're mapping out
+%   exactly where its planning capability runs out (depth, context,
+%   lighting, etc).
+% - GA9 (Independent learning) now explicitly calls out "adaptability to
+%   new and emerging technologies" and research-literature engagement.
+%   Locally hosted LLM/VLM robotics is about as "emerging" as it gets,
+%   and you built the whole pipeline (ROS2 node graph reverse-engineered
+%   from no docs, Ollama serving, the depth sweep methodology) largely
+%   through your own independent reading rather than a taught module.
+%
+% I picked these two because they're the ones with a genuine, specific,
+% non-generic match to what your project actually does — I didn't want
+% to force-fit all seven required GAs into two sentences in the
+% Introduction (that's what Appendix B is for, and I've already drafted
+% that separately). If you'd rather anchor to different GAs here, tell
+% me which and I'll redo it.
+%
+% WHERE IT GOES: end of \mysection{Background}, right before
+% \mysection{Problem Statement and Research Questions} begins.
+% ============================================================
+
+% --- EDIT 1: insert new closing paragraph at the end of Background ---
+%
+% CURRENT (last paragraph of \mysection{Background}, ends with):
+%
+% Second, keeping inference off the rover and on a host machine that can run the same
+% planner locally or swap to a cloud API, is what makes the local-versus-cloud comparison closer to
+% apples-to-apples of model capability alone. If the rover itself hosted the model,
+% switching the benchmark to a cloud API would also change the hardware story and the not a fair comparison.
+% Third, it keeps the result general: the rover's own on-board computer, a Raspberry
+% Pi, only has to stream camera frames and relay drive and sensor commands over the local network.
+% Using the same rover would work unchanged with a different host machine entirely.
+%
+% \mysection{Problem Statement and Research Questions}{Problem Statement and Research Questions}
+% \label{sec:problem-statement}
+%
+% REPLACE WITH (same text, plus one new paragraph inserted before the
+% \mysection{Problem Statement...} line):
+%
+% Second, keeping inference off the rover and on a host machine that can run the same
+% planner locally or swap to a cloud API, is what makes the local-versus-cloud comparison closer to
+% apples-to-apples of model capability alone. If the rover itself hosted the model,
+% switching the benchmark to a cloud API would also change the hardware story and the not a fair comparison.
+% Third, it keeps the result general: the rover's own on-board computer, a Raspberry
+% Pi, only has to stream camera frames and relay drive and sensor commands over the local network.
+% Using the same rover would work unchanged with a different host machine entirely.
+%
+% This framing also lines up with ECSA's revised Graduate Attribute definitions for PE448: Graduate
+% Attribute 5 (Use of Engineering Tools) now explicitly requires an engineer to recognise the
+% limitations of the modern engineering and IT tools they apply, rather than only how to operate them,
+% which is exactly what RQ1 and RQ2 set out to do for a locally hosted LLM and VLM pipeline. Building
+% and evaluating that pipeline from scratch, with no existing local reference implementation to follow,
+% also draws directly on Graduate Attribute 9 (Independent Learning Ability), in its updated emphasis
+% on adapting to new and emerging technologies.
+%
+% \mysection{Problem Statement and Research Questions}{Problem Statement and Research Questions}
+% \label{sec:problem-statement}
+%
+% ============================================================
+% That's the only change in this file. Brace count below is for the
+% inserted paragraph alone (it's plain prose, no macros that open a
+% brace without closing it on the same line, so this should be 0/0 —
+% checked anyway against the convention).
+% ============================================================

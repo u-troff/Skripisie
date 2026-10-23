@@ -1,0 +1,76 @@
+% ============================================================
+% DRAFT — Appendix A: Project Planning Schedule.
+%
+% The PE448 2026 framework explicitly requires this ("Compile a
+% planning schedule (Appendix A in project report) for the project"),
+% and your own earlier status note already said this appendix is
+% missing from your current draft. Two formats are both used in past
+% Skripsie reports: a literal visual Gantt chart (e.g. DuPlessis 2020,
+% just an inserted image/figure), or a week-by-week text table (e.g.
+% Wait 2020, and the Theron 2025 report you just had me read). I've
+% drafted the table version below because I have your real dates for
+% it (from the six-week plan in the project's own status notes) and a
+% table compiles with no extra packages. If you'd rather have an
+% actual Gantt chart image instead, say so and I can build one
+% (pgfgantt in LaTeX, or a plotted image you embed) from the same
+% underlying dates -- just tell me which you want.
+%
+% Dates below come directly from your own project status notes
+% (6-week shape, Sept-Oct 2026) and the PE448 2026 framework's fixed
+% deadlines. The weekly goals are paraphrased from what actually
+% happened/was planned, not invented -- but you know the ground truth
+% better than I do, so check these against what you actually did,
+% especially for the later weeks which were still "planned" rather
+% than "done" as of the status note's date (16 Sept).
+%
+% This is a draft for review. Nothing here has been written into your
+% actual chapter/appendix files.
+% ============================================================
+
+\chapter{Project Planning Schedule}
+\label{app:planning}
+
+The first meeting with my advisor took place at the start of the second
+semester, where the project topic and scope were discussed and finalised.
+Table~\ref{tab:planning} shows how the goals of the project were set out to
+be completed.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Project Planning Schedule.}
+    \label{tab:planning}
+    \begin{tabular}{p{3.2cm}p{9.5cm}}
+        \toprule
+        Time Frame & Planned Goals \\
+        \midrule
+        16--22 Sep 2026 & Bench hardware sanity checks on the TurboPi: confirm
+        full ROS2 bring-up, end-to-end motor control, and resolve the camera
+        frame-rate issue caused by its auto-exposure behaviour in low light. \\
+        \addlinespace
+        23--29 Sep 2026 & Finish the physical rover controller (drive and
+        camera), wire in line-following, and get the first full
+        voice-to-drive-to-report loop working on the simplest command level. \\
+        \addlinespace
+        30 Sep--6 Oct 2026 & Harden the physical integration (line lost/
+        regained, ultrasonic obstacle stop, multi-waypoint routes); draft the
+        Implementation chapter. \\
+        \addlinespace
+        7--13 Oct 2026 & Run the full experiment battery: the physical command
+        levels (L0--L5) and the virtual compositional-depth sweep; generate
+        trace and result figures. \\
+        \addlinespace
+        14--20 Oct 2026 & Write the Evaluation and Conclusion chapters;
+        consistency pass on the Introduction and Literature Review. \\
+        \addlinespace
+        21--27 Oct 2026 & Full report compile and proofreading pass; draft the
+        poster and oral presentation outline. \\
+        \addlinespace
+        28--30 Oct 2026 & Final editing and formatting pass; report submission
+        (hand-in deadline 30 October 2026, 23:59). \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Oral presentations and the internal examination take place 6--13 November
+2026, followed by the project open day (poster presentation and external
+moderator interviews) on 18 November 2026.

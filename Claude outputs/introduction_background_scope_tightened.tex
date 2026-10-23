@@ -1,0 +1,145 @@
+% ============================================================
+% DRAFT ONLY — not meant to compile, nothing \input's this file.
+% This supersedes introduction_new_GAs_addition.tex — the GA
+% paragraph is folded into the tightened Background below, so just
+% use this file now and ignore that one.
+%
+% WHAT THIS IS: full replacement text for \mysection{Background} and
+% \mysection{Scope and Limitations} in introduction.tex, tightened per
+% your request. Lines starting with % are my notes/the CURRENT text
+% for reference — DO NOT paste those. Lines with no % prefix are the
+% REPLACE-WITH text — paste those in directly, paragraph breaks as
+% shown.
+%
+% What changed and why, so nothing feels like it vanished on you:
+% - Background: cut restatement (the "every command sent... every
+%   camera frame..." privacy point was made twice back to back — now
+%   once), merged the Jetson rejection from four numbered "reasons"
+%   down to three real ones stated once each instead of twice, and
+%   folded in the new-GA paragraph (GA5/GA9) we drafted earlier so you
+%   only have one file to paste from. Nothing was deleted that wasn't
+%   a repeat of something still there.
+% - Scope and Limitations: same approach — merged two of the six
+%   paragraphs that were both just "X is out of scope" with their own
+%   throat-clearing into one paragraph, and fixed a few grammar slips
+%   ("does not perform no part", "Rather than guaranteeing" as a
+%   stray sentence fragment) while I was in there.
+% - Section headers and \label{} lines are UNCHANGED — only the body
+%   paragraphs underneath them are replaced.
+% ============================================================
+
+
+% ---------------- BACKGROUND ----------------
+% CURRENT: everything under \mysection{Background}{Background} /
+% \label{sec:background}, i.e. all paragraphs up to (not including)
+% \mysection{Problem Statement and Research Questions}.
+%
+% REPLACE WITH (paste as the full body of the Background section):
+
+A robot that takes spoken instructions removes two obstacles that make most mobile robots
+difficult to operate day to day: a screen to navigate on, and an operator trained on its
+command set. This matters even more for a small indoor rover, since tasks such as checking
+whether a door is open or looking at what is on a shelf are exactly the kind of thing a person
+would rather say out loud than type into an application.
+
+\Acp{llm} are transformer-based neural networks trained on large collections of text to predict
+the next word given what came before, which makes them well suited to interpreting everyday
+instructions and gives them a broad general-knowledge base. Given a natural-language command
+and a description of what a robot can do, an \ac{llm} can break the command into a sequence of
+simple actions, a \ac{robotactionprimitive} (RAP), built only from actions the robot can
+actually perform, without a developer hand-coding a fixed list of recognised
+phrases~\cite{ahn2022saycan}. Ambiguous commands can be resolved the same way, through
+clarifying questions: when a command leaves out information, the model asks the user
+follow-up questions before committing to a plan. This back-and-forth is referred to in this
+report as a \emph{multi-turn dialogue}~\cite{hori2025longhorizon}.
+
+Handing planning to a language model introduces two problems. Spoken commands are often
+ambiguous, and a system that always acts on its first interpretation will act on the wrong one
+often enough to matter~\cite{ren2023knowno}. Language models also hallucinate: they produce
+fluent, confident output that does not correspond to anything real, and this becomes more
+likely as a task is broken into more steps~\cite{liang2024introspective}. The techniques that
+catches ambiguity or hallucination before a plan is set can also run while the plan is carried
+out, by monitoring the robot's observations for signs that something has gone
+wrong~\cite{sinha2024aesop, elhafsi2023semantic}.
+
+Systems that demonstrate these techniques typically rely on large cloud-hosted models and
+robots with rich sensing such as \acs{lidar}, an \ac{imu} and wheel encoders. Both assumptions
+are reasonable in a research laboratory, but do not hold in every setting where a
+voice-commanded robot would be useful.
+
+A private home is one such setting. Every command sent to a cloud-hosted model, and every
+camera frame used to check progress, leaves the home for a third party's server — unacceptable
+to many households for a device that moves through their living space and records it. A home
+robot also has to be affordable, which rules out \acs{lidar} and a powerful on-board computer,
+leaving a camera as the most practical sensor. Low-cost drive platforms also typically lack
+wheel encoders and an \ac{imu}, and slip enough that a command such as `drive forward one
+metre' cannot be trusted to be carried out accurately. In this setting the language models
+must run on hardware the household already owns, such as a desktop with a consumer graphics
+card, and the robot must rely on its camera to know whether its plan is working. Where privacy
+is not a concern and a reliable connection is available, a cloud-hosted model remains the
+better choice, since it is larger and more capable than anything that fits on consumer
+hardware.
+
+An alternative would be to mount a dedicated embedded AI accelerator, such as an NVIDIA Jetson
+Orin Nano or Orin NX, directly on the rover and run the whole pipeline on board. This project
+deliberately does not do that. First, the home-robot framing above assumes the household
+already owns the compute the system needs, in the form of a desktop or laptop. This requires a
+separate accelerator module reintroduces exactly the extra, specialised hardware cost this
+project is trying to avoid. Second, keeping inference off the rover, on a host machine that can
+run the same planner locally or swap to a cloud API, keeps the local-versus-cloud comparison
+closer to apples-to-apples on model capability alone. If the rover itself hosted the model,
+switching the benchmark to a cloud API would also change the hardware story. Third, it keeps
+the result general: the rover's own on-board computer, a Raspberry Pi, only has to stream
+camera frames and relay drive and sensor commands over the local network, so the same rover
+would work unchanged with a different host machine entirely.
+
+This framing also lines up with Graduate Attribute 5 (Use of Engineering Tools), which shows the
+limitations of the modern engineering and IT tools applied to a problem, not just how to
+operate them. Exactly what RQ1 and RQ2 set out to do for a locally hosted LLM and VLM
+pipeline. Building that pipeline from scratch, with no existing local reference implementation
+to follow, also draws on Graduate Attribute 9 (Independent Learning Ability), in its new
+emphasis on adapting to emerging technologies.
+
+
+% ---------------- SCOPE AND LIMITATIONS ----------------
+% CURRENT: everything under \mysection{Scope and Limitations}{Scope
+% and Limitations} / \label{sec:scope-and-limitations}, i.e. all
+% paragraphs up to (not including) \mysection{Report Outline}.
+%
+% REPLACE WITH (paste as the full body of Scope and Limitations):
+
+This project is concerned with turning vague spoken commands into robot action plans, so its
+scope is limited to the pipeline from speech to executed plan: transcription, clarification of
+ambiguous commands through spoken dialogue, plan generation and verification, and the spoken
+confirmation step. Navigation is used only to carry out and test the plans; improving
+navigation itself is not an aim of this project.
+
+Before the rover is used in a room, the room is recorded once in a short walkthrough video,
+which a \ac{vlm} describes frame by frame to produce a written summary of the objects present
+and their layout. This summary is given to the planner, so plans refer only to things that are
+actually present, and selected frames are stored alongside their descriptions as a reference
+set that the rover's live camera frames are compared against during a mission. The scan is not
+turned into a three-dimensional model or map; building a general-purpose mapping system is
+outside this project's scope.
+
+Cloud-hosted models are used only as a benchmark for the locally hosted pipeline and are not
+part of the system under test. The rover itself is deliberately limited to a camera, an
+ultrasonic distance sensor and a line sensor, with no wheel encoders, \ac{imu} or \acs{lidar}. This
+reflects the low-cost home robot described in Section~\ref{sec:background} and forces the
+pipeline to rely on the camera to judge whether a plan is succeeding. As a result, movement is carried out without precise measurement of
+distance or heading, and commands requiring distances beyond what the ultrasonic sensor can
+measure are not supported.
+
+In the same spirit, the rover's own on-board computer is treated as instrumentation rather
+than part of the system under test: it streams camera frames to the host machine and relays
+back the drive and sensor commands it receives, performing none of the planning, perception or
+clarification itself. The language and vision models that answer RQ1 and RQ2 run on the host
+machine defined in Section~\ref{sec:background}, so both questions probe those models'
+capability on fixed, known hardware rather than being confounded by whatever embedded computer
+happens to be fitted to the rover.
+
+Similarly, the system is not designed to operate in arbitrary rooms or with arbitrary commands:
+evaluation is limited to a small number of test rooms and a fixed set of commands at each level
+in Table~\ref{tab:command-levels}, sufficient to answer RQ1 and RQ2. The results describe the
+pipeline's behaviour on the cases tested, not a guarantee of its performance in other rooms or
+with other commands.

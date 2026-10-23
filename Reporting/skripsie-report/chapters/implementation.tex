@@ -13,6 +13,8 @@
 }
 
 
+%can be max 10 pages
+
 In the design chapter (Chapter~\ref{chap:design}), we went over what each pat of the pipeline does at a higher level. The following chapter
 says how each of these part is actually built: the libraries, the process, layout, the message formats and how design decisions were turned instrumentation
 code. There re no specific numbers references in the design chapter. The implementation chapter is where values are defined and implemented.
@@ -52,7 +54,7 @@ will load the PiperVoice model once and keep it as a callable instance. Piper's 
 model is. Initially I had to download the voice using: \texttt{python -m piper.\allowbreak download\_voices
 en\_US-\allowbreak lessac-medium}. Then point the environment variable at the \texttt{.onnx} file as well as its \texttt{.onnx.json} config file. There is no 
 Afrikaanse voice available so the models were only configured in english. 
-
+%can remove this one
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig5_2_flow_tts.png}
@@ -75,7 +77,7 @@ Every provider creation is cached by (role, provider, model), so a planner can b
 environment variable (\texttt{PLANNER\_PROVIDER}, \texttt{VLM\_PROVIDER}), not a code change. This stays in-tune with my modular design so testing different local models comes with ease.
 
 
-
+%make sense and needs to stay make more prety
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig5_3_providers.png}
@@ -91,17 +93,18 @@ the same tokens. \texttt{build\_plan\_prompt} function assembles a prompt form t
 one is loaded, and the conditioanl guidance block when the command contains a conditional word (Section~\ref{sec:condional}). A pure function which is seperate 
 from \texttt{generate\_plan}. The following \texttt{tools/snapshot\_ptompt.py}, can print out the exact prompt a command would produce without calling a model.
 
+%add a start button above it  
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig5_4_flow_planner.png}
-  \caption{\texttt{generate\_plan}. A smaller model sometimes writes a step as a bare string instead of an object, or nests the list oddly, so every step is checked before anything downstream calls \texttt{.get} on it. \texttt{\_promote\_moves\_to\_approach} rewrites a \texttt{move} step whose target names an object into an \texttt{approach} step (Section~\ref{sec:vocabulary}); the retried transient failures from \texttt{provider.complete()} are omitted here for space and described in the text above.}
+  \caption{\texttt{generate\_plan} function flow. }
   \label{fig:flow-planner}
 \end{figure}
 
 Having a look inside the Failure recovery (Section~\ref(ssec:guidance_loop)). There is an second prompt which is built using what 
-we created called, \texttt{build\_replan\_prompt}, as well as a second ebntry point, \texttt{replan\_from\_state} used instead of 
-using a parameter on \texttt{generate\_plan}. Since a replan is built from thee command as well s the steps which have been executed as
-well as the steps which failed and why it failed. 
+we created called, \texttt{build\_replan\_prompt}, as well as a second entry point, \texttt{replan\_from\_state} used instead of 
+using a parameter on \texttt{generate\_plan}. Since a replan is built from the command, the steps which have been executed, the steps which failed and why it failed. 
 
 \mysubsection{Vision-language verification}{Vision-language Verification}
 \label{sec:vlm}
@@ -113,20 +116,20 @@ the \texttt{\_ask} function to execute that step. The single purpose prompts are
 \texttt{describe\_frame}, \texttt{inventory\_frame}, \texttt{locate\_target},
 \texttt{check\_condition} and \texttt{survey\_frame}. None of the prompts used follows a particular template as this can results in
 the answer from the model having extra fields which are not intended.
-
+% this is in the wrong place 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig5_5_flow_vlm.png}
-  \caption{\texttt{\_ask}. Salvage is only enabled for \texttt{inventory\_frame} and \texttt{survey\_frame}, the two calls that ask for a list of objects and sometimes hit \texttt{num\_predict} mid-list on a model that has started repeating itself; a reply with ten correct objects and one truncated one is more useful than discarding it. Every other call keeps \texttt{salvage=False}, since a truncated yes/no answer or bounding box is not something a partial parse can safely recover.}
+  \caption{\texttt{\_ask} functionality}
   \label{fig:flow-vlm}
 \end{figure}
 
 
 The \texttt{locate\_target} has the most moving parts. It is called once per cycle in the free-roam approach (Section~\ref{ssec:freeroam}).
 The prompt asks the VLM for a bounding box, how confident it is in it's answer and how far away the object is. Using \texttt{distance\_cm\_from}
-it converts whichever unit the model used inot centimetres, or if it fails it returns \texttt{None}. Any distance estimate that falls outside of
+it converts whichever unit the model used into centimetres, or if it fails it returns \texttt{None}. Any distance estimate that falls outside of
 \((0,\;\texttt{VLM\_DIST\_MAX\_CM}]\), including a \texttt{NaN}, is also treated as if it were \texttt{None}. Any value that the model outputs is handled the 
-same way. Since a model this small is small the predictions can be slightly incorrect
+same way. These small parameter model tend to have bad predictions
 
 \mysection{Clarification and mission orchestration}{Clarification and Mission Orchestration}
 \label{sec:orchestration}
@@ -145,7 +148,7 @@ worker threads.This would result in flags being set errouneously.
 
 \texttt{effective\_command} helps to remove all the noise in the raw logs. Now the reason for there is three checks for the command 
 at different stages. The resolved command once the vision model has written one, the orginal command spoken if the dialogue sessions reaches
-its cap and the current command with the dialgue after all the clarification questions. Using only 1 function to update the command resulted in
+its cap and the current command with the dialogue after all the clarification questions. Using only 1 function to update the command resulted in
 the dashboard, the planner and the logs always having the same updated command.
 
 
@@ -154,17 +157,17 @@ The confirmation file has a smaller state machine inside of \texttt{confirmation
 Since its only job is to turn whatever was said into a yes, no or unclear output. The \texttt{keyword\_pass} function checks the reply given again English and an
 Afrikaans phrase list. The rejected list is check first so a phrase like 'no, don't go'. Is not classified as 'yes' to go. This part of the pipeline does not
 need a model to interpret what it should do. Since either the rover should go, 'yes',  or It should stay, 'no'.
-
+%need to fix this so that it read as left to right
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig5_6_flow_clarify.png}
-  \caption{\texttt{\_advance\_to\_confirmation}, one turn of the clarification loop. The repeat-question check exists because a model that cannot think of anything new to ask would otherwise repeat the same question until the five-turn cap was reached, rather than giving up as soon as it had nothing left to add.}
+  \caption{\texttt{\_advance\_to\_confirmation} functionality, only one turn of the clarification loop. }
   \label{fig:flow-clarify}
 \end{figure}
 
 
 Once the back and forth dialogue between the rover and the human is done. The \texttt{DialogueSession} 
-hands the mission state off to \texttt{MissionSession}. Once that is complete the rover is no in a new state of
+hands the mission state off to \texttt{MissionSession}. Once that is complete the rover is now in a new state of
 executing and will only communicate back to the user if it needs help with guidance or if it has arrived. The state
 machine at play here is mission phases. 
 
@@ -175,7 +178,7 @@ machine at play here is mission phases.
 Once the plan is confirmed, \texttt{run\_mission} is one function that drives the rover, one step at a time, 
 until the mission reaches its terminal phase or it ran out of approach steps. This is kept as one function for
 simplicty since if it was written in a class with multiple methods it would complicate it more. It does 4 things in
-a loop. Read the cursor, run one step, decide what the results mean and move to the next step. If it was written in a 
+a loop. Read where the cursor is currently, run one step, decide what the results mean and move to the next step. If it was written in a 
 class it would mean passing in the arguements between different methods and that would be more debugging work.
 
 Which function actually runs a step depends on what the step is and on
@@ -196,7 +199,7 @@ a camera that it can pan and trying to code that would not solve our initial pro
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig_mission_loop.png}
-  \caption{\texttt{run\_mission}'s step loop. The conditional-tag check is what Section~\ref{sec:conditional} relies on: the planner only decides which steps carry a \texttt{when} tag, and this check is what honours it. The loop's own \texttt{finally} block (not shown) writes the report for every non-aborted outcome; an operator-triggered \texttt{asyncio.CancelledError} skips straight to \texttt{rover.halt()} instead.}
+  \caption{\texttt{run\_mission}'s step loop. The flow diagram describes the full loop the robot runs in one mission. }
   \label{fig:flow-mission}
 \end{figure}
 
@@ -218,7 +221,7 @@ builds a question from a fixed template keyed on the failure reason  (\texttt{ta
 generic fallback) and it asks the user up to 3 times on what its next steps are. The questions for guidance are templated and not generated
 by a model for the simple fact that the model might have planned incorrectly so it is not a good idea to ask the source of the error why It
 has stopped. This makes it predictable to know that the rover is lost and needs the actual steps to get to its target.
-
+%this is not in the correct place it is in mid mission revision sections
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig5_8_flow_guidance.png}
@@ -236,7 +239,7 @@ calls to a bigger model. The VLM is not asked to look at every single frame. thi
 frames is higher than the rate at which the VLM can process images. The three tiers in Figure~\ref{fig:flow-revision} let cheap, local checks
 filter out the frames which are very similar and the VLM can prioritize the frames which are unique.
 
-
+%this figure is also lower than it shoiuld be
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig_perception_tiers.png}
@@ -278,7 +281,7 @@ gimbal. It also opents two ROS2 services to access \texttt{/line\_follow/cmd} an
 node rather than reimplementing line following from scratch. 
 
 
-
+%In the correct spot but missing 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig5_10_flow_followline.png}
@@ -298,7 +301,7 @@ like drive forward, or turn right. The approach step hands over the target to th
 rover and expects it to work out how to get there, while a \texttt{move} and \texttt{turn} step only 
 hands over a specific distance or angle.
 
-Both halves read from the same OccupancyGrid (nav.py), built once per room with the rover's footprint 
+Both halves read from the same OccupancyGrid (nav.py), built once per room with the rover's 
 clearance baked in, so the planner and the collision checker can never silently disagree about what's free.
 
 \begin{figure}[htbp]
@@ -359,13 +362,11 @@ the dashboard's Logs page reads from. There is a small \texttt{/logs/\{session\_
 endpoint that lets an operator mark a run good, bad
 or for review with a note
 
-The dashboard is a React and TypeScript single-page app, a thin client over
-these same endpoints, and it holds no logic of its own that the evaluation
+The dashboard is a React and TypeScript single-page app and it holds no logic of its own that the evaluation
 depends on, every number Chapter~\ref{chap:evaluation} reports comes from
 the JSON logs, never from anything the UI computed on its own. It is a debugging and
 demonstration tool and nothing more. Something that lets me upload a room
-walkthrough video, watch a dialogue and a mission happen panel by panel,
-and drive the rover manually, all without needing a terminal open
+walkthrough video, watch a dialogue and a mission happen in real time.
 
 \mysection{Logging and measurement instrumentation}{Logging and Measurement Instrumentation}
 \label{sec:logging}
@@ -373,15 +374,15 @@ and drive the rover manually, all without needing a terminal open
 
 There are two logging methods used here. The \texttt{brain.log} is a conventional application log, written
 through Python's \texttt{logging} module,interleaving every call in time
-order with full prompts and raw model output at debug level. Then we have the run log, one JSON file per executed mission.
-This is the run log our evaluaiton secition gets the information it needs. The \texttt{report.py} file assembles: he plan, every check and its
+order with full prompts and raw model output for debugging. Then we have the run log, one JSON file per executed mission.
+This is the run log our evaluaiton secition gets the information it needs. The \texttt{report.py} file assembles: the plan, every check and its
 result, the guidance log, the light-state timeline, the model tag for both
 roles, and a tagged \texttt{test\_level} when one is set.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{figures/fig5_13_flow_outcome.png}
-  \caption{\texttt{report.py}'s outcome classification. A mission that needed at least one guidance turn is never reported as a plain \texttt{completed}, even if it finished, because the distinction between a clean run and a recovered one (Section~\ref{sec:recovery}) is exactly what RQ1 needs to see; \texttt{recovered} only counts a run that actually reached its target afterwards, not merely one that ended without halting.}
+  \caption{\texttt{report.py}'s outcome classification. A mission that needed at least one guidance turn is never reported as a plain \texttt{completed}.}
   \label{fig:flow-outcome}
 \end{figure}
 
@@ -392,7 +393,6 @@ A separate, offline tool, \texttt{tools/context\_budget.py}, measures something 
 its own cannot. How many tokens a given prompt would cost before it is
 ever actually sent to a model. If you  ask ollama for the \texttt{prompt\_eval\_count} and send in a prompt with
 the parameter \texttt{num\_predict=1}. It counts the tokens the
-model would have to read without paying for a real generation afterward. It can measure the fixed instructions, t
-he room digest, one clarification turn
+model would have to read without paying for a real generation afterward. It can measure the fixed instructions, the room digest, one clarification turn
 and one recovery turn separately. This allows you to see a prompt's
 token budget is actually going before running a mission to see if it would fail.

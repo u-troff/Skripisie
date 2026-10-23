@@ -1,5 +1,5 @@
 %!TEX root = ../thesis.tex
-
+%max 10 pages
 
 \mychapter{System Design}{System Design}{}
 \label{chap:design}
@@ -35,24 +35,24 @@ Sections~\ref{sec:objectives}.
   \small
   \begin{tabular}{@{}l p{9.4cm} l@{}}
     \toprule
-    ID & Requirement & Objective \\
+    ID & Requirement  \\
     \midrule
-    FR1 & Take the command by voice and transcribe it locally. & 2 \\
-    FR2 & Before planning, check the command against the room and ask the person a spoken question when the command is ambiguous, up to a fixed number of questions. & 4 \\
-    FR3 & Produce a plan that uses only actions the rover has and objects the room contains. & 3, 5 \\
-    FR4 & Read the plan back and move only after a spoken confirmation. A rejection must lead back to the dialogue, not end it. & 4 \\
-    FR5 & Carry out the plan one step at a time, if a obstacle is in the rovers way it should stop without consulting a model. & 1, 3 \\
-    FR6 & Use the camera to check progress and arrival during a step. & 5 \\
-    FR7 & Report the outcome of the rover if it completed the steps and if it was unsure about anything. & 4, 7 \\
-    FR8 & When a step fails, ask the person what to do next and carry on from where the rover is. This is for failure only, never for ambiguity. & 4 \\
-    FR9 & Log every model call and decision made to help with debugging. & 6, 7, 8 \\
-    FR10 & When a command contains a condition, look once to decide it, run only the matching steps, and ask the person when the camera cannot tell. Never guess a branch. & 3, 7 \\
-    FR11 & When the person asks what is near a target, report what is around it and not only whether the target was reached. & 3, 5 \\
-    NR1 & Run planning, vision and speech on consumer grade hardware, e.g. a Ryzen 5 3600 with 16\,GB RAM and a 12\,GB GPU. Cloud models are allowed only as a benchmark. & 9 \\
-    NR2 & Keep the rover stoppable when the network or a model is slow or gone. & 1 \\
-    NR3 & Use only a camera, an ultrasonic sensor and a line sensor. No encoders, IMU or lidar. & 1 \\
-    NR4 & Let the planner or vision model be swapped by configuration, with no change to the pipeline code. & 9 \\
-    NR5 & Show the person what state the rover is in without a screen, using onboard lights& 4 \\
+    FR1 & Take the command by voice and transcribe it locally. \\
+    FR2 & Before planning, check the command against the room and ask the person a spoken question when the command is ambiguous, up to a fixed number of questions. \\
+    FR3 & Produce a plan that uses only actions the rover has and objects the room contains. \\
+    FR4 & Read the plan back and move only after a spoken confirmation. A rejection must lead back to the dialogue, not end it. \\
+    FR5 & Carry out the plan one step at a time, if a obstacle is in the rovers way it should stop without consulting a model. \\
+    FR6 & Use the camera to check progress and arrival during a step. \\
+    FR7 & Report the outcome of the rover if it completed the steps and if it was unsure about anything. \\
+    FR8 & When a step fails, ask the person what to do next and carry on from where the rover is. This is for failure only, never for ambiguity. \\
+    FR9 & Log every model call and decision made to help with debugging. \\
+    FR10 & When a command contains a condition, look once to decide it, run only the matching steps, and ask the person when the camera cannot tell. Never guess a branch. \\
+    FR11 & When the person asks what is near a target, report what is around it and not only whether the target was reached. \\
+    NR1 & Run planning, vision and speech on consumer grade hardware, e.g. a Ryzen 5 3600 with 16\,GB RAM and a 12\,GB GPU. Cloud models are allowed only as a benchmark. \\
+    NR2 & Keep the rover stoppable when the network or a model is slow or gone. \\
+    NR3 & Use only a camera, an ultrasonic sensor and a line sensor. No encoders, IMU or lidar. \\
+    NR4 & Let the planner or vision model be swapped by configuration, with no change to the pipeline code. \\
+    NR5 & Show the person what state the rover is in without a screen, using onboard lights\\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -175,7 +175,7 @@ cannot occur in a closed loop.
 Instead there is a reactive layer on the turboPi itself, that came stock with it. It reads the sonar at 10-30\,Hz
 and stop the rover if something is in the way. It also follows a line from the IR array uder the rover without consulting 
 the models. The actual decision making engine runs on the brain at a pace  of the models and hardware. It chooses the next steps,
-deciddes whether the rover has arrived at the desired destination. Where the closed loop system occurs is at 
+decides whether the rover has arrived at the desired destination. Where the closed loop system occurs is at 
 every step boundary and at distinctive times during the rovers runs. 
 
 The reason it is design like this is because the rover never relies on the vision model to make a immediate decision on when to stop
@@ -595,38 +595,3 @@ If the rover try to execute a command outside of its vocabulary. The spoken summ
 The log file is not only important for debugging but also for the Chapter~\ref{chap:evaluation}, which is why FR9 is a requirement. Every mission ran is written to the disk as a single
 record that includes the plan, the checks, the guidance turns, light timeline and what model was used for vision and planning. Every condition is checked is listed with its answer. Test levels L0-L5
 can also be tagged on mission runs so that they can be grouped without reading every command.
-
-\mysection{Summary of design decisions}{Summary of Design Decisions}
-\label{sec:design_decisions}
-
-
-
-Table~\ref{tab:decisions} lists the decisions that shape the rest of the report,
-with the reason for each and the alternative I turned down.
-
-\begin{table}[htbp]
-  \centering
-  \caption{The main design decisions.}
-  \label{tab:decisions}
-  \small
-  \begin{tabular}{@{}p{3.6cm} p{5.6cm} p{4.0cm}@{}}
-    \toprule
-    Decision & Reason & Turned down \\
-    \midrule
-    Models on a separate machine & About 7\,GB of models do not fit on the Pi. & Everything on the Pi, with a much smaller model. \\
-    Reactive layer stays on the Pi & A model call takes 15\,s, steering needs 30 to 100\,ms. & Closing the loop through the vision model. \\
-    Room as a text digest & A map is a separate system and out of scope. & Building a map from the walkthrough. \\
-    Ask before departure only & The person may not be present once the rover is moving. & Asking when confidence drops mid-mission. \\
-    Unclear confirmation means stay & A missed yes is cheap, a missed no is not. & Moving on a best guess. \\
-    Vocabulary stated in the prompt and audited & Lets me measure how often the planner leaves it. & Silently correcting every plan. \\
-    Vocabulary enforced on recovery plans & Nobody hears a recovery plan before it runs. & Trusting the prompt alone. \\
-    Recovery only on failure & Keeps it distinct from clarification. & One mechanism for both. \\
-    Unsure condition means ask & A wrong guessed branch looks like a correct one. & Defaulting to yes or no. \\
-    Condition action offered only when needed & Keeps the prompt short and stops a condition being invented. & Listing every action in every prompt. \\
-    A recovery plan must retry the approach & A plan that walks away from the failed step is not recovery. & Accepting any valid plan. \\
-    Gimbal-first search & Pan angles are known, pivots drift. & Spinning the chassis to look. \\
-    Two-signal arrival & Neither sonar nor a 3B vision model is reliable alone. & Trusting the first positive. \\
-    Fixed hop as default, variable as option & The distance estimate is uncalibrated, and I want it tested first. & Committing to the variable hop. \\
-    \bottomrule
-  \end{tabular}
-\end{table}

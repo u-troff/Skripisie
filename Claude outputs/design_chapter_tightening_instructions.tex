@@ -1,0 +1,254 @@
+% ============================================================
+% DRAFT ONLY — not meant to compile, nothing \input's this file.
+%
+% WHAT THIS IS: edit-by-edit instructions for tightening
+% design.tex, covering the subsections you flagged (State Machine,
+% Failure Recovery, Conditional Commands) plus the Table 3.1 trim
+% we discussed. I left Plan Check, Confirmation and Later Moments
+% untouched since you said those are fine.
+%
+% Format per edit: CURRENT (commented, quoted from the live file so
+% you can find it with Ctrl+F) then REPLACE WITH (not commented —
+% paste that text in directly). Section headers and \label{} lines
+% are never touched, only body text.
+%
+% ONE EDIT NEEDS A COMPANION CHANGE IN implementation.tex — marked
+% clearly below (EDIT 3). Skipping that half would genuinely lose a
+% technical detail (the halt() flag mechanism), not just shorten
+% something, so don't skip it.
+% ============================================================
+
+
+% ============================================================
+% EDIT 1 — Table 3.1 (User and functional requirements)
+% Drop the "Objective" column (it only re-points at the Objectives
+% list, adds nothing new) and tighten the requirement wording. Keeps
+% the FR/NR IDs intact since NR1, NR3 and FR9 are cited elsewhere in
+% this chapter (System Architecture and Reporting) — cutting the
+% table entirely would orphan those three citations.
+%
+% CURRENT: the whole \begin{table}[htbp] ... \end{table} environment
+% under \label{tab:requirements} (the one with the "ID / Requirement
+% / Objective" header row).
+%
+% REPLACE WITH:
+
+\begin{table}[htbp]
+  \centering
+  \caption{Functional (FR) and non-functional (NR) requirements.}
+  \label{tab:requirements}
+  \small
+  \begin{tabular}{@{}l p{10.8cm}@{}}
+    \toprule
+    ID & Requirement \\
+    \midrule
+    FR1 & Take the command by voice and transcribe it locally. \\
+    FR2 & Check the command against the room before planning, and ask a spoken question when it is ambiguous, up to a fixed number of questions. \\
+    FR3 & Produce a plan that uses only actions the rover has and objects the room contains. \\
+    FR4 & Read the plan back and move only after a spoken confirmation; a rejection returns to the dialogue rather than ending it. \\
+    FR5 & Stop without consulting a model when an obstacle blocks a step. \\
+    FR6 & Use the camera to check progress and arrival during a step. \\
+    FR7 & Report whether the rover completed the steps and flag anything it was unsure about. \\
+    FR8 & On a failure (never on ambiguity), ask the person what to do next and carry on from where the rover is. \\
+    FR9 & Log every model call and decision made, to support debugging. \\
+    FR10 & On a conditional command, decide the condition once, run only the matching steps, and ask the person when the camera cannot tell. Never guess a branch. \\
+    FR11 & When asked what is near a target, report what surrounds it, not only whether the target was reached. \\
+    NR1 & Run planning, vision and speech on consumer-grade hardware (e.g.\ a Ryzen 5 3600, 16\,GB RAM, 12\,GB GPU). Cloud models are allowed only as a benchmark. \\
+    NR2 & Keep the rover stoppable when the network or a model is slow or unavailable. \\
+    NR3 & Use only a camera, an ultrasonic sensor and a line sensor — no encoders, IMU or lidar. \\
+    NR4 & Let the planner or vision model be swapped by configuration, with no change to the pipeline code. \\
+    NR5 & Show the rover's state without a screen, using onboard lights. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+% ============================================================
+% EDIT 2 — State Machine (\label{ssec:statemachine})
+% Cuts one sentence that just restates "capped at five questions"
+% a second time, and fixes typos along the way (wether/whether,
+% sued/used, quetion/question, coould/could, textt/texttt,
+% "I am no fully sure I understoon"/"I am not fully sure I
+% understood").
+%
+% CURRENT: the full body of \mysubsection{The dialogue as a state
+% machine}{State Machine}, from "The command spoke moves through..."
+% down to "...could result in letting every command through."
+%
+% REPLACE WITH:
+
+The command moves through the phases in Figure~\ref{fig:states}. In \texttt{CLARIFYING}, the
+vision model is asked whether the command is ambiguous, given the command and the scene
+digest, and answers in JSON with four fields: whether it is ambiguous, why, a question to ask,
+and a rewritten command. An ambiguous command gets the question spoken and the answer added to
+the history; a clear command uses the rewritten version from then on, which only names objects
+and avoids words like `left' or `behind you', since those are relative to the camera's
+position when asked and can be wrong once the rover moves.
+
+The loop is capped at five questions, after which the session is marked capped and planning
+proceeds from whichever command is available — rewritten if a question was answered, original
+if none was. A question already asked is dropped from the next round; if that leaves nothing
+new to ask, the loop breaks early onto planning. The read-back plan is prefixed with a warning
+(`I am not fully sure I understood') whenever the session was capped, so the person knows the
+plan is not certain.
+
+If the vision model fails to load, it is retried once; a second failure tells the person and
+asks them to repeat the command, rather than letting it through unchecked.
+
+
+% ============================================================
+% EDIT 3 — Failure Recovery (\label{sec:recovery})
+% THREE separate changes in this section. The third one MOVES a
+% paragraph to implementation.tex rather than cutting it — see the
+% companion edit at the bottom of this block. Do all three or the
+% halt() mechanism disappears from the report entirely.
+
+% --- 3a: opening paragraph ---
+% CURRENT: "From the pre-video recording which generates the scene
+% digest. New objects can be introduced into the room or old objects
+% can be removed. Situations like an 'orange box' being behind a
+% chair or a bag is left in the rovers path. If the rover reached the
+% desired destination the plan named but the camera sees a different
+% scene. This is a case where the plan was correct but the world did
+% not coporate."
+%
+% REPLACE WITH:
+
+The pre-recorded scene digest can go stale: an object can be moved, removed, or something new
+(a bag left in the rover's path) can appear by the time the rover gets there. If the rover
+reaches the location the plan named but the camera sees a different scene, the plan was
+correct but the world did not cooperate.
+
+% --- 3b: the guidance-response paragraph ---
+% CURRENT: "The person can then repond by answering what the rover
+% should do next.  The planner can then write a new plan for what
+% it still has to do given  the original command, the steps that it
+% already completed, the steps that failed and why it failed. What
+% the rover has already seen and the conversation up until that
+% point. The prompt then tells the planner to use the answer to
+% decide where to look or what to reach instead. If the person says
+% where the target is, the rover should turn that way and approach
+% the target again."
+%
+% REPLACE WITH:
+
+The person responds with what the rover should do next. The planner then writes a new plan
+using the original command, the steps already completed, the failed step and why, what the
+rover has seen, and the conversation so far, with the person's answer used to decide where to
+look or what to approach instead — if they name where the target is, the rover turns that way
+and tries the approach again.
+
+% --- 3c: the halt() / TurboPi flag paragraph — MOVE, don't cut ---
+% CURRENT (last paragraph of the section): "The \texttt{halt()}
+% function is not called in a recovery stage. If a step is blocked
+% it stops counting the time it tales to execute that step.The
+% turboPi then sets a \texttt{halt()} flag that only the next
+% \texttt{execute\_step} clears. Since the free-roam approach in
+% Section~\ref{ssec:freeroam} directly calls the drive commands on
+% the rover, a flag that is not cleared could cause issues down the
+% line."
+%
+% This is implementation detail, not design reasoning — it belongs
+% in implementation.tex next to the other recovery-loop code detail,
+% not here. REPLACE the paragraph above WITH this one line in
+% design.tex:
+
+Entering recovery does not itself call \texttt{halt()} — how the rover is kept stopped across
+a blocked step is implementation detail, covered in Section~\ref{ssec:guidance_loop}.
+
+% AND separately, add this new paragraph to implementation.tex, at
+% the end of \mysubsection{Failure reovery in code}{Failure Recovery
+% in Code} (\label{ssec:guidance_loop}) — it isn't there yet:
+
+\texttt{halt()} is not called when entering recovery itself. A blocked step stops the rover's
+step-timing clock, and the TurboPi sets a \texttt{halt()} flag that only the next
+\texttt{execute\_step} call clears. This matters because the free-roam approach
+(Section~\ref{ssec:freeroam}) calls the drive commands directly, so a flag left set could
+otherwise block the next approach step from moving at all.
+
+
+% ============================================================
+% EDIT 4 — Conditional Commands (\label{sec:conditional})
+% Four small tightenings through the section; typos fixed along the
+% way (decisioins/decisions, seperated/separated, repond/respond,
+% continueally/continually, "Rather than guaranteeing" fragment-style
+% phrasing cleaned up where it occurs here too).
+
+% --- 4a ---
+% CURRENT: "A conditional command, which is level L4 test in
+% Table~\ref{tab:command-levels},asks the rover to make a decision on
+% something and act on the answer: 'check whether the orange box is
+% visible, and if it is, go to it, otherwise stop'. Who actually
+% makes the decision in this case. The planner writes both branches
+% up front, before anything moves, and the rover only evaluates the
+% one condition at the moment it matters. This allows the planner to
+% do the thing it is good at, and turning words into structured plan.
+% Then leaving the single judgements that need a vision model call to
+% the camera and vision model."
+%
+% REPLACE WITH:
+
+A conditional command (level L4 in Table~\ref{tab:command-levels}) asks the rover to decide
+something and act on the answer, e.g.\ `check whether the orange box is visible, and if it is,
+go to it, otherwise stop'. The planner writes both branches up front, before anything moves,
+and the rover evaluates only the one condition that matters at the time — letting the planner
+do what it is good at, turning words into a structured plan, while leaving the single judgement
+that needs a camera and vision model to the point where it actually matters.
+
+% --- 4b ---
+% CURRENT: "When the rover reaches a \texttt{check} step in the plan.
+% The rover centers the gimbal, waits half a second for it to settle,
+% and then takes one frame (Figure~\ref{fig:cond}). The vision model
+% is asked whether the stated condition is true of what is visible
+% and it can answer yes, no or unsure. Now this loop can remembers
+% the answer. Every later step tagged with that answer is skipped and
+% logged as skipped. The run record now can show which branch ran and
+% which did not."
+%
+% REPLACE WITH:
+
+At a \texttt{check} step, the rover centres the gimbal, waits half a second to settle, and
+takes one frame (Figure~\ref{fig:cond}). The vision model answers yes, no or unsure for the
+stated condition; every later step tagged with the opposite answer is skipped and logged as
+skipped, so the run record shows which branch ran.
+
+% --- 4c ---
+% CURRENT: "Now the choice of what happens on the 'unsure', and on a
+% failed vision call. The step returns \texttt{blocked}, and the
+% existing recovery loop (Section~\ref{sec:recovery}) asks the person
+% what to do. There is no default branch added and if the rover
+% guesses 'no' continually it would prompt the rover to go to the
+% incorrect object continueally without anyone understanding if it
+% was working."
+%
+% REPLACE WITH:
+
+An `unsure' answer, or a failed vision call, returns \texttt{blocked} and goes to the existing
+recovery loop (Section~\ref{sec:recovery}) rather than defaulting to a branch — a rover that
+silently guessed `no' every time could run for a long time without anyone noticing it wasn't
+working.
+
+% --- 4d ---
+% CURRENT: "There are limits, and I would state them here. The check
+% is one frame from wherever the rover is standing. It does not
+% search. A condition about an object just outside the camera view
+% will come back with a 'no' or 'unsure' even if the object is in the
+% room. The results depends on where the rover is facing."
+%
+% REPLACE WITH:
+
+The check is limited to one frame from wherever the rover is standing — it does not search, so
+a condition about an object just outside the camera's view can come back `no' or `unsure' even
+though the object is in the room; the result depends on which way the rover happens to be
+facing.
+
+% ============================================================
+% Rough page impact: Edit 1 ~0.3 page, Edit 2 ~0.2 page, Edit 3
+% ~0.15 page (plus the moved paragraph, net page count for Design
+% unaffected by the move itself since it's leaving the chapter, not
+% getting cut — implementation gains it back), Edit 4 ~0.2 page.
+% Call it under a page total from these four. Getting from ~18 pages
+% to 10 still needs the flow-diagrams-to-appendix move and a similar
+% pass over System Architecture and Free-roam Approach, which we
+% haven't touched yet — flag if you want those done the same way.
+% ============================================================
